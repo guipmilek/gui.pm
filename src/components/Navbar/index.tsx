@@ -1,5 +1,7 @@
 'use client'
 
+import { useEffect } from 'react'
+
 import Link from 'next/link'
 
 import { useActiveItem } from '@/hooks/useActiveItem'
@@ -20,6 +22,24 @@ const sectionsIds = sectionInfos.map((sectionInfo) => sectionInfo.id)
 
 export function Navbar() {
   const activeSection = useActiveItem(sectionsIds, sectionsIds[0])
+
+  useEffect(() => {
+    if ('scrollRestoration' in history) {
+      history.scrollRestoration = 'manual'
+    }
+
+    const hash = window.location.hash
+    if (hash) {
+      setTimeout(() => {
+        const element = document.querySelector(hash)
+        if (element) {
+          element.scrollIntoView({ behavior: 'smooth' })
+        }
+      }, 100)
+    } else {
+      window.scrollTo(0, 0)
+    }
+  }, [])
 
   return (
     <NavbarContainer>

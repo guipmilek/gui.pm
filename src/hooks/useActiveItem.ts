@@ -7,6 +7,13 @@ export function useActiveItem(
   const [activeId, setActiveId] = useState<string>(defaultActiveItemId || '')
 
   useEffect(() => {
+    if (window.location.hash) {
+      const hashId = window.location.hash.substring(1)
+      if (itemIds.includes(hashId)) {
+        setActiveId(hashId)
+      }
+    }
+
     const observer = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {

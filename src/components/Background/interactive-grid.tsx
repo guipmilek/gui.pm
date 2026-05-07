@@ -168,6 +168,13 @@ export function InteractiveGrid() {
     const maxStars = window.innerWidth >= 1024 ? MAX_STARS : 8
 
     let running = true
+    let isMouseInside = true
+    let glowOpacity = 0
+
+    const onMouseEnter = () => { isMouseInside = true }
+    const onMouseLeave = () => { isMouseInside = false }
+    document.documentElement.addEventListener('mouseenter', onMouseEnter)
+    document.documentElement.addEventListener('mouseleave', onMouseLeave)
 
     const updateSize = () => {
       const dpr = window.devicePixelRatio || 1
@@ -246,11 +253,16 @@ export function InteractiveGrid() {
         const rect = canvas.getBoundingClientRect()
         const mx = positionRef.current.x - rect.left
         const my = positionRef.current.y - rect.top
-        if (mx > 0 && my > 0 && mx < w && my < h) {
-          const EASING = 0.20
-          smoothRef.current.x += (mx - smoothRef.current.x) * EASING
-          smoothRef.current.y += (my - smoothRef.current.y) * EASING
+        
+        const EASING = 0.20
+        smoothRef.current.x += (mx - smoothRef.current.x) * EASING
+        smoothRef.current.y += (my - smoothRef.current.y) * EASING
 
+        const inBounds = mx > 0 && my > 0 && mx < w && my < h
+        const targetOpacity = isMouseInside && inBounds ? 1 : 0
+        glowOpacity += (targetOpacity - glowOpacity) * 0.15
+
+        if (glowOpacity > 0.01) {
           const { x: sx, y: sy } = smoothRef.current
 
           glowCtx.clearRect(0, 0, w, h)
@@ -259,6 +271,7 @@ export function InteractiveGrid() {
           glowCtx.globalCompositeOperation = 'destination-in'
           glowCtx.save()
           glowCtx.translate(sx - R, sy - R)
+          glowCtx.globalAlpha = glowOpacity
           glowCtx.drawImage(maskCanvas, 0, 0)
           glowCtx.restore()
           glowCtx.globalCompositeOperation = 'source-over'
@@ -317,6 +330,8 @@ export function InteractiveGrid() {
       observer.disconnect()
       document.removeEventListener('visibilitychange', onVisibility)
       window.removeEventListener('pageshow', onPageShow)
+      document.documentElement.removeEventListener('mouseenter', onMouseEnter)
+      document.documentElement.removeEventListener('mouseleave', onMouseLeave)
     }
   }, [positionRef])
 
