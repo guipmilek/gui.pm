@@ -5,13 +5,15 @@ const nextConfig = {
   },
 
   images: {
-    remotePatterns: [
-      {
-        protocol: process.env.API_REMOTEPATTERNS_PROTOCOL || 'https',
-        hostname: process.env.API_REMOTEPATTERNS_HOSTNAME || 'localhost',
-        pathname: process.env.API_REMOTEPATTERNS_PATHNAME || '/**',
-      },
-    ],
+    remotePatterns: process.env.API_REMOTEPATTERNS_HOSTNAME
+      ? [
+          {
+            protocol: process.env.API_REMOTEPATTERNS_PROTOCOL || 'https',
+            hostname: process.env.API_REMOTEPATTERNS_HOSTNAME,
+            pathname: process.env.API_REMOTEPATTERNS_PATHNAME || '/**',
+          },
+        ]
+      : [],
   },
 
   async redirects() {
