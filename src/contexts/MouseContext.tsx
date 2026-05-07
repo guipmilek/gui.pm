@@ -22,19 +22,13 @@ export function MouseProvider({ children }: { children: ReactNode }) {
     const isCoarse = window.matchMedia('(pointer: coarse)').matches
     if (isCoarse) return
 
-    let rafId: number | null = null
     let clientX = INITIAL_POSITION.x
     let clientY = INITIAL_POSITION.y
-    let hasMoved = false
-
-    const updatePosition = () => {
-      positionRef.current = { x: clientX, y: clientY }
-      rafId = null
-    }
 
     const hideStyle = document.createElement('style')
     hideStyle.id = 'custom-cursor-hide'
-    hideStyle.textContent = 'html * { cursor: none !important; }'
+    hideStyle.textContent =
+      'html :not(input):not(textarea):not([contenteditable]) { cursor: none !important; }'
 
     function hideNativeCursor() {
       if (!document.getElementById('custom-cursor-hide')) {
@@ -49,25 +43,18 @@ export function MouseProvider({ children }: { children: ReactNode }) {
     const onMouseMove = (event: MouseEvent) => {
       clientX = event.clientX
       clientY = event.clientY
-      if (!hasMoved) {
-        hasMoved = true
-        hideNativeCursor()
-      }
-      if (rafId === null) {
-        rafId = requestAnimationFrame(updatePosition)
-      }
+      positionRef.current = { x: clientX, y: clientY }
     }
 
     const onMouseEnter = () => {
-      if (hasMoved) hideNativeCursor()
+      hideNativeCursor()
     }
     const onMouseLeave = () => {
       showNativeCursor()
     }
 
     function restore() {
-      rafId = null
-      if (hasMoved) hideNativeCursor()
+      hideNativeCursor()
       document.documentElement.addEventListener('mouseenter', onMouseEnter)
       document.documentElement.addEventListener('mouseleave', onMouseLeave)
       window.addEventListener('mousemove', onMouseMove)
@@ -75,7 +62,6 @@ export function MouseProvider({ children }: { children: ReactNode }) {
 
     const onPageShow = (event: PageTransitionEvent) => {
       if (event.persisted) {
-        hasMoved = true
         clientX = positionRef.current.x
         clientY = positionRef.current.y
         restore()
@@ -90,7 +76,6 @@ export function MouseProvider({ children }: { children: ReactNode }) {
       document.documentElement.removeEventListener('mouseleave', onMouseLeave)
       window.removeEventListener('mousemove', onMouseMove)
       window.removeEventListener('pageshow', onPageShow)
-      if (rafId !== null) cancelAnimationFrame(rafId)
       showNativeCursor()
     }
   }, [])

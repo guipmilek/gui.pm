@@ -13,16 +13,9 @@ interface ShootingStar {
   startTime: number
 }
 
-interface Ripple {
-  x: number
-  y: number
-  startTime: number
-}
-
 const BIG_SIZE = 80
 const SMALL_SIZE = 20
 const TRAIL_LENGTH = 150
-const RIPPLE_DURATION = 1000
 const MAX_STARS = 15
 const STAR_THICKNESS = 1
 
@@ -34,7 +27,6 @@ const STAR_SPEED_MAX = 4500
 const GRID_BIG = 'rgba(113, 113, 122, 0.15)'
 const GRID_SMALL = 'rgba(113, 113, 122, 0.07)'
 const HOVER_RADIUS = 280
-const RIPPLE_COLOR = 'rgba(56, 189, 248, 0.4)'
 const STAR_COLOR = 'rgba(148, 163, 184, 0.85)'
 
 function drawGrid(
@@ -121,48 +113,16 @@ function drawStars(
   ctx.globalAlpha = 1
 }
 
-function drawRipples(
-  ctx: CanvasRenderingContext2D,
-  now: number,
-  ripples: Ripple[],
-) {
-  for (let i = ripples.length - 1; i >= 0; i--) {
-    const ripple = ripples[i]
-    const elapsed = now - ripple.startTime
-    const progress = elapsed / RIPPLE_DURATION
-
-    if (progress >= 1) {
-      ripples.splice(i, 1)
-      continue
-    }
-
-    const alpha = (1 - progress) ** 2 * 0.5
-    const radius = progress * 200
-
-    ctx.strokeStyle = RIPPLE_COLOR
-    ctx.globalAlpha = alpha
-    ctx.lineWidth = 1.5
-    ctx.beginPath()
-    ctx.arc(ripple.x, ripple.y, radius, 0, Math.PI * 2)
-    ctx.stroke()
-  }
-
-  ctx.globalAlpha = 1
-}
-
 export function InteractiveGrid() {
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const starsRef = useRef<ShootingStar[]>([])
-  const ripplesRef = useRef<Ripple[]>([])
-  // Canvas logical dimensions — separate from DPR-scaled pixel dimensions.
   const sizeRef = useRef({ w: 0, h: 0 })
   const animRef = useRef(0)
   const spawnIdRef = useRef<ReturnType<typeof setTimeout>>(undefined)
-  // Cached gradient — rebuilt only on resize.
   const vignetteRef = useRef<CanvasGradient | null>(null)
-  // Smoothed mouse position for the hover glow — mutated in place.
   const smoothRef = useRef({ x: -100, y: -100 })
   const isTouchRef = useRef(true)
+  const prefersReducedMotionRef = useRef(false)
 
   const positionRef = useMousePosition()
 
@@ -172,20 +132,19 @@ export function InteractiveGrid() {
     const ctx = canvas.getContext('2d')
     if (!ctx) return
 
-    // Off-screen canvas for the mouse hover glow layer.
     const glowCanvas = document.createElement('canvas')
     const glowCtx = glowCanvas.getContext('2d')
     if (!glowCtx) return
 
-    // Detect pointer type once — no need for a separate effect.
     isTouchRef.current = !window.matchMedia('(pointer: fine)').matches
+    prefersReducedMotionRef.current = window.matchMedia(
+      '(prefers-reduced-motion: reduce)',
+    ).matches
 
     let running = true
 
     const updateSize = () => {
       const dpr = window.devicePixelRatio || 1
-      // The canvas is position:absolute inset:0 so its rect.left/top are
-      // always 0 — we only need the CSS dimensions.
       const w = canvas.offsetWidth
       const h = canvas.offsetHeight
 
@@ -199,7 +158,6 @@ export function InteractiveGrid() {
 
       sizeRef.current = { w, h }
 
-      // Rebuild the vignette gradient after every resize — it depends on w/h.
       const cx = w / 2
       const cy = h / 2
       const maxDim = Math.max(w, h)
@@ -210,6 +168,7 @@ export function InteractiveGrid() {
     }
 
     const doSpawn = () => {
+      if (prefersReducedMotionRef.current) return
       const { w, h } = sizeRef.current
       if (w === 0 || h === 0) return
       if (starsRef.current.length >= MAX_STARS) return
@@ -262,14 +221,10 @@ export function InteractiveGrid() {
       drawGrid(ctx, w, h, SMALL_SIZE, GRID_SMALL, 0.6)
       drawGrid(ctx, w, h, BIG_SIZE, GRID_BIG, 0.8)
 
-      // Mouse hover glow — desktop only, reads position directly from the ref.
       if (!isTouchRef.current) {
         const { x: mx, y: my } = positionRef.current
-        // positionRef uses client coordinates; the canvas is inset:0
-        // so client coords map directly onto canvas coords.
         if (mx > 0 && my > 0 && mx < w && my < h) {
-          const EASING = 0.08
-          // Mutate in place — no object allocation per frame.
+          const EASING = 0.18
           smoothRef.current.x += (mx - smoothRef.current.x) * EASING
           smoothRef.current.y += (my - smoothRef.current.y) * EASING
 
@@ -281,9 +236,9 @@ export function InteractiveGrid() {
 
           glowCtx.globalCompositeOperation = 'destination-in'
           const mask = glowCtx.createRadialGradient(sx, sy, 0, sx, sy, HOVER_RADIUS)
-          mask.addColorStop(0, 'rgba(0,0,0,0.50)')
-          mask.addColorStop(0.2, 'rgba(0,0,0,0.30)')
-          mask.addColorStop(0.5, 'rgba(0,0,0,0.08)')
+          mask.addColorStop(0, 'rgba(0,0,0,0.75)')
+          mask.addColorStop(0.2, 'rgba(0,0,0,0.45)')
+          mask.addColorStop(0.5, 'rgba(0,0,0,0.12)')
           mask.addColorStop(1, 'rgba(0,0,0,0)')
           glowCtx.fillStyle = mask
           glowCtx.fillRect(0, 0, w, h)
@@ -294,9 +249,7 @@ export function InteractiveGrid() {
       }
 
       drawStars(ctx, w, h, timestamp, starsRef.current)
-      drawRipples(ctx, timestamp, ripplesRef.current)
 
-      // Apply the vignette using the cached gradient (rebuilt only on resize).
       if (vignetteRef.current) {
         ctx.save()
         ctx.globalCompositeOperation = 'destination-in'
@@ -337,7 +290,6 @@ export function InteractiveGrid() {
       ctx.clearRect(0, 0, w, h)
       drawGrid(ctx, w, h, SMALL_SIZE, GRID_SMALL, 0.6)
       drawGrid(ctx, w, h, BIG_SIZE, GRID_BIG, 0.8)
-      // Hide the CSS fallback grid once the canvas is ready.
       const fallback = document.getElementById('grid-fallback')
       if (fallback) fallback.style.display = 'none'
     }
@@ -360,14 +312,6 @@ export function InteractiveGrid() {
     }
   }, [positionRef])
 
-  const handleClick = (e: React.MouseEvent<HTMLCanvasElement>) => {
-    ripplesRef.current.push({
-      x: e.clientX,
-      y: e.clientY,
-      startTime: performance.now(),
-    })
-  }
-
   return (
     <canvas
       ref={canvasRef}
@@ -376,9 +320,7 @@ export function InteractiveGrid() {
         inset: 0,
         width: '100%',
         height: '100%',
-        pointerEvents: 'auto',
       }}
-      onClick={handleClick}
       aria-hidden="true"
     />
   )
