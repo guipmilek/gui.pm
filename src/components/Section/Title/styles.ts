@@ -27,7 +27,7 @@ export const sectionTitleContainerStyles = cva({
 
       marginLeft: '-1.5rem',
 
-      content: '""',
+      content: "''",
 
       backdropFilter: 'blur(8px)',
 

@@ -37,7 +37,7 @@ export const customLinkStyles = cva({
         borderBottom: '1px solid',
         borderColor: 'primary',
 
-        content: '""',
+        content: "''",
 
         transition: 'width 0.2s',
       },
