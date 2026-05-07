@@ -6,7 +6,12 @@ import { ExperienceList } from '@/components/(sections)/ExperienceList'
 import { ProjectList } from '@/components/(sections)/ProjectList'
 import { AsideHeader } from '@/components/AsideHeader'
 import { Section } from '@/components/Section'
-import { AsideHeaderSkeleton, SectionSkeleton } from '@/components/Skeletons'
+import {
+  AboutMeSkeleton,
+  AsideHeaderSkeleton,
+  ExperienceListSkeleton,
+  ProjectListSkeleton,
+} from '@/components/Skeletons'
 
 import { HomeContainer } from './styles'
 
@@ -19,7 +24,7 @@ export default function Home() {
 
       <main>
         <Section id="about" sectionTitle="SOBRE">
-          <Suspense fallback={<SectionSkeleton />}>
+          <Suspense fallback={<AboutMeSkeleton />}>
             <AboutMe />
           </Suspense>
         </Section>
@@ -32,7 +37,7 @@ export default function Home() {
             url: '/curriculo.pdf',
           }}
         >
-          <Suspense fallback={<SectionSkeleton />}>
+          <Suspense fallback={<ExperienceListSkeleton />}>
             <ExperienceList />
           </Suspense>
         </Section>
@@ -45,7 +50,7 @@ export default function Home() {
             url: 'https://github.com/guipmilek?tab=repositories',
           }}
         >
-          <Suspense fallback={<SectionSkeleton />}>
+          <Suspense fallback={<ProjectListSkeleton />}>
             <ProjectList />
           </Suspense>
         </Section>

@@ -6,9 +6,15 @@ export interface Profile {
   links: Link[]
 }
 
+export interface QueryOptions<T> {
+  sort?: keyof T
+  order?: 'asc' | 'desc' | null
+  limit?: number | null
+}
+
 export interface DataProvider {
   getProfile(): Promise<Profile>
   getAbout(): Promise<string[]>
-  getExperiences(): Promise<Experience[]>
-  getProjects(): Promise<Project[]>
+  getExperiences(options?: QueryOptions<Experience>): Promise<Experience[]>
+  getProjects(options?: QueryOptions<Project>): Promise<Project[]>
 }

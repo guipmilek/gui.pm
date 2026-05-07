@@ -5,7 +5,7 @@ interface CustomDate {
   year: number
 }
 
-interface Link {
+export interface Link {
   type: keyof Icons
   title: string
   url: string

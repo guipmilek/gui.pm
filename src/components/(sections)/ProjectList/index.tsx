@@ -3,7 +3,11 @@ import { staticDataProvider } from '@/providers'
 import { CardList } from '@/theme/recipes/cardListRecipe'
 
 export async function ProjectList() {
-  const projects = await staticDataProvider.getProjects()
+  const projects = await staticDataProvider.getProjects({
+    sort: 'id',
+    order: 'desc',
+    limit: 3,
+  })
 
   return (
     <CardList>
