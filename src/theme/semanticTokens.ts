@@ -6,15 +6,15 @@ export const semanticTokens = defineSemanticTokens({
     primaryDark: { value: '{colors.skyDark.sky2}' },
 
     background: { value: '{colors.slateDark.slate1}' },
-    sectionTitleBackground: { value: '{colors.slateDarkA.slateA1/50}' },
-    cardBackground: { value: '{colors.slateDarkA.slateA4/25}' },
+    sectionTitleBackground: { value: '{colors.slateDarkA.slateA1-50}' },
+    cardBackground: { value: '{colors.slateDarkA.slateA4-25}' },
 
     cardTopBorder: {
-      value: '{colors.slateDarkA.slateA11/10}',
+      value: '{colors.slateDarkA.slateA11-10}',
     },
     imageBorder: {
-      base: { value: '{colors.slateDarkA.slateA12/10}' },
-      hover: { value: '{colors.slateDarkA.slateA12/30}' },
+      base: { value: '{colors.slateDarkA.slateA12-10}' },
+      hover: { value: '{colors.slateDarkA.slateA12-30}' },
     },
 
     title: { value: '{colors.slateDark.slate12}' },
@@ -22,12 +22,12 @@ export const semanticTokens = defineSemanticTokens({
     text: { value: '{colors.slateDark.slate11}' },
 
     gridLines: {
-      small: { value: '{colors.slateDarkA.slateA2/35}' },
-      big: { value: '{colors.slateDarkA.slateA2/75}' },
+      small: { value: '{colors.slateDarkA.slateA2-35}' },
+      big: { value: '{colors.slateDarkA.slateA2-75}' },
     },
 
-    cursorGradient: { value: '{colors.slateDarkA.slateA2/50}' },
-    cursor: { value: '{colors.slateDarkA.slateA12/30}' },
+    cursorGradient: { value: '{colors.slateDarkA.slateA2-50}' },
+    cursor: { value: '{colors.slateDarkA.slateA12-30}' },
   },
 
   gradients: {

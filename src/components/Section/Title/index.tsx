@@ -12,27 +12,32 @@ interface SectionTitleProps {
 
 export function SectionTitle({ sectionId, sectionTitle }: SectionTitleProps) {
   const ref = useRef<HTMLAnchorElement | null>(null)
-  const entry = useIntersectionObserver(ref, {
+  const { ref: observerRef, entry } = useIntersectionObserver({
     threshold: 1,
     rootMargin: '-1px 0px 0px 0px',
   })
   const [isPinned, setIsPinned] = useState(false)
 
-  const isStickyDetectionReady = !!entry
+  const isStickyDetectionReady = entry !== undefined
 
   const sectionLink = `#${sectionId}`
 
   useEffect(() => {
-    if (isStickyDetectionReady) {
+    if (isStickyDetectionReady && entry) {
       const elementVisibilityPercentage = entry.intersectionRatio
 
       setIsPinned(elementVisibilityPercentage < 1)
     }
-  }, [entry?.intersectionRatio, isStickyDetectionReady])
+  }, [entry, isStickyDetectionReady])
+
+  const setRefs = (node: HTMLAnchorElement | null) => {
+    ref.current = node
+    observerRef(node)
+  }
 
   return (
     <SectionTitleContainer
-      ref={ref}
+      ref={setRefs}
       href={sectionLink}
       className={isPinned ? 'pinned' : undefined}
       isSticky={isStickyDetectionReady}
