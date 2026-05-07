@@ -168,7 +168,6 @@ export function InteractiveGrid() {
     const maxStars = window.innerWidth >= 1024 ? MAX_STARS : 8
 
     let running = true
-    let resizeTimer: ReturnType<typeof setTimeout> | undefined
 
     const updateSize = () => {
       const dpr = window.devicePixelRatio || 1
@@ -243,9 +242,6 @@ export function InteractiveGrid() {
 
       ctx.clearRect(0, 0, w, h)
 
-      drawGrid(ctx, w, h, SMALL_SIZE, GRID_SMALL, 0.6)
-      drawGrid(ctx, w, h, BIG_SIZE, GRID_BIG, 0.8)
-
       if (!isTouchRef.current) {
         const rect = canvas.getBoundingClientRect()
         const mx = positionRef.current.x - rect.left
@@ -293,8 +289,6 @@ export function InteractiveGrid() {
         const { w, h } = sizeRef.current
         if (w > 0 && h > 0) {
           ctx.clearRect(0, 0, w, h)
-          drawGrid(ctx, w, h, SMALL_SIZE, GRID_SMALL, 0.6)
-          drawGrid(ctx, w, h, BIG_SIZE, GRID_BIG, 0.8)
         }
         running = true
         animRef.current = requestAnimationFrame(frame)
@@ -303,18 +297,11 @@ export function InteractiveGrid() {
     }
 
     updateSize()
-    const { w, h } = sizeRef.current
-    if (w > 0 && h > 0) {
-      ctx.clearRect(0, 0, w, h)
-      drawGrid(ctx, w, h, SMALL_SIZE, GRID_SMALL, 0.6)
-      drawGrid(ctx, w, h, BIG_SIZE, GRID_BIG, 0.8)
-      const fallback = document.getElementById('grid-fallback')
-      if (fallback) fallback.style.display = 'none'
-    }
 
     const observer = new ResizeObserver(() => {
-      clearTimeout(resizeTimer)
-      resizeTimer = setTimeout(updateSize, 100)
+      updateSize()
+      cancelAnimationFrame(animRef.current)
+      frame(performance.now())
     })
     observer.observe(canvas)
     document.addEventListener('visibilitychange', onVisibility)
@@ -328,7 +315,6 @@ export function InteractiveGrid() {
       cancelAnimationFrame(animRef.current)
       clearTimeout(spawnIdRef.current)
       observer.disconnect()
-      clearTimeout(resizeTimer)
       document.removeEventListener('visibilitychange', onVisibility)
       window.removeEventListener('pageshow', onPageShow)
     }

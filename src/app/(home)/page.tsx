@@ -1,32 +1,21 @@
 import Link from 'next/link'
-import { Suspense } from 'react'
 
 import { AboutMe } from '@/components/(sections)/AboutMe'
 import { ExperienceList } from '@/components/(sections)/ExperienceList'
 import { ProjectList } from '@/components/(sections)/ProjectList'
 import { AsideHeader } from '@/components/AsideHeader'
 import { Section } from '@/components/Section'
-import {
-  AboutMeSkeleton,
-  AsideHeaderSkeleton,
-  ExperienceListSkeleton,
-  ProjectListSkeleton,
-} from '@/components/Skeletons'
 
 import { HomeContainer } from './styles'
 
 export default function Home() {
   return (
     <HomeContainer>
-      <Suspense fallback={<AsideHeaderSkeleton />}>
-        <AsideHeader />
-      </Suspense>
+      <AsideHeader />
 
       <main>
         <Section id="about" sectionTitle="SOBRE">
-          <Suspense fallback={<AboutMeSkeleton />}>
-            <AboutMe />
-          </Suspense>
+          <AboutMe />
         </Section>
 
         <Section
@@ -37,9 +26,7 @@ export default function Home() {
             url: '/curriculo.pdf',
           }}
         >
-          <Suspense fallback={<ExperienceListSkeleton />}>
-            <ExperienceList />
-          </Suspense>
+          <ExperienceList />
         </Section>
 
         <Section
@@ -50,9 +37,7 @@ export default function Home() {
             url: 'https://github.com/guipmilek?tab=repositories',
           }}
         >
-          <Suspense fallback={<ProjectListSkeleton />}>
-            <ProjectList />
-          </Suspense>
+          <ProjectList />
         </Section>
       </main>
 
