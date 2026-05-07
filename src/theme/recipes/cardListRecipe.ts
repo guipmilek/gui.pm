@@ -1,7 +1,7 @@
 import { cva } from '@/styled-system/css'
 import { styled } from '@/styled-system/jsx'
 
-export const cardListRecipe = cva({
+const cardListRecipe = cva({
   base: {
     display: 'flex',
     flexDirection: 'column',

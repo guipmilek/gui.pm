@@ -28,14 +28,7 @@ export function useActiveItem(
     })
 
     return () => {
-      itemIds.forEach((id) => {
-        if (!id) return
-
-        const element = document.getElementById(id)
-        if (element) {
-          observer.unobserve(element)
-        }
-      })
+      observer.disconnect()
     }
   }, [itemIds])
 

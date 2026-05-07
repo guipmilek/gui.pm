@@ -15,13 +15,6 @@ export const textStyles = defineTextStyles({
     },
   },
 
-  md: {
-    value: {
-      fontSize: '1rem',
-      lineHeight: '1.5rem',
-    },
-  },
-
   xl: {
     value: {
       fontSize: '1.25rem',

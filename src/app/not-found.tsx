@@ -19,7 +19,7 @@ export default function NotFound() {
       <span
         className={css({
           color: 'primary',
-          textStyle: '2xl',
+          textStyle: '3xl',
           fontWeight: 'bold',
           lineHeight: '1',
         })}

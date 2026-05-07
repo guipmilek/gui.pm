@@ -23,7 +23,7 @@ export function Navbar() {
 
   return (
     <NavbarContainer>
-      {sectionInfos.map((sectionInfo, index) => {
+      {sectionInfos.map((sectionInfo) => {
         const { id, text } = sectionInfo
 
         const sectionId = `#${id}`

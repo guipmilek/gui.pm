@@ -70,6 +70,10 @@ export const Bio = styled('div', {
 
         animation: 'glitchAnimation1 2s infinite linear 0s alternate-reverse',
 
+        '@media (prefers-reduced-motion: reduce)': {
+          animation: 'none',
+        },
+
         '&::before, &::after': {
           visibility: 'hidden',
 
