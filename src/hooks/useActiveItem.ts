@@ -18,7 +18,13 @@ export function useActiveItem(
       (entries) => {
         entries.forEach((entry) => {
           if (entry.isIntersecting) {
-            setActiveId(entry.target.id)
+            const newId = entry.target.id
+            setActiveId(newId)
+
+            const currentHash = window.location.hash.substring(1)
+            if (currentHash !== newId) {
+              window.history.replaceState(null, '', `#${newId}`)
+            }
           }
         })
       },
