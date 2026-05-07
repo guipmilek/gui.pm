@@ -1,9 +1,8 @@
-import Link from 'next/link'
+import { cva } from '@/styled-system/css'
 
-import { styled } from '@/styled-system/jsx'
-
-export const SectionTitleContainer = styled(Link, {
+export const sectionTitleContainerStyles = cva({
   base: {
+    display: 'block',
     top: 0,
     zIndex: 2,
 

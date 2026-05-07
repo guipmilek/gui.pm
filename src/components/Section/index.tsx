@@ -1,7 +1,8 @@
+import Link from 'next/link'
 import { ComponentPropsWithoutRef, ReactNode } from 'react'
 import { RxArrowRight } from 'react-icons/rx'
 
-import { CustomLink, SectionContainer } from './styles'
+import { customLinkStyles, SectionContainer } from './styles'
 import { SectionTitle } from './Title'
 
 interface SectionProps extends ComponentPropsWithoutRef<'section'> {
@@ -32,15 +33,16 @@ export function Section({
       {children}
 
       {hasLink && (
-        <CustomLink
+        <Link
           href={link.url}
+          className={customLinkStyles()}
           {...(isExternalURL && {
             target: '_blank',
             rel: 'noopener noreferrer',
           })}
         >
           <span>{link.text}</span> <RxArrowRight size={12} />
-        </CustomLink>
+        </Link>
       )}
     </SectionContainer>
   )

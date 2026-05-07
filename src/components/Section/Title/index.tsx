@@ -1,9 +1,10 @@
 'use client'
 
+import Link from 'next/link'
 import { useEffect, useRef, useState } from 'react'
 import { useIntersectionObserver } from 'usehooks-ts'
 
-import { SectionTitleContainer } from './styles'
+import { sectionTitleContainerStyles } from './styles'
 
 interface SectionTitleProps {
   sectionId: string
@@ -36,13 +37,12 @@ export function SectionTitle({ sectionId, sectionTitle }: SectionTitleProps) {
   }
 
   return (
-    <SectionTitleContainer
+    <Link
       ref={setRefs}
       href={sectionLink}
-      className={isPinned ? 'pinned' : undefined}
-      isSticky={isStickyDetectionReady}
+      className={`${sectionTitleContainerStyles({ isSticky: isStickyDetectionReady })}${isPinned ? ' pinned' : ''}`}
     >
       <h2>{sectionTitle}</h2>
-    </SectionTitleContainer>
+    </Link>
   )
 }

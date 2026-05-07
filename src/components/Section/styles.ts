@@ -1,5 +1,4 @@
-import Link from 'next/link'
-
+import { cva } from '@/styled-system/css'
 import { styled } from '@/styled-system/jsx'
 
 export const SectionContainer = styled('section', {
@@ -14,7 +13,7 @@ export const SectionContainer = styled('section', {
   },
 })
 
-export const CustomLink = styled(Link, {
+export const customLinkStyles = cva({
   base: {
     width: 'fit-content',
 
