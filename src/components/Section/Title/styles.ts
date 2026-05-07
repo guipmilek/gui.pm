@@ -2,7 +2,6 @@ import { cva } from '@/styled-system/css'
 
 export const sectionTitleContainerStyles = cva({
   base: {
-    position: 'relative',
     display: 'block',
     top: 0,
     zIndex: 2,
@@ -31,7 +30,6 @@ export const sectionTitleContainerStyles = cva({
       content: '""',
 
       backdropFilter: 'blur(8px)',
-      WebkitBackdropFilter: 'blur(8px)',
 
       md: {
         width: 'calc(100% + (3rem * 2))',
