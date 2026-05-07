@@ -2,37 +2,48 @@ import { styled } from '@/styled-system/jsx'
 
 export const CardItemContainer = styled('li', {
   base: {
+    position: 'relative',
+    isolation: 'isolate',
+
     '&:hover': {
       '& header img': {
         borderColor: 'imageBorder.hover',
       },
     },
 
-    lg: {
-      position: 'relative',
+    '&::before': {
+      opacity: 1,
 
+      position: 'absolute',
+      inset: '-1.5rem',
+      zIndex: 0,
+
+      backgroundColor: 'cardBackground',
+      width: 'calc(100% + (1.5rem * 2))',
+      height: 'calc(100% + (1.5rem * 2))',
+
+      padding: '1.5rem',
+      borderTop: '1px solid',
+      borderColor: 'cardTopBorder',
+      borderRadius: '6px',
+
+      boxShadow: 'card',
+
+      content: "''",
+      pointerEvents: 'none',
+
+      backdropBlurSafe: '4px',
+
+      transition: 'opacity 0.2s',
+
+      '@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px)))': {
+        backgroundColor: 'slateDark.slate2',
+      },
+    },
+
+    '@media (hover: hover) and (pointer: fine)': {
       '&::before': {
         opacity: 0,
-
-        position: 'absolute',
-        inset: '-1.5rem',
-
-        backgroundColor: 'cardBackground',
-        width: 'calc(100% + (1.5rem * 2))',
-        height: 'calc(100% + (1.5rem * 2))',
-
-        padding: '1.5rem',
-        borderTop: '1px solid',
-        borderColor: 'cardTopBorder',
-        borderRadius: '6px',
-
-        boxShadow: 'card',
-
-        content: "''",
-
-        backdropFilter: 'blur(4px)',
-
-        transition: 'opacity 0.2s',
       },
 
       '&:hover': {
@@ -54,6 +65,9 @@ export const CardItemContainer = styled('li', {
 
 export const CardItemContent = styled('div', {
   base: {
+    position: 'relative',
+    zIndex: 1,
+
     display: 'flex',
     flexDirection: 'column',
     gap: '1rem',
@@ -64,9 +78,6 @@ export const CardItemContent = styled('div', {
     },
 
     lg: {
-      position: 'relative',
-      zIndex: 1,
-
       gridTemplateColumns: 'minmax(120px, 20%) 1fr',
     },
 

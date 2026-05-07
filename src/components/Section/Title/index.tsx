@@ -1,7 +1,7 @@
 'use client'
 
 import Link from 'next/link'
-import { useEffect, useRef, useState } from 'react'
+import { useRef } from 'react'
 import { useIntersectionObserver } from 'usehooks-ts'
 
 import { sectionTitleContainerStyles } from './styles'
@@ -17,19 +17,9 @@ export function SectionTitle({ sectionId, sectionTitle }: SectionTitleProps) {
     threshold: 1,
     rootMargin: '-1px 0px 0px 0px',
   })
-  const [isPinned, setIsPinned] = useState(false)
-
-  const isStickyDetectionReady = entry !== undefined
+  const isPinned = entry !== undefined && entry.intersectionRatio < 1
 
   const sectionLink = `#${sectionId}`
-
-  useEffect(() => {
-    if (isStickyDetectionReady && entry) {
-      const elementVisibilityPercentage = entry.intersectionRatio
-
-      setIsPinned(elementVisibilityPercentage < 1)
-    }
-  }, [entry, isStickyDetectionReady])
 
   const setRefs = (node: HTMLAnchorElement | null) => {
     ref.current = node
@@ -40,7 +30,7 @@ export function SectionTitle({ sectionId, sectionTitle }: SectionTitleProps) {
     <Link
       ref={setRefs}
       href={sectionLink}
-      className={`${sectionTitleContainerStyles({ isSticky: isStickyDetectionReady })}${isPinned ? ' pinned' : ''}`}
+      className={`${sectionTitleContainerStyles()}${isPinned ? ' pinned' : ''}`}
     >
       <h2>{sectionTitle}</h2>
     </Link>

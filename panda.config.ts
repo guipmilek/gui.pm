@@ -32,6 +32,22 @@ export default defineConfig({
 
   globalCss,
 
+  utilities: {
+    extend: {
+      backdropBlurSafe: {
+        // Let Lightning CSS add the WebKit fallback without dropping the standard property.
+        property: 'backdropFilter',
+        className: 'bkdp-blur-safe',
+        values: { type: 'string' },
+        transform(value) {
+          return {
+            backdropFilter: `blur(${value})`,
+          }
+        },
+      },
+    },
+  },
+
   gitignore: true,
 
   minify: true,

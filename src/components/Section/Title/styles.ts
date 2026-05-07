@@ -3,7 +3,8 @@ import { cva } from '@/styled-system/css'
 export const sectionTitleContainerStyles = cva({
   base: {
     display: 'block',
-    position: 'relative',
+    position: 'sticky',
+    isolation: 'isolate',
     top: 0,
     zIndex: 10,
 
@@ -23,7 +24,9 @@ export const sectionTitleContainerStyles = cva({
       zIndex: 1,
     },
 
-    '&.pinned::before': {
+    '&::before': {
+      opacity: 0,
+
       position: 'absolute',
       inset: 0,
       zIndex: 0,
@@ -34,8 +37,15 @@ export const sectionTitleContainerStyles = cva({
       marginLeft: '-1.5rem',
 
       content: "''",
+      pointerEvents: 'none',
 
-      backdropFilter: 'blur(8px)',
+      backdropBlurSafe: '8px',
+
+      transition: 'opacity 0.2s ease-out',
+
+      '@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px)))': {
+        backgroundColor: 'background',
+      },
 
       md: {
         width: 'calc(100% + (3rem * 2))',
@@ -43,12 +53,9 @@ export const sectionTitleContainerStyles = cva({
         marginLeft: '-3rem',
       },
     },
-  },
-  variants: {
-    isSticky: {
-      true: {
-        position: 'sticky',
-      },
+
+    '&.pinned::before': {
+      opacity: 1,
     },
   },
 })
