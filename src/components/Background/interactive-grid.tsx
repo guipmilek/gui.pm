@@ -119,7 +119,6 @@ export function InteractiveGrid() {
   const sizeRef = useRef({ w: 0, h: 0 })
   const animRef = useRef(0)
   const spawnIdRef = useRef<ReturnType<typeof setTimeout>>(undefined)
-  const vignetteRef = useRef<CanvasGradient | null>(null)
   const smoothRef = useRef({ x: -100, y: -100 })
   const isTouchRef = useRef(true)
   const prefersReducedMotionRef = useRef(false)
@@ -191,14 +190,6 @@ export function InteractiveGrid() {
       drawGrid(glowGridCtx, w, h, BIG_SIZE, 'rgba(161, 161, 170, 0.28)', 1)
 
       sizeRef.current = { w, h }
-
-      const cx = w / 2
-      const cy = h / 2
-      const maxDim = Math.max(w, h)
-      const g = ctx.createRadialGradient(cx, cy, maxDim * 0.3, cx, cy, maxDim * 0.7)
-      g.addColorStop(0, 'rgba(0,0,0,1)')
-      g.addColorStop(1, 'rgba(0,0,0,0)')
-      vignetteRef.current = g
     }
 
     const doSpawn = () => {
@@ -281,14 +272,6 @@ export function InteractiveGrid() {
       }
 
       drawStars(ctx, w, h, timestamp, starsRef.current)
-
-      if (vignetteRef.current) {
-        ctx.save()
-        ctx.globalCompositeOperation = 'destination-in'
-        ctx.fillStyle = vignetteRef.current
-        ctx.fillRect(0, 0, w, h)
-        ctx.restore()
-      }
 
       animRef.current = requestAnimationFrame(frame)
     }
