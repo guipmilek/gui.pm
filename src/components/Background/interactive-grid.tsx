@@ -256,7 +256,9 @@ export function InteractiveGrid() {
       drawGrid(ctx, w, h, BIG_SIZE, GRID_BIG, 0.8)
 
       if (!isTouchRef.current) {
-        const { x: mx, y: my } = positionRef.current
+        const rect = canvas.getBoundingClientRect()
+        const mx = positionRef.current.x - rect.left
+        const my = positionRef.current.y - rect.top
         if (mx > 0 && my > 0 && mx < w && my < h) {
           const EASING = 0.20
           smoothRef.current.x += (mx - smoothRef.current.x) * EASING
