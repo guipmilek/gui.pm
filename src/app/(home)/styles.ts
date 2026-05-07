@@ -12,11 +12,11 @@ export const HomeContainer = styled('div', {
     alignItems: 'start',
 
     '& main': {
-      display: 'flex',
-      flexDirection: 'column',
-      gap: '6rem',
+    display: 'flex',
+    flexDirection: 'column',
+    gap: 0,
 
-      paddingBottom: '5rem',
+    paddingBottom: '5rem',
 
       lg: {
         gridArea: 'b',

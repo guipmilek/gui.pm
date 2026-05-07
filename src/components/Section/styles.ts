@@ -10,6 +10,8 @@ export const SectionContainer = styled('section', {
       sm: 'start',
     },
     gap: '1rem',
+
+    paddingBottom: { base: '6rem', lg: '0' },
   },
 })
 
