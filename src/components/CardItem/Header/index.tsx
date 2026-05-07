@@ -39,13 +39,11 @@ export function HeaderCardItem({ type, data }: HeaderCardItemProps) {
 
     case 'project': {
       const { imagePath } = data
-      const baseUrl = process.env.API_BASE_URL
-      const src = baseUrl ? `${baseUrl}${imagePath}` : imagePath
 
       return (
         <HeaderCardItemContainer type="project">
           <Image
-            src={src}
+            src={imagePath}
             alt={`${data.title} preview`}
             width={200}
             height={112.5}

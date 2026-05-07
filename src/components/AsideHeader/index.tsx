@@ -4,38 +4,13 @@ import { IconType } from 'react-icons'
 
 import guipmdevLogo from '@/assets/guipmdev-logo.svg'
 import { icons } from '@/libs/reactIcons'
-import { api, isApiAvailable } from '@/libs/wretch'
+import { staticDataProvider } from '@/providers'
 
 import { Navbar } from '../Navbar'
 import { AsideHeaderContainer, Bio, SocialLinks } from './styles'
 
-type LinkType = typeof icons
-
-interface LinkItem {
-  type: keyof LinkType
-  title: string
-  url: string
-}
-
-interface Profile {
-  headline: string
-  bio: string
-  links: LinkItem[]
-}
-
-const fallbackProfile: Profile = {
-  headline: 'Full-stack developer',
-  bio: 'Desenvolvedor full-stack apaixonado por criar experiencias digitais incriveis.',
-  links: [
-    { type: 'github', title: 'GitHub', url: 'https://github.com/guipmilek' },
-    { type: 'linkedin', title: 'LinkedIn', url: 'https://linkedin.com/in/guipmilek' },
-  ],
-}
-
 export async function AsideHeader() {
-  const profile: Profile = isApiAvailable && api
-    ? await api.get('/profile').json()
-    : fallbackProfile
+  const profile = await staticDataProvider.getProfile()
 
   const { headline, bio, links } = profile
 

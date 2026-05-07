@@ -5,17 +5,7 @@ const nextConfig: NextConfig = {
   reactCompiler: true,
 
   images: {
-    remotePatterns: process.env.API_REMOTEPATTERNS_HOSTNAME
-      ? [
-          {
-            protocol: (process.env.API_REMOTEPATTERNS_PROTOCOL as
-              | 'http'
-              | 'https') || 'https',
-            hostname: process.env.API_REMOTEPATTERNS_HOSTNAME,
-            pathname: process.env.API_REMOTEPATTERNS_PATHNAME || '/**',
-          },
-        ]
-      : [],
+    remotePatterns: [],
   },
 
   async redirects() {
