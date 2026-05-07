@@ -127,21 +127,49 @@ export function InteractiveGrid() {
   const positionRef = useMousePosition()
 
   useEffect(() => {
+    // B1: On touch/coarse devices the CSS GridFallback handles everything.
+    // No need for canvas rAF — zero CPU/battery waste on mobile.
+    if (!window.matchMedia('(pointer: fine)').matches) return
+
     const canvas = canvasRef.current
     if (!canvas) return
-    const ctx = canvas.getContext('2d')
+    const ctx = canvas.getContext('2d', { desynchronized: true })
     if (!ctx) return
 
     const glowCanvas = document.createElement('canvas')
     const glowCtx = glowCanvas.getContext('2d')
     if (!glowCtx) return
 
-    isTouchRef.current = !window.matchMedia('(pointer: fine)').matches
+    // Cache the bright glow grid — drawn once on resize, reused every frame.
+    const glowGridCanvas = document.createElement('canvas')
+    const glowGridCtx = glowGridCanvas.getContext('2d')
+    if (!glowGridCtx) return
+
+    // Cache the radial mask — fixed size, drawn once, translated each frame.
+    const R = HOVER_RADIUS
+    const maskCanvas = document.createElement('canvas')
+    maskCanvas.width = R * 2
+    maskCanvas.height = R * 2
+    const maskCtx = maskCanvas.getContext('2d')
+    if (maskCtx) {
+      const g = maskCtx.createRadialGradient(R, R, 0, R, R, R)
+      g.addColorStop(0, 'rgba(0,0,0,0.75)')
+      g.addColorStop(0.2, 'rgba(0,0,0,0.45)')
+      g.addColorStop(0.5, 'rgba(0,0,0,0.12)')
+      g.addColorStop(1, 'rgba(0,0,0,0)')
+      maskCtx.fillStyle = g
+      maskCtx.fillRect(0, 0, R * 2, R * 2)
+    }
+
+    isTouchRef.current = false
     prefersReducedMotionRef.current = window.matchMedia(
       '(prefers-reduced-motion: reduce)',
     ).matches
 
+    const maxStars = window.innerWidth >= 1024 ? MAX_STARS : 8
+
     let running = true
+    let resizeTimer: ReturnType<typeof setTimeout> | undefined
 
     const updateSize = () => {
       const dpr = window.devicePixelRatio || 1
@@ -155,6 +183,12 @@ export function InteractiveGrid() {
       glowCanvas.width = w * dpr
       glowCanvas.height = h * dpr
       glowCtx.setTransform(dpr, 0, 0, dpr, 0, 0)
+
+      glowGridCanvas.width = glowCanvas.width
+      glowGridCanvas.height = glowCanvas.height
+      glowGridCtx.setTransform(dpr, 0, 0, dpr, 0, 0)
+      drawGrid(glowGridCtx, w, h, SMALL_SIZE, 'rgba(161, 161, 170, 0.15)', 1)
+      drawGrid(glowGridCtx, w, h, BIG_SIZE, 'rgba(161, 161, 170, 0.28)', 1)
 
       sizeRef.current = { w, h }
 
@@ -171,7 +205,7 @@ export function InteractiveGrid() {
       if (prefersReducedMotionRef.current) return
       const { w, h } = sizeRef.current
       if (w === 0 || h === 0) return
-      if (starsRef.current.length >= MAX_STARS) return
+      if (starsRef.current.length >= maxStars) return
 
       const dir: 'h' | 'v' = Math.random() > 0.5 ? 'h' : 'v'
       const forward = Math.random() > 0.5
@@ -224,24 +258,20 @@ export function InteractiveGrid() {
       if (!isTouchRef.current) {
         const { x: mx, y: my } = positionRef.current
         if (mx > 0 && my > 0 && mx < w && my < h) {
-          const EASING = 0.18
+          const EASING = 0.20
           smoothRef.current.x += (mx - smoothRef.current.x) * EASING
           smoothRef.current.y += (my - smoothRef.current.y) * EASING
 
           const { x: sx, y: sy } = smoothRef.current
 
           glowCtx.clearRect(0, 0, w, h)
-          drawGrid(glowCtx, w, h, SMALL_SIZE, 'rgba(161, 161, 170, 0.15)', 1)
-          drawGrid(glowCtx, w, h, BIG_SIZE, 'rgba(161, 161, 170, 0.28)', 1)
+          glowCtx.drawImage(glowGridCanvas, 0, 0)
 
           glowCtx.globalCompositeOperation = 'destination-in'
-          const mask = glowCtx.createRadialGradient(sx, sy, 0, sx, sy, HOVER_RADIUS)
-          mask.addColorStop(0, 'rgba(0,0,0,0.75)')
-          mask.addColorStop(0.2, 'rgba(0,0,0,0.45)')
-          mask.addColorStop(0.5, 'rgba(0,0,0,0.12)')
-          mask.addColorStop(1, 'rgba(0,0,0,0)')
-          glowCtx.fillStyle = mask
-          glowCtx.fillRect(0, 0, w, h)
+          glowCtx.save()
+          glowCtx.translate(sx - R, sy - R)
+          glowCtx.drawImage(maskCanvas, 0, 0)
+          glowCtx.restore()
           glowCtx.globalCompositeOperation = 'source-over'
 
           ctx.drawImage(glowCanvas, 0, 0)
@@ -264,8 +294,11 @@ export function InteractiveGrid() {
     const onVisibility = () => {
       if (document.hidden) {
         cancelAnimationFrame(animRef.current)
+        clearTimeout(spawnIdRef.current)
+        spawnIdRef.current = undefined
       } else {
         animRef.current = requestAnimationFrame(frame)
+        scheduleNext()
       }
     }
 
@@ -294,7 +327,10 @@ export function InteractiveGrid() {
       if (fallback) fallback.style.display = 'none'
     }
 
-    const observer = new ResizeObserver(updateSize)
+    const observer = new ResizeObserver(() => {
+      clearTimeout(resizeTimer)
+      resizeTimer = setTimeout(updateSize, 100)
+    })
     observer.observe(canvas)
     document.addEventListener('visibilitychange', onVisibility)
     window.addEventListener('pageshow', onPageShow)
@@ -307,6 +343,7 @@ export function InteractiveGrid() {
       cancelAnimationFrame(animRef.current)
       clearTimeout(spawnIdRef.current)
       observer.disconnect()
+      clearTimeout(resizeTimer)
       document.removeEventListener('visibilitychange', onVisibility)
       window.removeEventListener('pageshow', onPageShow)
     }

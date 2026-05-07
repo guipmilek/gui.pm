@@ -7,6 +7,8 @@ export const CursorContainer = styled('div', {
     left: 0,
     zIndex: 10,
 
+    willChange: 'transform',
+
     display: {
       base: 'none',
       lg: 'block',

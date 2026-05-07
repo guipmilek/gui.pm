@@ -11,19 +11,14 @@ interface MouseContextValue {
   positionRef: React.MutableRefObject<MousePosition>
 }
 
-const INITIAL_POSITION: MousePosition = { x: -52.5, y: -52.5 }
-
 const MouseContext = createContext<MouseContextValue | null>(null)
 
 export function MouseProvider({ children }: { children: ReactNode }) {
-  const positionRef = useRef<MousePosition>(INITIAL_POSITION)
+  const positionRef = useRef<MousePosition>({ x: -52.5, y: -52.5 })
 
   useEffect(() => {
     const isCoarse = window.matchMedia('(pointer: coarse)').matches
     if (isCoarse) return
-
-    let clientX = INITIAL_POSITION.x
-    let clientY = INITIAL_POSITION.y
 
     const hideStyle = document.createElement('style')
     hideStyle.id = 'custom-cursor-hide'
@@ -40,10 +35,13 @@ export function MouseProvider({ children }: { children: ReactNode }) {
       if (hideStyle.parentNode) hideStyle.remove()
     }
 
-    const onMouseMove = (event: MouseEvent) => {
-      clientX = event.clientX
-      clientY = event.clientY
-      positionRef.current = { x: clientX, y: clientY }
+    const onPointerMove = (event: PointerEvent) => {
+      const last =
+        'getCoalescedEvents' in event
+          ? (event.getCoalescedEvents().at(-1) ?? event)
+          : event
+      positionRef.current.x = last.clientX
+      positionRef.current.y = last.clientY
     }
 
     const onMouseEnter = () => {
@@ -57,13 +55,11 @@ export function MouseProvider({ children }: { children: ReactNode }) {
       hideNativeCursor()
       document.documentElement.addEventListener('mouseenter', onMouseEnter)
       document.documentElement.addEventListener('mouseleave', onMouseLeave)
-      window.addEventListener('mousemove', onMouseMove)
+      window.addEventListener('pointermove', onPointerMove)
     }
 
     const onPageShow = (event: PageTransitionEvent) => {
       if (event.persisted) {
-        clientX = positionRef.current.x
-        clientY = positionRef.current.y
         restore()
       }
     }
@@ -74,7 +70,7 @@ export function MouseProvider({ children }: { children: ReactNode }) {
     return () => {
       document.documentElement.removeEventListener('mouseenter', onMouseEnter)
       document.documentElement.removeEventListener('mouseleave', onMouseLeave)
-      window.removeEventListener('mousemove', onMouseMove)
+      window.removeEventListener('pointermove', onPointerMove)
       window.removeEventListener('pageshow', onPageShow)
       showNativeCursor()
     }

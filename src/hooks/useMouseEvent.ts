@@ -7,6 +7,8 @@ import { useMousePosition } from '@/contexts/MouseContext'
 const INTERACTIVE_SELECTOR =
   'a, button, input, select, textarea, [role="button"], [contenteditable="true"], .hoverable'
 
+const HALF = 55
+
 export function useMouseEvent() {
   const positionRef = useMousePosition()
   const cursorRef = useRef<HTMLDivElement>(null)
@@ -16,10 +18,13 @@ export function useMouseEvent() {
 
     let animId = 0
     let running = true
-    let prevX = -1
-    let prevY = -1
+    let frameCount = 2
+    let cx = positionRef.current.x
+    let cy = positionRef.current.y
     let isHovering = false
     let isClicking = false
+
+    const SPRING = 0.38
 
     function loop() {
       if (!running) return
@@ -30,15 +35,15 @@ export function useMouseEvent() {
       }
 
       const { x, y } = positionRef.current
-      if (x !== prevX || y !== prevY) {
-        prevX = x
-        prevY = y
-        container.style.transform =
-          `translate(calc(${x}px - 50%), calc(${y}px - 50%))`
-      }
+      cx += (x - cx) * SPRING
+      cy += (y - cy) * SPRING
 
-      // Hover detection — cheaper than a document-wide mouseover listener.
-      if (x >= 0 && y >= 0) {
+      container.style.transform =
+        `translate3d(${(cx - HALF).toFixed(1)}px, ${(cy - HALF).toFixed(1)}px, 0)`
+
+      // Hover detection — throttled to every 3rd frame (~20Hz, imperceptible).
+      frameCount += 1
+      if (frameCount % 3 === 0 && x >= 0 && y >= 0) {
         const el = document.elementFromPoint(x, y)
         const interactive = el?.closest(INTERACTIVE_SELECTOR) ?? null
         if (interactive && !isHovering) {
@@ -84,8 +89,8 @@ export function useMouseEvent() {
     const onPageShow = (event: PageTransitionEvent) => {
       if (event.persisted) {
         running = true
-        prevX = -1
-        prevY = -1
+        cx = positionRef.current.x
+        cy = positionRef.current.y
         document.documentElement.addEventListener('mouseenter', onMouseEnter)
         document.documentElement.addEventListener('mouseleave', onMouseLeave)
         cursorRef.current?.classList.add('visible')
