@@ -14,7 +14,10 @@ interface DescriptionCardItemProps {
 export function DescriptionCardItem({ description }: DescriptionCardItemProps) {
   const divRef = useRef<HTMLDivElement | null>(null)
 
-  const [hasOverflow, setHasOverflow] = useState(false)
+  const estimatedChars = description.reduce((acc, p) => acc + p.length, 0)
+  const isLikelyToOverflow = estimatedChars > 350 || description.length > 5
+
+  const [hasOverflow, setHasOverflow] = useState(isLikelyToOverflow)
   const [isExpanded, setIsExpanded] = useState(false)
 
   const lineHeightInRem = 1.25
@@ -23,22 +26,24 @@ export function DescriptionCardItem({ description }: DescriptionCardItemProps) {
   const defaultDivMaxHeight = `calc(${lineHeightInRem}rem * ${initialVisibleLinesNumber})`
   const defaultButtonMarginTop = 'calc((2.625rem + 0.75rem) * -1)'
 
+  const [maxHeight, setMaxHeight] = useState<string>(defaultDivMaxHeight)
+
   function handleToggleDescription() {
     if (!divRef.current) return
 
-    const remSizeInPx = parseInt(
-      getComputedStyle(document.documentElement).fontSize,
-    )
+    if (isExpanded) {
+      setMaxHeight(defaultDivMaxHeight)
+    } else {
+      const remSizeInPx = parseInt(
+        getComputedStyle(document.documentElement).fontSize,
+      )
 
-    const divHeightInPx = divRef.current.scrollHeight
-    const lineHeightInPx = lineHeightInRem * remSizeInPx
-    const linesNumber = Math.ceil(divHeightInPx / lineHeightInPx)
+      const divHeightInPx = divRef.current.scrollHeight
+      const lineHeightInPx = lineHeightInRem * remSizeInPx
+      const linesNumber = Math.ceil(divHeightInPx / lineHeightInPx)
 
-    divRef.current.style.maxHeight = isExpanded
-      ? defaultDivMaxHeight
-      : `calc(${lineHeightInRem}rem * ${linesNumber})`
-
-    divRef.current.dataset.expanded = isExpanded ? 'false' : 'true'
+      setMaxHeight(`calc(${lineHeightInRem}rem * ${linesNumber})`)
+    }
 
     setIsExpanded((prev) => !prev)
   }
@@ -47,21 +52,23 @@ export function DescriptionCardItem({ description }: DescriptionCardItemProps) {
     const div = divRef.current
     if (!div) return
 
-    div.style.maxHeight = defaultDivMaxHeight
     const overflow = div.scrollHeight > div.clientHeight
 
     setHasOverflow(overflow)
 
-    if (overflow) {
-      div.dataset.overflow = 'true'
-    } else {
-      div.style.maxHeight = 'auto'
+    if (!overflow) {
+      setMaxHeight('auto')
     }
-  }, [defaultDivMaxHeight])
+  }, [])
 
   return (
     <ParagraphCardItemContainer>
-      <div ref={divRef}>
+      <div
+        ref={divRef}
+        style={{ maxHeight }}
+        data-overflow={hasOverflow}
+        data-expanded={isExpanded}
+      >
         {description.map((paragraph, index) =>
           paragraph.length ? (
             <p key={paragraph + index}>{paragraph}</p>
