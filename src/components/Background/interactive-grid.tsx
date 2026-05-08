@@ -18,13 +18,13 @@ interface ShootingStar {
 const BIG_SIZE = 80
 const SMALL_SIZE = 20
 const TRAIL_LENGTH = 150
-const MAX_STARS = 15
+const MAX_STARS = 6
 const STAR_THICKNESS = 1
 
-const STAR_SPAWN_MIN = 200
-const STAR_SPAWN_MAX = 600
-const STAR_SPEED_MIN = 2000
-const STAR_SPEED_MAX = 4500
+const STAR_SPAWN_MIN = 1200
+const STAR_SPAWN_MAX = 2400
+const STAR_SPEED_MIN = 6000
+const STAR_SPEED_MAX = 10000
 
 const GRID_BIG = 'rgba(113, 113, 122, 0.15)'
 const GRID_SMALL = 'rgba(113, 113, 122, 0.07)'
@@ -184,7 +184,7 @@ export function InteractiveGrid() {
       '(prefers-reduced-motion: reduce)',
     ).matches
 
-    const maxStars = window.innerWidth >= 1024 ? MAX_STARS : 8
+    const maxStars = window.innerWidth >= 1024 ? MAX_STARS : 3
 
     let running = true
     let isMouseInside = true
