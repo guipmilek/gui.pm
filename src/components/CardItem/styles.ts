@@ -10,7 +10,7 @@ export const CardItemContainer = styled('li', {
       padding: { base: '1rem', md: '1.5rem' },
 
       boxShadow: { base: 'card', lg: 'none' },
-      transition: 'box-shadow 0.2s, opacity 0.2s',
+      transition: 'box-shadow 0.5s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.5s cubic-bezier(0.4, 0, 0.2, 1)',
 
       // Ensure the distortion layer is above the background grid but below content
       zIndex: 0,
