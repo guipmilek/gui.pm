@@ -9,7 +9,8 @@ export const CardItemContainer = styled('li', {
       margin: { base: '-1rem', md: '-1.5rem' },
       padding: { base: '1rem', md: '1.5rem' },
 
-      boxShadow: 'card',
+      boxShadow: { base: 'card', lg: 'none' },
+      transition: 'box-shadow 0.2s, opacity 0.2s',
 
       // Ensure the distortion layer is above the background grid but below content
       zIndex: 0,
@@ -24,6 +25,10 @@ export const CardItemContainer = styled('li', {
       '&:hover:not(:where(.hover-stale *)), &.scroll-hover': {
         '& header img': {
           borderColor: 'imageBorder.hover',
+        },
+
+        '& .glass-card-wrapper': {
+          boxShadow: 'card',
         },
       },
     },
