@@ -15,7 +15,7 @@ export const ParagraphCardItemContainer = styled('div', {
 
       marginBottom: '0.5rem',
 
-      transition: 'max-height 0.5s, mask-position 0.5s, -webkit-mask-position 0.5s',
+      transition: 'height 0.5s, mask-position 0.5s, -webkit-mask-position 0.5s',
 
       '& p': {
         textStyle: 'sm',

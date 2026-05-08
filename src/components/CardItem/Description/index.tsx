@@ -22,27 +22,29 @@ export function DescriptionCardItem({ description }: DescriptionCardItemProps) {
 
   const lineHeightInRem = 1.25
   const initialVisibleLinesNumber = 10
-
-  const defaultDivMaxHeight = `calc(${lineHeightInRem}rem * ${initialVisibleLinesNumber})`
   const defaultButtonMarginTop = 'calc((2.625rem + 0.75rem) * -1)'
 
-  const [maxHeight, setMaxHeight] = useState<string>(defaultDivMaxHeight)
+  // Use concrete px values so Firefox interpolates numbers, not calc() exprs.
+  // calc() heights force a full layout recalc every animation frame.
+  function getCollapsedHeight() {
+    if (typeof window === 'undefined') {
+      return `calc(${lineHeightInRem}rem * ${initialVisibleLinesNumber})`
+    }
+    const remSizeInPx = parseFloat(
+      getComputedStyle(document.documentElement).fontSize,
+    )
+    return `${lineHeightInRem * initialVisibleLinesNumber * remSizeInPx}px`
+  }
+
+  const [height, setHeight] = useState<string>(() => getCollapsedHeight())
 
   function handleToggleDescription() {
     if (!divRef.current) return
 
     if (isExpanded) {
-      setMaxHeight(defaultDivMaxHeight)
+      setHeight(getCollapsedHeight())
     } else {
-      const remSizeInPx = parseInt(
-        getComputedStyle(document.documentElement).fontSize,
-      )
-
-      const divHeightInPx = divRef.current.scrollHeight
-      const lineHeightInPx = lineHeightInRem * remSizeInPx
-      const linesNumber = Math.ceil(divHeightInPx / lineHeightInPx)
-
-      setMaxHeight(`calc(${lineHeightInRem}rem * ${linesNumber})`)
+      setHeight(`${divRef.current.scrollHeight}px`)
     }
 
     setIsExpanded((prev) => !prev)
@@ -57,15 +59,19 @@ export function DescriptionCardItem({ description }: DescriptionCardItemProps) {
     setHasOverflow(overflow)
 
     if (!overflow) {
-      setMaxHeight('auto')
+      setHeight('auto')
+    } else {
+      // Resolve the initial collapsed height now that fonts are loaded.
+      setHeight(getCollapsedHeight())
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   return (
     <ParagraphCardItemContainer>
       <div
         ref={divRef}
-        style={{ maxHeight }}
+        style={{ height }}
         data-overflow={hasOverflow}
         data-expanded={isExpanded}
       >

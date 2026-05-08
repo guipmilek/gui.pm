@@ -55,7 +55,7 @@ export function MouseProvider({ children }: { children: ReactNode }) {
       hideNativeCursor()
       document.documentElement.addEventListener('mouseenter', onMouseEnter)
       document.documentElement.addEventListener('mouseleave', onMouseLeave)
-      window.addEventListener('pointermove', onPointerMove)
+      window.addEventListener('pointermove', onPointerMove, { passive: true })
     }
 
     const onPageShow = (event: PageTransitionEvent) => {

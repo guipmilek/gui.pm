@@ -28,6 +28,7 @@ const GRID_BIG = 'rgba(113, 113, 122, 0.15)'
 const GRID_SMALL = 'rgba(113, 113, 122, 0.07)'
 const HOVER_RADIUS = 280
 const STAR_COLOR = 'rgba(148, 163, 184, 0.85)'
+const MAX_CANVAS_DPR = 1.5
 
 function drawGrid(
   ctx: CanvasRenderingContext2D,
@@ -36,17 +37,19 @@ function drawGrid(
   size: number,
   color: string,
   alpha: number,
+  offsetX = 0,
+  offsetY = 0,
 ) {
   ctx.strokeStyle = color
   ctx.globalAlpha = alpha
   ctx.lineWidth = 1
 
   ctx.beginPath()
-  for (let x = 0; x <= w; x += size) {
+  for (let x = offsetX; x <= w; x += size) {
     ctx.moveTo((x + 0.5) | 0, 0)
     ctx.lineTo((x + 0.5) | 0, h)
   }
-  for (let y = 0; y <= h; y += size) {
+  for (let y = offsetY; y <= h; y += size) {
     ctx.moveTo(0, (y + 0.5) | 0)
     ctx.lineTo(w, (y + 0.5) | 0)
   }
@@ -113,10 +116,15 @@ function drawStars(
   ctx.globalAlpha = 1
 }
 
+function gridOffset(scroll: number, size: number) {
+  return -(((scroll % size) + size) % size)
+}
+
 export function InteractiveGrid() {
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const starsRef = useRef<ShootingStar[]>([])
   const sizeRef = useRef({ w: 0, h: 0 })
+  const dprRef = useRef(1)
   const animRef = useRef(0)
   const spawnIdRef = useRef<ReturnType<typeof setTimeout>>(undefined)
   const smoothRef = useRef({ x: -100, y: -100 })
@@ -132,7 +140,7 @@ export function InteractiveGrid() {
 
     const canvas = canvasRef.current
     if (!canvas) return
-    const ctx = canvas.getContext('2d', { desynchronized: true })
+    const ctx = canvas.getContext('2d')
     if (!ctx) return
 
     const glowCanvas = document.createElement('canvas')
@@ -144,7 +152,7 @@ export function InteractiveGrid() {
     const glowGridCtx = glowGridCanvas.getContext('2d')
     if (!glowGridCtx) return
 
-    // Cache the radial mask — fixed size, drawn once, translated each frame.
+    // Cache the radial mask; the glow tile reuses it every frame.
     const R = HOVER_RADIUS
     const maskCanvas = document.createElement('canvas')
     maskCanvas.width = R * 2
@@ -170,31 +178,80 @@ export function InteractiveGrid() {
     let running = true
     let isMouseInside = true
     let glowOpacity = 0
+    let lastMx = -1
+    let lastMy = -1
+    let lastGlowLeft = -R
+    let lastGlowTop = -R
+    let lastScrollX = Number.NaN
+    let lastScrollY = Number.NaN
 
     const onMouseEnter = () => { isMouseInside = true }
     const onMouseLeave = () => { isMouseInside = false }
     document.documentElement.addEventListener('mouseenter', onMouseEnter)
     document.documentElement.addEventListener('mouseleave', onMouseLeave)
 
-    const updateSize = () => {
-      const dpr = window.devicePixelRatio || 1
-      const w = canvas.offsetWidth
-      const h = canvas.offsetHeight
+    const drawGlowGrid = (w: number, h: number) => {
+      const scrollX = window.scrollX
+      const scrollY = window.scrollY
 
-      canvas.width = w * dpr
-      canvas.height = h * dpr
+      glowGridCtx.clearRect(0, 0, w, h)
+      drawGrid(
+        glowGridCtx,
+        w,
+        h,
+        SMALL_SIZE,
+        'rgba(161, 161, 170, 0.15)',
+        1,
+        gridOffset(scrollX, SMALL_SIZE),
+        gridOffset(scrollY, SMALL_SIZE),
+      )
+      drawGrid(
+        glowGridCtx,
+        w,
+        h,
+        BIG_SIZE,
+        'rgba(161, 161, 170, 0.28)',
+        1,
+        gridOffset(scrollX, BIG_SIZE),
+        gridOffset(scrollY, BIG_SIZE),
+      )
+
+      lastScrollX = scrollX
+      lastScrollY = scrollY
+      lastMx = Number.NaN
+      lastMy = Number.NaN
+    }
+
+    const updateSize = () => {
+      const dpr = Math.min(window.devicePixelRatio || 1, MAX_CANVAS_DPR)
+      const w = window.innerWidth
+      const h = window.innerHeight
+      const pixelW = Math.round(w * dpr)
+      const pixelH = Math.round(h * dpr)
+
+      if (
+        canvas.width === pixelW &&
+        canvas.height === pixelH &&
+        sizeRef.current.w === w &&
+        sizeRef.current.h === h
+      ) return
+
+      canvas.width = pixelW
+      canvas.height = pixelH
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0)
 
-      glowCanvas.width = w * dpr
-      glowCanvas.height = h * dpr
+      const glowSize = R * 2
+      const glowPixelSize = Math.round(glowSize * dpr)
+      glowCanvas.width = glowPixelSize
+      glowCanvas.height = glowPixelSize
       glowCtx.setTransform(dpr, 0, 0, dpr, 0, 0)
 
-      glowGridCanvas.width = glowCanvas.width
-      glowGridCanvas.height = glowCanvas.height
+      glowGridCanvas.width = pixelW
+      glowGridCanvas.height = pixelH
       glowGridCtx.setTransform(dpr, 0, 0, dpr, 0, 0)
-      drawGrid(glowGridCtx, w, h, SMALL_SIZE, 'rgba(161, 161, 170, 0.15)', 1)
-      drawGrid(glowGridCtx, w, h, BIG_SIZE, 'rgba(161, 161, 170, 0.28)', 1)
+      drawGlowGrid(w, h)
 
+      dprRef.current = dpr
       sizeRef.current = { w, h }
     }
 
@@ -247,13 +304,16 @@ export function InteractiveGrid() {
         return
       }
 
+      if (window.scrollX !== lastScrollX || window.scrollY !== lastScrollY) {
+        drawGlowGrid(w, h)
+      }
+
       ctx.clearRect(0, 0, w, h)
 
       if (!isTouchRef.current) {
-        const rect = canvas.getBoundingClientRect()
-        const mx = positionRef.current.x - rect.left
-        const my = positionRef.current.y - rect.top
-        
+        const mx = positionRef.current.x
+        const my = positionRef.current.y
+
         const EASING = 0.20
         smoothRef.current.x += (mx - smoothRef.current.x) * EASING
         smoothRef.current.y += (my - smoothRef.current.y) * EASING
@@ -262,21 +322,54 @@ export function InteractiveGrid() {
         const targetOpacity = isMouseInside && inBounds ? 1 : 0
         glowOpacity += (targetOpacity - glowOpacity) * 0.15
 
-        if (glowOpacity > 0.01) {
-          const { x: sx, y: sy } = smoothRef.current
+        const mouseStill = Math.abs(mx - lastMx) < 0.5 && Math.abs(my - lastMy) < 0.5
+        const isSmoothSettled = Math.abs(mx - smoothRef.current.x) < 0.5 && Math.abs(my - smoothRef.current.y) < 0.5
+        const glowSettled = glowOpacity < 0.01 || Math.abs(targetOpacity - glowOpacity) < 0.005
 
-          glowCtx.clearRect(0, 0, w, h)
-          glowCtx.drawImage(glowGridCanvas, 0, 0)
+        if (glowOpacity > 0.01 && !(mouseStill && isSmoothSettled && glowSettled)) {
+          lastMx = mx
+          lastMy = my
+
+          const { x: sx, y: sy } = smoothRef.current
+          const dpr = dprRef.current
+          const glowSize = R * 2
+          const left = Math.floor(sx - R)
+          const top = Math.floor(sy - R)
+          const sourceX = Math.max(0, left)
+          const sourceY = Math.max(0, top)
+          const destX = sourceX - left
+          const destY = sourceY - top
+          const sourceW = Math.min(glowSize - destX, w - sourceX)
+          const sourceH = Math.min(glowSize - destY, h - sourceY)
+
+          lastGlowLeft = left
+          lastGlowTop = top
+
+          glowCtx.clearRect(0, 0, glowSize, glowSize)
+
+          if (sourceW > 0 && sourceH > 0) {
+            glowCtx.drawImage(
+              glowGridCanvas,
+              sourceX * dpr,
+              sourceY * dpr,
+              sourceW * dpr,
+              sourceH * dpr,
+              destX,
+              destY,
+              sourceW,
+              sourceH,
+            )
+          }
 
           glowCtx.globalCompositeOperation = 'destination-in'
-          glowCtx.save()
-          glowCtx.translate(sx - R, sy - R)
           glowCtx.globalAlpha = glowOpacity
-          glowCtx.drawImage(maskCanvas, 0, 0)
-          glowCtx.restore()
+          glowCtx.drawImage(maskCanvas, 0, 0, glowSize, glowSize)
+          glowCtx.globalAlpha = 1
           glowCtx.globalCompositeOperation = 'source-over'
 
-          ctx.drawImage(glowCanvas, 0, 0)
+          ctx.drawImage(glowCanvas, left, top, glowSize, glowSize)
+        } else if (glowOpacity > 0.01) {
+          ctx.drawImage(glowCanvas, lastGlowLeft, lastGlowTop, R * 2, R * 2)
         }
       }
 
@@ -311,13 +404,17 @@ export function InteractiveGrid() {
 
     updateSize()
 
-    const observer = new ResizeObserver(() => {
-      updateSize()
-      cancelAnimationFrame(animRef.current)
-      frame(performance.now())
-    })
-    observer.observe(canvas)
+    let resizeTimeout: ReturnType<typeof setTimeout>
+    const scheduleResize = () => {
+      clearTimeout(resizeTimeout)
+      resizeTimeout = setTimeout(() => {
+        updateSize()
+      }, 200)
+    }
+    const observer = new ResizeObserver(scheduleResize)
+    observer.observe(document.documentElement)
     document.addEventListener('visibilitychange', onVisibility)
+    window.addEventListener('resize', scheduleResize)
     window.addEventListener('pageshow', onPageShow)
 
     animRef.current = requestAnimationFrame(frame)
@@ -327,8 +424,10 @@ export function InteractiveGrid() {
       running = false
       cancelAnimationFrame(animRef.current)
       clearTimeout(spawnIdRef.current)
+      clearTimeout(resizeTimeout)
       observer.disconnect()
       document.removeEventListener('visibilitychange', onVisibility)
+      window.removeEventListener('resize', scheduleResize)
       window.removeEventListener('pageshow', onPageShow)
       document.documentElement.removeEventListener('mouseenter', onMouseEnter)
       document.documentElement.removeEventListener('mouseleave', onMouseLeave)
@@ -339,10 +438,11 @@ export function InteractiveGrid() {
     <canvas
       ref={canvasRef}
       style={{
-        position: 'absolute',
+        position: 'fixed',
         inset: 0,
-        width: '100%',
-        height: '100%',
+        width: '100vw',
+        height: '100vh',
+        pointerEvents: 'none',
       }}
       aria-hidden="true"
     />
