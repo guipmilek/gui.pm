@@ -17,6 +17,7 @@ interface ShootingStar {
   color: string
   startTime: number
   absorbTime?: number
+  occupancyKey?: string
 }
 
 const BIG_SIZE = 80
@@ -24,10 +25,11 @@ const SMALL_SIZE = 20
 const TRAIL_LENGTH = 160
 const MAX_STARS = 20
 const STAR_THICKNESS = 1.2
+const STAR_HEAD_SIZE = 1.2
 
 const STAR_SPAWN_MIN = 350
 const STAR_SPAWN_MAX = 800
-const STAR_SPEED = 0.40 // px/ms
+const STAR_SPEED = 0.28 // px/ms
 const STAR_LIFETIME = 8000 // ms
 const ABSORB_DIST = 62
 const ABSORB_FADE = 300 // ms
@@ -90,6 +92,12 @@ function drawStars(
 
     ctx.globalAlpha = alpha
 
+    // Draw the "Spark" head - softer and smaller
+    ctx.fillStyle = 'rgba(255, 255, 255, 0.4)'
+    ctx.beginPath()
+    ctx.arc(star.headX - scrollX, star.headY - scrollY, STAR_HEAD_SIZE, 0, Math.PI * 2)
+    ctx.fill()
+
     const trailPoints = [
       { x: star.headX, y: star.headY },
       ...star.waypoints,
@@ -132,8 +140,8 @@ function drawStars(
 
       const getStopColor = (d: number) => {
         const p = 1 - d / TRAIL_LENGTH
-        if (p > 0.7) return `rgba(255, 255, 255, ${p})`
-        if (p > 0) return star.color.replace('0.85', (p * 0.85).toFixed(2))
+        if (p > 0.8) return `rgba(226, 232, 240, ${p * 0.4})`
+        if (p > 0) return `rgba(148, 163, 184, ${p * 0.2})`
         return 'transparent'
       }
 
@@ -182,7 +190,7 @@ export function InteractiveGrid() {
 
   const { positionRef, isHoveringRef } = useMouseContext()
   const lastTimeRef = useRef(0)
-  const lineOccupancyRef = useRef<Set<number>>(new Set())
+  const lineOccupancyRef = useRef<Set<string>>(new Set())
 
   useEffect(() => {
     // B1: On touch/coarse devices the CSS GridFallback handles everything.
@@ -326,46 +334,52 @@ export function InteractiveGrid() {
       let headY = 0
       let dir: 'h' | 'v' = 'h'
       let moveSign = 1
-      let lineValue = 0
+      let occupancyKey = ''
 
-      const findUnoccupiedLine = (scroll: number, size: number) => {
+      const findUnoccupiedLine = (scroll: number, size: number, orientation: 'h' | 'v') => {
         for (let attempt = 0; attempt < 10; attempt++) {
           const line = randomGridLine(scroll, size)
-          if (!lineOccupancyRef.current.has(line)) return line
+          const key = `${orientation}-${line}`
+          if (!lineOccupancyRef.current.has(key)) return { line, key }
         }
-        return randomGridLine(scroll, size)
+        const line = randomGridLine(scroll, size)
+        return { line, key: `${orientation}-${line}` }
       }
 
       if (guided) {
         const edge = (Math.random() * 4) | 0
         if (edge === 0) {
           // Top
-          headX = findUnoccupiedLine(scrollX, w)
+          const { line, key } = findUnoccupiedLine(scrollX, w, 'v')
+          headX = line
+          occupancyKey = key
           headY = scrollY - 100
           dir = 'v'
           moveSign = 1
-          lineValue = headX
         } else if (edge === 1) {
           // Bottom
-          headX = findUnoccupiedLine(scrollX, w)
+          const { line, key } = findUnoccupiedLine(scrollX, w, 'v')
+          headX = line
+          occupancyKey = key
           headY = scrollY + h + 100
           dir = 'v'
           moveSign = -1
-          lineValue = headX
         } else if (edge === 2) {
           // Left
           headX = scrollX - 100
-          headY = findUnoccupiedLine(scrollY, h)
+          const { line, key } = findUnoccupiedLine(scrollY, h, 'h')
+          headY = line
+          occupancyKey = key
           dir = 'h'
           moveSign = 1
-          lineValue = headY
         } else {
           // Right
           headX = scrollX + w + 100
-          headY = findUnoccupiedLine(scrollY, h)
+          const { line, key } = findUnoccupiedLine(scrollY, h, 'h')
+          headY = line
+          occupancyKey = key
           dir = 'h'
           moveSign = -1
-          lineValue = headY
         }
       } else {
         const side: 'h' | 'v' = Math.random() > 0.5 ? 'h' : 'v'
@@ -373,17 +387,19 @@ export function InteractiveGrid() {
         dir = side
         moveSign = forward ? 1 : -1
         if (side === 'h') {
-          headY = findUnoccupiedLine(scrollY, h)
+          const { line, key } = findUnoccupiedLine(scrollY, h, 'h')
+          headY = line
+          occupancyKey = key
           headX = forward ? scrollX - 100 : scrollX + w + 100
-          lineValue = headY
         } else {
-          headX = findUnoccupiedLine(scrollX, w)
+          const { line, key } = findUnoccupiedLine(scrollX, w, 'v')
+          headX = line
+          occupancyKey = key
           headY = forward ? scrollY - 100 : scrollY + h + 100
-          lineValue = headX
         }
       }
 
-      lineOccupancyRef.current.add(lineValue)
+      lineOccupancyRef.current.add(occupancyKey)
       starsRef.current.push({
         headX,
         headY,
@@ -396,6 +412,7 @@ export function InteractiveGrid() {
         guided,
         color: STAR_COLOR,
         startTime: performance.now(),
+        occupancyKey,
       })
     }
 
@@ -540,8 +557,7 @@ export function InteractiveGrid() {
         }
 
         if (elapsed > STAR_LIFETIME) {
-          lineOccupancyRef.current.delete(star.startPos.x)
-          lineOccupancyRef.current.delete(star.startPos.y)
+          if (star.occupancyKey) lineOccupancyRef.current.delete(star.occupancyKey)
           starsRef.current.splice(i, 1)
           continue
         }
@@ -557,8 +573,7 @@ export function InteractiveGrid() {
           const currentAbsorbDist = isHoveringRef.current ? 16 : ABSORB_DIST
           if (distToMouse < currentAbsorbDist) {
             star.absorbTime = timestamp
-            lineOccupancyRef.current.delete(star.startPos.x)
-            lineOccupancyRef.current.delete(star.startPos.y)
+            if (star.occupancyKey) lineOccupancyRef.current.delete(star.occupancyKey)
             continue
           }
 
@@ -574,27 +589,42 @@ export function InteractiveGrid() {
           const targetGridY = Math.round(ty / gridSize) * gridSize
 
           if (star.dir === 'h') {
-            const dx = targetGridX - star.headX
-            if (Math.abs(dx) < step) {
-              star.headX = targetGridX
+            star.headX += star.moveSign * step
+            const nextGridX = Math.round(star.headX / gridSize) * gridSize
+            if (Math.abs(star.headX - nextGridX) < step) {
               if (Math.abs(targetGridY - star.headY) >= gridSize) {
+                star.headX = nextGridX
                 star.waypoints.unshift({ x: star.headX, y: star.headY })
                 star.dir = 'v'
+                star.moveSign = Math.sign(targetGridY - star.headY) || 1
               }
-            } else {
-              star.headX += Math.sign(dx) * step
             }
           } else {
-            const dy = targetGridY - star.headY
-            if (Math.abs(dy) < step) {
-              star.headY = targetGridY
+            star.headY += star.moveSign * step
+            const nextGridY = Math.round(star.headY / gridSize) * gridSize
+            if (Math.abs(star.headY - nextGridY) < step) {
               if (Math.abs(targetGridX - star.headX) >= gridSize) {
+                star.headY = nextGridY
                 star.waypoints.unshift({ x: star.headX, y: star.headY })
                 star.dir = 'h'
+                star.moveSign = Math.sign(targetGridX - star.headX) || 1
               }
-            } else {
-              star.headY += Math.sign(dy) * step
             }
+          }
+
+          // Waypoint Trimming: Remove waypoints that are further than TRAIL_LENGTH
+          let totalWpDist = 0
+          let lastX = star.headX
+          let lastY = star.headY
+          for (let j = 0; j < star.waypoints.length; j++) {
+            const wp = star.waypoints[j]
+            totalWpDist += Math.sqrt((wp.x - lastX) ** 2 + (wp.y - lastY) ** 2)
+            if (totalWpDist > TRAIL_LENGTH) {
+              star.waypoints.splice(j + 1)
+              break
+            }
+            lastX = wp.x
+            lastY = wp.y
           }
         } else {
           if (star.dir === 'h') {
