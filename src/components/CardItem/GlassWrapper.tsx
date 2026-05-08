@@ -20,9 +20,9 @@ interface GlassWrapperProps {
 export function GlassWrapper({
   children,
   flexibility = 1,
-  distortion = 20,
+  distortion = 35,
   blur = 2,
-  backgroundOpacity = 1,
+  backgroundOpacity = 0.4,
   backgroundColor = 'var(--colors-card-background)',
   borderSize = 1,
   borderColor = 'var(--colors-card-border)',
@@ -75,13 +75,20 @@ export function GlassWrapper({
 
         [data-glass-hover='true'] .glass-ui-border-layer,
         [data-glass-hover='true'] .glass-ui-inner-light {
-          opacity: 0.2 !important;
+          opacity: 0.8 !important; /* Increase opacity for Apple-style rim light */
         }
       `}</style>
       <GlassCard
         flexibility={flexibility}
         distortion={distortion}
         blur={blur}
+        chromaticAberration={2} /* Apple-style color fringing */
+        saturation={140} /* Pop the colors behind the glass */
+        brightness={110}
+        innerLightColor="rgba(255, 255, 255, 0.4)"
+        innerLightBlur={1}
+        innerLightSpread={1}
+        innerLightOpacity={0.8}
         backgroundOpacity={backgroundOpacity}
         backgroundColor={backgroundColor}
         borderSize={borderSize}
@@ -89,7 +96,7 @@ export function GlassWrapper({
         borderRadius={borderRadius}
         padding={padding}
         className={className}
-        avoidSvgCreation={false} // Always keep SVG in DOM for smooth opacity transition
+        avoidSvgCreation={false}
       >
         {children}
       </GlassCard>
