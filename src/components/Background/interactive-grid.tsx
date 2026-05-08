@@ -593,10 +593,38 @@ export function InteractiveGrid() {
             const nextGridX = Math.round(star.headX / gridSize) * gridSize
             if (Math.abs(star.headX - nextGridX) < step) {
               if (Math.abs(targetGridY - star.headY) >= gridSize) {
-                star.headX = nextGridX
-                star.waypoints.unshift({ x: star.headX, y: star.headY })
-                star.dir = 'v'
-                star.moveSign = Math.sign(targetGridY - star.headY) || 1
+                const targetKey = `v-${nextGridX}`
+                const isOccupied = lineOccupancyRef.current.has(targetKey)
+
+                // Check for a free alternative vertical line that also reaches the cursor
+                const altGridX = targetGridX === nextGridX
+                  ? (tx > targetGridX ? targetGridX + gridSize : targetGridX - gridSize)
+                  : targetGridX
+                const altKey = `v-${altGridX}`
+                const isAltOccupied = lineOccupancyRef.current.has(altKey)
+                const altReaches = Math.abs(altGridX - tx) < gridSize * 1.5
+
+                let shouldTurn = false
+                if (!isOccupied) {
+                  shouldTurn = true
+                } else if (distToMouse < 160) {
+                  // If occupied but close, only skip if there's a free alternative
+                  if (altReaches && !isAltOccupied && altGridX !== nextGridX) {
+                    shouldTurn = false
+                  } else {
+                    shouldTurn = true
+                  }
+                }
+
+                if (shouldTurn) {
+                  if (star.occupancyKey) lineOccupancyRef.current.delete(star.occupancyKey)
+                  star.headX = nextGridX
+                  star.waypoints.unshift({ x: star.headX, y: star.headY })
+                  star.dir = 'v'
+                  star.moveSign = Math.sign(targetGridY - star.headY) || 1
+                  star.occupancyKey = targetKey
+                  lineOccupancyRef.current.add(targetKey)
+                }
               }
             }
           } else {
@@ -604,10 +632,37 @@ export function InteractiveGrid() {
             const nextGridY = Math.round(star.headY / gridSize) * gridSize
             if (Math.abs(star.headY - nextGridY) < step) {
               if (Math.abs(targetGridX - star.headX) >= gridSize) {
-                star.headY = nextGridY
-                star.waypoints.unshift({ x: star.headX, y: star.headY })
-                star.dir = 'h'
-                star.moveSign = Math.sign(targetGridX - star.headX) || 1
+                const targetKey = `h-${nextGridY}`
+                const isOccupied = lineOccupancyRef.current.has(targetKey)
+
+                // Check for a free alternative horizontal line that also reaches the cursor
+                const altGridY = targetGridY === nextGridY
+                  ? (ty > targetGridY ? targetGridY + gridSize : targetGridY - gridSize)
+                  : targetGridY
+                const altKey = `h-${altGridY}`
+                const isAltOccupied = lineOccupancyRef.current.has(altKey)
+                const altReaches = Math.abs(altGridY - ty) < gridSize * 1.5
+
+                let shouldTurn = false
+                if (!isOccupied) {
+                  shouldTurn = true
+                } else if (distToMouse < 160) {
+                  if (altReaches && !isAltOccupied && altGridY !== nextGridY) {
+                    shouldTurn = false
+                  } else {
+                    shouldTurn = true
+                  }
+                }
+
+                if (shouldTurn) {
+                  if (star.occupancyKey) lineOccupancyRef.current.delete(star.occupancyKey)
+                  star.headY = nextGridY
+                  star.waypoints.unshift({ x: star.headX, y: star.headY })
+                  star.dir = 'h'
+                  star.moveSign = Math.sign(targetGridX - star.headX) || 1
+                  star.occupancyKey = targetKey
+                  lineOccupancyRef.current.add(targetKey)
+                }
               }
             }
           }
