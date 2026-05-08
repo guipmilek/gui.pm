@@ -604,8 +604,8 @@ export function InteractiveGrid() {
           star.guided = true
         }
 
-        // B2: Stars only "react" and start trying to reach the cursor when near it (within HOVER_RADIUS).
-        const isActivelyGuided = star.guided && hasPointer && isMouseInside && distToMouse < HOVER_RADIUS
+        // B2: Stars always seek the cursor if they are guided, ensuring they stay on path.
+        const isActivelyGuided = star.guided && hasPointer && isMouseInside
 
         // Update dynamic size: match small grid (1.0) only when guided and on small grid,
         // otherwise revert to original STAR_THICKNESS (1.2).
