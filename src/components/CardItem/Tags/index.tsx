@@ -16,25 +16,16 @@ export function TagsCardItem({ tags }: TagsCardItemProps) {
 
   const extraRef = useRef<HTMLUListElement | null>(null)
   const badgeRef = useRef<HTMLButtonElement | null>(null)
-  // Largura capturada ANTES do click (antes do React re-renderizar)
-  const widthBeforeToggle = useRef<number | null>(null)
+
+  // Estados para controle da animação FLIP
+  const lastWidthRef = useRef<number | null>(null)
+  const prevExpandedRef = useRef(isTagsExpanded)
 
   const visibleTags = tags.slice(0, VISIBLE_LIMIT)
   const hiddenTags = tags.slice(VISIBLE_LIMIT)
   const hasOverflow = hiddenTags.length > 0
 
   const badgeText = isTagsExpanded ? '−' : `+${hiddenTags.length}`
-
-  // Captura a largura atual ANTES de qualquer mudança de estado
-  function handleToggle() {
-    if (badgeRef.current) {
-      // Remove width fixo para medir a largura natural atual
-      badgeRef.current.style.transition = 'none'
-      badgeRef.current.style.width = 'auto'
-      widthBeforeToggle.current = badgeRef.current.getBoundingClientRect().width
-    }
-    toggleTags()
-  }
 
   // Anima a altura da lista extra
   useEffect(() => {
@@ -46,15 +37,16 @@ export function TagsCardItem({ tags }: TagsCardItemProps) {
     }
   }, [isTagsExpanded])
 
-  // FLIP da largura: roda depois que o React atualizou o DOM (novo texto),
-  // mas antes do browser pintar (useLayoutEffect)
+  // FLIP da largura: detecta mudança no estado e anima do valor capturado no render anterior
   useLayoutEffect(() => {
-    if (!badgeRef.current || !hasOverflow) return
-    if (widthBeforeToggle.current === null) return
+    const wasExpanded = prevExpandedRef.current
+    prevExpandedRef.current = isTagsExpanded
+
+    if (wasExpanded === isTagsExpanded) return
+    if (!badgeRef.current || !hasOverflow || lastWidthRef.current === null) return
 
     const el = badgeRef.current
-    const oldWidth = widthBeforeToggle.current
-    widthBeforeToggle.current = null
+    const oldWidth = lastWidthRef.current
 
     // Mede a largura com o novo texto (DOM já atualizado pelo React)
     el.style.transition = 'none'
@@ -77,6 +69,15 @@ export function TagsCardItem({ tags }: TagsCardItemProps) {
     })
   }, [isTagsExpanded, hasOverflow])
 
+  // Captura a largura a cada renderização para estar pronto para o próximo toggle
+  useLayoutEffect(() => {
+    if (badgeRef.current) {
+      // Importante: medir sem o override de width do FLIP se ele estiver rodando
+      // mas como useLayoutEffect roda síncrono, o valor aqui será o pós-render
+      lastWidthRef.current = badgeRef.current.getBoundingClientRect().width
+    }
+  })
+
   return (
     <TagsWrapper>
       <TagsList>
@@ -90,7 +91,7 @@ export function TagsCardItem({ tags }: TagsCardItemProps) {
           <li>
             <TagsBadge
               ref={badgeRef}
-              onClick={handleToggle}
+              onClick={toggleTags}
               data-expanded={isTagsExpanded}
               style={{
                 display: 'inline-flex',
