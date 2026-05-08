@@ -205,6 +205,7 @@ export const ExtraTags = styled('ul', {
     flexWrap: 'wrap',
     gap: '0.375rem',
     overflow: 'hidden',
+    height: '0',
 
     transition: 'height 0.4s ease',
 

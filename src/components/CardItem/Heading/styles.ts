@@ -48,6 +48,8 @@ export const HeadingCardItemContainer = styled('h2', {
 
           width: 'calc(100% + (1.5rem * 2))',
           height: 'calc(100% + (1.5rem * 2))',
+
+          pointerEvents: 'none',
         },
       },
 

@@ -107,7 +107,7 @@ export function TagsCardItem({ tags }: TagsCardItemProps) {
       </TagsList>
 
       {hasOverflow && (
-        <ExtraTags ref={extraRef} style={{ height: '0' }}>
+        <ExtraTags ref={extraRef}>
           {hiddenTags.map((tag, index) => (
             <li
               key={tag}
