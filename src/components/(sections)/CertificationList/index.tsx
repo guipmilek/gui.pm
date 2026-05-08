@@ -1,9 +1,9 @@
 import Link from 'next/link'
 import { RxExternalLink } from 'react-icons/rx'
 
-import { CardItemContainer, CardItemContent } from '@/components/CardItem/styles'
 import { HeaderCardItemContainer } from '@/components/CardItem/Header/styles'
 import { HeadingCardItemContainer } from '@/components/CardItem/Heading/styles'
+import { CardItemContainer, CardItemContent } from '@/components/CardItem/styles'
 import { staticDataProvider } from '@/providers'
 import { CardList } from '@/theme/recipes/cardListRecipe'
 

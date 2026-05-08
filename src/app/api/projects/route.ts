@@ -1,5 +1,5 @@
-import { staticDataProvider } from '@/providers'
 import type { Project } from '@/interfaces/cardItem'
+import { staticDataProvider } from '@/providers'
 
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url)

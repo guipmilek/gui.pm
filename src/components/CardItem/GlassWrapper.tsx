@@ -1,7 +1,7 @@
 'use client'
 
-import { GlassCard } from 'react-glass-ui'
 import { ReactNode, useEffect, useState } from 'react'
+import { GlassCard } from 'react-glass-ui'
 
 interface GlassWrapperProps {
   children: ReactNode

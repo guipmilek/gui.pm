@@ -10,8 +10,8 @@ import { ExpandProvider } from './ExpandContext'
 import { GlassWrapper } from './GlassWrapper'
 import { HeaderCardItem } from './Header'
 import { HeadingCardItem } from './Heading'
-import { TagsCardItem } from './Tags'
 import { CardItemContainer, CardItemContent, Infos, Tags } from './styles'
+import { TagsCardItem } from './Tags'
 
 type CardItemProps = { revealDelay?: number } & (
   | {

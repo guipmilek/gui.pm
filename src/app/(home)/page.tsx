@@ -7,8 +7,8 @@ import { ExperienceList } from '@/components/(sections)/ExperienceList'
 import { LanguageList } from '@/components/(sections)/LanguageList'
 import { ProjectList } from '@/components/(sections)/ProjectList'
 import { AsideHeader } from '@/components/AsideHeader'
-import { Section } from '@/components/Section'
 import { SafeFluentEmoji } from '@/components/SafeFluentEmoji'
+import { Section } from '@/components/Section'
 
 import { HomeContainer } from './styles'
 
