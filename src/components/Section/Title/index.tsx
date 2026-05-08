@@ -1,5 +1,6 @@
 'use client'
 
+import { GlassCard } from 'react-glass-ui'
 import Link from 'next/link'
 import { useRef } from 'react'
 import { useIntersectionObserver } from 'usehooks-ts'
@@ -32,7 +33,21 @@ export function SectionTitle({ sectionId, sectionTitle }: SectionTitleProps) {
       href={sectionLink}
       className={`${sectionTitleContainerStyles()}${isPinned ? ' pinned' : ''}`}
     >
-      <h2>{sectionTitle}</h2>
+      {isPinned ? (
+        <GlassCard
+          distortion={10}
+          blur={8}
+          backgroundOpacity={1}
+          backgroundColor="var(--colors-section-title-background)"
+          borderSize={0}
+          padding="0"
+          className="header-glass-card"
+        >
+          <h2>{sectionTitle}</h2>
+        </GlassCard>
+      ) : (
+        <h2>{sectionTitle}</h2>
+      )}
     </Link>
   )
 }
