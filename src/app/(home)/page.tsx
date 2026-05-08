@@ -68,8 +68,7 @@ export default function Home() {
             rel="noopener noreferrer"
           >
             <strong>guipm.dev</strong>
-          </Link>
-          .
+          </Link>.
         </div>
 
         <p>
