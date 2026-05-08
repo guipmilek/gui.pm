@@ -174,6 +174,58 @@ export const Bio = styled('div', {
   },
 })
 
+export const ResumeButton = styled('a', {
+  base: {
+    opacity: 0,
+
+    display: 'flex',
+    alignItems: 'center',
+    gap: '0.25rem',
+
+    width: 'fit-content',
+    margin: '0 auto',
+
+    padding: '0.5rem',
+    borderWidth: '1px',
+    borderStyle: 'solid',
+    borderColor: 'title',
+    borderRadius: '6px',
+
+    color: 'title',
+    textStyle: 'xs',
+    textTransform: 'uppercase',
+    textDecoration: 'none',
+
+    cursor: 'pointer',
+
+    transition: 'color 0.2s, background-color 0.2s',
+
+    animation: 'fadeSlideUp 0.7s cubic-bezier(0.22, 1, 0.36, 1) both',
+    animationDelay: '280ms',
+
+    '@media (prefers-reduced-motion: reduce)': {
+      opacity: '1 !important',
+      transform: 'none !important',
+      filter: 'none !important',
+      animation: 'none !important',
+    },
+
+    lg: {
+      margin: 0,
+      animation: 'fadeSlideRight 0.7s cubic-bezier(0.22, 1, 0.36, 1) both',
+      animationDelay: '780ms',
+    },
+
+    '@media (hover: hover) and (pointer: fine)': {
+      '&:hover:not(:where(.hover-stale *))': {
+        backgroundColor: 'title',
+        borderColor: 'title',
+        color: 'background',
+      },
+    },
+  },
+})
+
 export const SocialLinks = styled('ul', {
   base: {
     display: 'flex',

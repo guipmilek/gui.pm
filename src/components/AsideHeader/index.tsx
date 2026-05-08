@@ -1,13 +1,14 @@
 import Image from 'next/image'
 import Link from 'next/link'
 import { IconType } from 'react-icons'
+import { RxDownload } from 'react-icons/rx'
 
 import guipmdevLogo from '@/assets/guipmdev-logo.svg'
 import { icons } from '@/libs/reactIcons'
 import { staticDataProvider } from '@/providers'
 
 import { Navbar } from '../Navbar'
-import { AsideHeaderContainer, Bio, SocialLinks } from './styles'
+import { AsideHeaderContainer, Bio, ResumeButton, SocialLinks } from './styles'
 
 export async function AsideHeader() {
   const profile = await staticDataProvider.getProfile()
@@ -34,6 +35,16 @@ export async function AsideHeader() {
       </Bio>
 
       <Navbar />
+
+      <ResumeButton
+        href="/curriculo.pdf"
+        target="_blank"
+        rel="noopener noreferrer"
+        download
+      >
+        <RxDownload size={14} />
+        Baixar currículo
+      </ResumeButton>
 
       {hasLinks && (
         <SocialLinks>
