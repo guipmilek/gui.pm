@@ -19,8 +19,8 @@ interface GlassWrapperProps {
 
 export function GlassWrapper({
   children,
-  flexibility = 1,
-  distortion = 30,
+  flexibility = 3, /* Increase for better mouse tracking */
+  distortion: targetDistortion = 30,
   blur = 2,
   backgroundOpacity = 0.3,
   backgroundColor = 'var(--colors-card-background)',
@@ -32,16 +32,36 @@ export function GlassWrapper({
 }: GlassWrapperProps) {
   const [isMounted, setIsMounted] = useState(false)
   const [isHovered, setIsHovered] = useState(false)
+  const [currentDistortion, setCurrentDistortion] = useState(0)
 
   useEffect(() => {
     setIsMounted(true)
   }, [])
 
+  // Animate distortion value manually for smoother SVG filter transition
+  useEffect(() => {
+    let frame: number
+    const animate = () => {
+      const target = isHovered || isMobile ? targetDistortion : 0
+      setCurrentDistortion((prev) => {
+        const diff = target - prev
+        if (Math.abs(diff) < 0.1) return target
+        return prev + diff * 0.15 // Smooth easing
+      })
+      frame = requestAnimationFrame(animate)
+    }
+    
+    if (isMounted) {
+      frame = requestAnimationFrame(animate)
+    }
+    
+    return () => cancelAnimationFrame(frame)
+  }, [isHovered, isMounted, targetDistortion])
+
   if (!isMounted) {
     return <div className={className}>{children}</div>
   }
 
-  // On mobile/touch devices, we want the effect to be always somewhat visible
   const isMobile = typeof window !== 'undefined' && window.matchMedia('(hover: none)').matches
 
   return (
@@ -53,8 +73,9 @@ export function GlassWrapper({
       style={{
         borderRadius,
         position: 'relative',
-        transition: 'transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1)',
-        transform: isHovered ? 'scale(1.01)' : 'scale(1)',
+        transition: 'transform 0.6s cubic-bezier(0.22, 1, 0.36, 1)',
+        transform: isHovered ? 'scale(1.02) translateY(-2px)' : 'scale(1) translateY(0)',
+        zIndex: isHovered ? 10 : 0,
       }}
     >
       <style jsx global>{`
@@ -65,11 +86,11 @@ export function GlassWrapper({
         .glass-ui-inner-light,
         .glass-ui-outer-light {
           opacity: 0 !important;
-          transform: scale(0.95) !important;
-          transform-origin: center !important;
+          transform: scale(0.98) !important;
+          transform-origin: center center !important;
           transition: 
-            opacity 0.5s cubic-bezier(0.4, 0, 0.2, 1),
-            transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) !important;
+            opacity 0.6s cubic-bezier(0.22, 1, 0.36, 1),
+            transform 0.6s cubic-bezier(0.22, 1, 0.36, 1) !important;
           pointer-events: none;
         }
 
@@ -85,10 +106,15 @@ export function GlassWrapper({
           opacity: 0.4 !important;
           transform: scale(1) !important;
         }
+
+        /* Ensure the library's internal container doesn't clip the magnification */
+        .glass-ui-container {
+          overflow: visible !important;
+        }
       `}</style>
       <GlassCard
         flexibility={flexibility}
-        distortion={distortion}
+        distortion={currentDistortion}
         blur={blur}
         chromaticAberration={1}
         saturation={120}
