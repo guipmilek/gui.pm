@@ -54,7 +54,7 @@ export default function NotFound() {
           textStyle: 'sm',
           fontWeight: 'medium',
           transition: 'color 0.2s, background-color 0.2s',
-          _hover: {
+          '&:hover:not(:where(.hover-stale *)), &.scroll-hover': {
             backgroundColor: 'title',
             color: 'background',
           },

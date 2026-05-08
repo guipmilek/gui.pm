@@ -33,7 +33,16 @@ export const NavbarContainer = styled('nav', {
         height: '1px',
       },
 
-      '&:hover, &.active': {
+      '&.active': {
+        color: 'title',
+
+        '& span': {
+          backgroundColor: 'title',
+          width: '64px',
+        },
+      },
+
+      '&:hover:not(:where(.hover-stale *)), &.scroll-hover': {
         color: 'title',
 
         '& span': {

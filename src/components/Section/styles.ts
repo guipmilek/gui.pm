@@ -55,7 +55,7 @@ export const customLinkStyles = cva({
       transition: 'transform 0.2s',
     },
 
-    '&:hover': {
+    '&:hover:not(:where(.hover-stale *)), &.scroll-hover': {
       '& span::before': {
         width: '100%',
       },

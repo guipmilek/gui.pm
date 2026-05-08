@@ -101,7 +101,7 @@ export const Bio = styled('div', {
         },
       },
 
-      '&:hover': {
+      '&:hover:not(:where(.hover-stale *)), &.scroll-hover': {
         '& img': {
           transform: 'rotate(-15deg) scale(105%)',
         },
@@ -148,7 +148,7 @@ export const SocialLinks = styled('ul', {
 
       transition: 'color 0.2s',
 
-      '&:hover': {
+      '&:hover:not(:where(.hover-stale *)), &.scroll-hover': {
         color: 'title',
       },
     },

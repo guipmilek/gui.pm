@@ -24,7 +24,7 @@ export const ButtonContainer = styled('button', {
 
     transition: 'color 0.2s, background-color 0.2s, margin 0.5s',
 
-    '&:hover': {
+    '&:hover:not(:where(.hover-stale *)), &.scroll-hover': {
       backgroundColor: 'title',
 
       borderColor: 'title',
