@@ -8,7 +8,7 @@ import { icons } from '@/libs/reactIcons'
 import { DescriptionCardItem } from './Description'
 import { HeaderCardItem } from './Header'
 import { HeadingCardItem } from './Heading'
-import { CardItemContainer, CardItemContent, Infos, Tags } from './styles'
+import { CardItemContainer, CardItemContent, Infos, PositioningTag, Tags } from './styles'
 
 type CardItemProps = { revealDelay?: number } & (
   | {
@@ -65,6 +65,10 @@ export function CardItem(props: CardItemProps) {
           </HeadingCardItem>
 
           <Infos>
+            {type === 'experience' && data.positioning && (
+              <PositioningTag>{data.positioning}</PositioningTag>
+            )}
+
             {type === 'experience' && data.summary && (
               <p>{data.summary}</p>
             )}

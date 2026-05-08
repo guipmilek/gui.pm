@@ -81,11 +81,13 @@ export async function HeadingCardItem({
 }: HeadingCardItemProps) {
   switch (type) {
     case 'experience': {
-      const { location, locationName } = data
+      const { location, locationName, locationText } = data
 
       const headingSubtitleArray = []
 
-      if (location) {
+      if (locationText) {
+        headingSubtitleArray.push(locationText)
+      } else if (location) {
         const res = await fetch(
           `https://viacep.com.br/ws/${location.postalCode}/json`,
           { next: { revalidate: 60 * 60 * 24 } },
@@ -99,7 +101,7 @@ export async function HeadingCardItem({
         headingSubtitleArray.push(headingLocation)
       }
 
-      if (data.locationName) {
+      if (locationName) {
         headingSubtitleArray.push(locationName)
       }
 
@@ -111,7 +113,6 @@ export async function HeadingCardItem({
           {children}
 
           {hasHeadingSubtitle && <p>{headingSubtitleText}</p>}
-          {data.positioning && <p>{data.positioning}</p>}
         </HeadingCardItemContainer>
       )
     }

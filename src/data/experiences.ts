@@ -12,6 +12,7 @@ export const experiences: Experience[] = [
     link: null,
     location: null,
     locationName: 'Presencial',
+    locationText: 'Caçador, SC',
     description: [
       'Diagnóstico de problemas em processos, cadastros, permissões, integrações, logs e rotinas operacionais.',
       'Uso de SQL/PostgreSQL para auditoria, validação de dados, investigação de divergências e apoio a correções.',
@@ -51,6 +52,7 @@ export const experiences: Experience[] = [
     link: null,
     location: null,
     locationName: 'Presencial',
+    locationText: 'Caçador, SC',
     description: [
       'Manutenção e sustentação de sistemas ERP usando a plataforma low-code GeneXus.',
       'Execução de validações e testes de novas funcionalidades antes da liberação.',
@@ -174,6 +176,7 @@ export const experiences: Experience[] = [
     link: null,
     location: null,
     locationName: 'Presencial',
+    locationText: 'Caçador, SC',
     description: [
       'Edição de vídeos e criação de animações para materiais digitais.',
       'Apoio à produção visual e comunicação de clientes.',
@@ -197,6 +200,7 @@ export const experiences: Experience[] = [
     link: null,
     location: null,
     locationName: 'Presencial',
+    locationText: 'Caçador, SC',
     description: [
       'Produção de conteúdos digitais e materiais de comunicação.',
       'Experiência inicial com comunicação, escrita e organização de informações para público externo.',

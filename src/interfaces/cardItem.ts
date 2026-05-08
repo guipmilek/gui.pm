@@ -25,6 +25,7 @@ export interface Experience {
     postalCode: string
   } | null
   locationName: 'Presencial' | 'Híbrida' | 'Remota' | null
+  locationText?: string | null
   description: string[] | null
   additionalLinks: Link[] | null
   skills: string[] | null
