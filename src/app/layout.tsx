@@ -35,7 +35,7 @@ const revealPreloadScript = `
 
 export default function RootLayout({ children }: RootLayoutProps) {
   return (
-    <html lang="pt-BR" className={fontClassName}>
+    <html lang="pt-BR" className={fontClassName} suppressHydrationWarning>
       <body>
         <style>
           {`
