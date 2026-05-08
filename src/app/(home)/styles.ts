@@ -29,7 +29,17 @@ export const HomeContainer = styled('div', {
 
       textAlign: 'center',
 
-      '& p:first-child': {
+      '& .footer-link': {
+        transition: 'color 0.2s',
+
+        '@media (hover: hover) and (pointer: fine)': {
+          '&:hover:not(:where(.hover-stale *)), &.scroll-hover': {
+            color: 'text',
+          },
+        },
+      },
+
+      '& p:first-child, & div:first-child': {
         marginBottom: '0.5rem',
 
         textStyle: 'sm',
