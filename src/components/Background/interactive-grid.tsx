@@ -8,11 +8,14 @@ interface ShootingStar {
   headX: number
   headY: number
   dir: 'h' | 'v'
-  moveSign: number
+  moveSignX: number
+  moveSignY: number
   speed: number
   waypoints: { x: number; y: number }[]
   startPos: { x: number; y: number }
   totalDist: number
+  lastTurnDist: number
+  lastGridSize: number
   guided: boolean
   color: string
   startTime: number
@@ -327,6 +330,8 @@ export function InteractiveGrid() {
 
       const mx = positionRef.current.x
       const my = positionRef.current.y
+      const tx = mx + window.scrollX
+      const ty = my + window.scrollY
       const hasPointer = Number.isFinite(mx) && Number.isFinite(my)
       const inBounds = hasPointer && mx > 0 && my > 0 && mx < w && my < h
       const guided = !isTouchRef.current && isMouseInside && inBounds
@@ -334,7 +339,8 @@ export function InteractiveGrid() {
       let headX = 0
       let headY = 0
       let dir: 'h' | 'v' = 'h'
-      let moveSign = 1
+      let moveSignX = 1
+      let moveSignY = 1
       let occupancyKey = ''
 
       const findUnoccupiedLine = (scroll: number, size: number, orientation: 'h' | 'v') => {
@@ -366,7 +372,8 @@ export function InteractiveGrid() {
           occupancyKey = key
           headY = scrollY - entryDepth
           dir = 'v'
-          moveSign = 1
+          moveSignY = 1
+          moveSignX = tx > headX ? 1 : -1
         } else if (edge === 1) {
           // Bottom
           const { line, key } = findUnoccupiedLine(scrollX, w, 'v')
@@ -374,7 +381,8 @@ export function InteractiveGrid() {
           occupancyKey = key
           headY = scrollY + h + entryDepth
           dir = 'v'
-          moveSign = -1
+          moveSignY = -1
+          moveSignX = tx > headX ? 1 : -1
         } else if (edge === 2) {
           // Left
           headX = scrollX - entryDepth
@@ -382,7 +390,8 @@ export function InteractiveGrid() {
           headY = line
           occupancyKey = key
           dir = 'h'
-          moveSign = 1
+          moveSignX = 1
+          moveSignY = ty > headY ? 1 : -1
         } else {
           // Right
           headX = scrollX + w + entryDepth
@@ -390,11 +399,11 @@ export function InteractiveGrid() {
           headY = line
           occupancyKey = key
           dir = 'h'
-          moveSign = -1
+          moveSignX = -1
+          moveSignY = ty > headY ? 1 : -1
         }
       } else {
         const forward = Math.random() > 0.5
-        moveSign = forward ? 1 : -1
         if (edge === 2 || edge === 3) {
           // Left or Right
           const side = edge === 2 ? 'left' : 'right'
@@ -403,7 +412,8 @@ export function InteractiveGrid() {
           occupancyKey = key
           headX = side === 'left' ? scrollX - entryDepth : scrollX + w + entryDepth
           dir = 'h'
-          moveSign = side === 'left' ? 1 : -1
+          moveSignX = side === 'left' ? 1 : -1
+          moveSignY = 1
         } else {
           // Top or Bottom
           const side = edge === 0 ? 'top' : 'bottom'
@@ -412,7 +422,8 @@ export function InteractiveGrid() {
           occupancyKey = key
           headY = side === 'top' ? scrollY - entryDepth : scrollY + h + entryDepth
           dir = 'v'
-          moveSign = side === 'top' ? 1 : -1
+          moveSignY = side === 'top' ? 1 : -1
+          moveSignX = 1
         }
       }
 
@@ -421,11 +432,14 @@ export function InteractiveGrid() {
         headX,
         headY,
         dir,
-        moveSign,
+        moveSignX,
+        moveSignY,
         speed: STAR_SPEED,
         waypoints: [],
         startPos: { x: headX, y: headY },
         totalDist: 0,
+        lastTurnDist: 0,
+        lastGridSize: BIG_SIZE,
         guided,
         color: STAR_COLOR,
         startTime: performance.now(),
@@ -593,17 +607,24 @@ export function InteractiveGrid() {
           const bty = Math.round(ty / BIG_SIZE) * BIG_SIZE
           const distToBigGrid = Math.sqrt((tx - btx) ** 2 + (ty - bty) ** 2)
 
-          // Only use the smaller grid if the big grid lines are too far to reach the cursor
-          const useSmallGrid = distToBigGrid > currentAbsorbDist - 5
-          const gridSize = useSmallGrid ? SMALL_SIZE : BIG_SIZE
+          // Grid size hysteresis to prevent flipping
+          let gridSize = star.lastGridSize || BIG_SIZE
+          const switchToSmall = distToBigGrid > currentAbsorbDist - 5
+          const switchToBig = distToBigGrid < currentAbsorbDist - 15
+          if (gridSize === BIG_SIZE && switchToSmall) gridSize = SMALL_SIZE
+          else if (gridSize === SMALL_SIZE && switchToBig) gridSize = BIG_SIZE
+          star.lastGridSize = gridSize
 
           const targetGridX = Math.round(tx / gridSize) * gridSize
           const targetGridY = Math.round(ty / gridSize) * gridSize
 
+          // Turn cool-down: must move a bit before turning again
+          const canTurn = (star.totalDist - star.lastTurnDist) > gridSize * 1.1
+
           if (star.dir === 'h') {
-            star.headX += star.moveSign * step
+            star.headX += star.moveSignX * step
             const nextGridX = Math.round(star.headX / gridSize) * gridSize
-            if (Math.abs(star.headX - nextGridX) < step) {
+            if (canTurn && Math.abs(star.headX - nextGridX) < step) {
               if (Math.abs(targetGridY - star.headY) >= gridSize) {
                 const targetKey = `v-${nextGridX}`
                 const isOccupied = lineOccupancyRef.current.has(targetKey)
@@ -620,7 +641,6 @@ export function InteractiveGrid() {
                 if (!isOccupied) {
                   shouldTurn = true
                 } else if (distToMouse < 160) {
-                  // If occupied but close, only skip if there's a free alternative
                   if (altReaches && !isAltOccupied && altGridX !== nextGridX) {
                     shouldTurn = false
                   } else {
@@ -629,20 +649,25 @@ export function InteractiveGrid() {
                 }
 
                 if (shouldTurn) {
-                  if (star.occupancyKey) lineOccupancyRef.current.delete(star.occupancyKey)
-                  star.headX = nextGridX
-                  star.waypoints.unshift({ x: star.headX, y: star.headY })
-                  star.dir = 'v'
-                  star.moveSign = Math.sign(targetGridY - star.headY) || 1
-                  star.occupancyKey = targetKey
-                  lineOccupancyRef.current.add(targetKey)
+                  // Momentum lock: don't reverse direction on an axis once committed near target
+                  const nextMoveSignY = Math.sign(targetGridY - star.headY) || 1
+                  if (distToMouse > 80 || nextMoveSignY === star.moveSignY || star.waypoints.length < 2) {
+                    if (star.occupancyKey) lineOccupancyRef.current.delete(star.occupancyKey)
+                    star.headX = nextGridX
+                    star.waypoints.unshift({ x: star.headX, y: star.headY })
+                    star.dir = 'v'
+                    star.moveSignY = nextMoveSignY
+                    star.lastTurnDist = star.totalDist
+                    star.occupancyKey = targetKey
+                    lineOccupancyRef.current.add(targetKey)
+                  }
                 }
               }
             }
           } else {
-            star.headY += star.moveSign * step
+            star.headY += star.moveSignY * step
             const nextGridY = Math.round(star.headY / gridSize) * gridSize
-            if (Math.abs(star.headY - nextGridY) < step) {
+            if (canTurn && Math.abs(star.headY - nextGridY) < step) {
               if (Math.abs(targetGridX - star.headX) >= gridSize) {
                 const targetKey = `h-${nextGridY}`
                 const isOccupied = lineOccupancyRef.current.has(targetKey)
@@ -667,13 +692,17 @@ export function InteractiveGrid() {
                 }
 
                 if (shouldTurn) {
-                  if (star.occupancyKey) lineOccupancyRef.current.delete(star.occupancyKey)
-                  star.headY = nextGridY
-                  star.waypoints.unshift({ x: star.headX, y: star.headY })
-                  star.dir = 'h'
-                  star.moveSign = Math.sign(targetGridX - star.headX) || 1
-                  star.occupancyKey = targetKey
-                  lineOccupancyRef.current.add(targetKey)
+                  const nextMoveSignX = Math.sign(targetGridX - star.headX) || 1
+                  if (distToMouse > 80 || nextMoveSignX === star.moveSignX || star.waypoints.length < 2) {
+                    if (star.occupancyKey) lineOccupancyRef.current.delete(star.occupancyKey)
+                    star.headY = nextGridY
+                    star.waypoints.unshift({ x: star.headX, y: star.headY })
+                    star.dir = 'h'
+                    star.moveSignX = nextMoveSignX
+                    star.lastTurnDist = star.totalDist
+                    star.occupancyKey = targetKey
+                    lineOccupancyRef.current.add(targetKey)
+                  }
                 }
               }
             }
@@ -695,9 +724,9 @@ export function InteractiveGrid() {
           }
         } else {
           if (star.dir === 'h') {
-            star.headX += star.moveSign * step
+            star.headX += star.moveSignX * step
           } else {
-            star.headY += star.moveSign * step
+            star.headY += star.moveSignY * step
           }
         }
       }
