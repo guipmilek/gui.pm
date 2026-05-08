@@ -1,8 +1,7 @@
 'use client'
 
-import { useEffect } from 'react'
-
 import Link from 'next/link'
+import { useEffect } from 'react'
 
 import { useActiveItem } from '@/hooks/useActiveItem'
 
@@ -21,7 +20,7 @@ const sectionInfos: SectionInfo[] = [
 const sectionsIds = sectionInfos.map((sectionInfo) => sectionInfo.id)
 
 export function Navbar() {
-  const activeSection = useActiveItem(sectionsIds, sectionsIds[0])
+  const activeSection = useActiveItem(sectionsIds)
 
   useEffect(() => {
     if ('scrollRestoration' in history) {
