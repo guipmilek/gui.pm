@@ -565,7 +565,7 @@ export function InteractiveGrid() {
         const step = star.speed * dt
         star.totalDist += step
 
-        if (star.guided && hasPointer) {
+        if (star.guided && hasPointer && isMouseInside) {
           const vmx = star.headX - scrollX
           const vmy = star.headY - scrollY
           const distToMouse = Math.sqrt((vmx - mx) ** 2 + (vmy - my) ** 2)
