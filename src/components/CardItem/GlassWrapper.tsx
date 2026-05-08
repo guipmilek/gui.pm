@@ -21,7 +21,7 @@ export function GlassWrapper({
   children,
   flexibility = 1,
   distortion = 20,
-  blur = 4,
+  blur = 2,
   backgroundOpacity = 1,
   backgroundColor = 'var(--colors-card-background)',
   borderSize = 1,
