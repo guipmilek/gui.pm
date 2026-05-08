@@ -32,7 +32,7 @@ export interface Experience {
 
 export interface Project {
   id: string
-  imagePath: string
+  imagePath: string | null
   title: string
   link: string | null
   description: string[] | null

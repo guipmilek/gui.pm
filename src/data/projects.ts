@@ -2,6 +2,54 @@ import type { Project } from '@/interfaces/cardItem'
 
 export const projects: Project[] = [
   {
+    id: '6',
+    imagePath: null,
+    title: 'Atrol UI Enhancements',
+    link: null,
+    description: [
+      'Desenvolvimento de uma camada de melhorias sobre o sistema legado Atrol/LSWS usando JavaScript, CSS e JSON declarativo.',
+      'Padronização de interfaces, tabelas, ações e componentes para reduzir duplicação e tornar a base mais sustentável para evoluções futuras.',
+    ],
+    additionalLinks: null,
+    tags: ['JavaScript', 'CSS', 'JSON', 'SQL', 'Atrol/LSWS', 'UX/UI'],
+  },
+  {
+    id: '5',
+    imagePath: null,
+    title: 'Servidor de Etiquetas',
+    link: null,
+    description: [
+      'Aplicação Windows desenvolvida em AutoIt para intermediar impressão RAW via TCP local em etiquetadoras térmicas.',
+      'Apoio a instalação, diagnóstico de spooler e compatibilidade com diferentes versões do Windows em ambientes heterogêneos.',
+    ],
+    additionalLinks: null,
+    tags: ['AutoIt', 'Windows', 'TCP/IP', 'Impressão RAW', 'Inno Setup'],
+  },
+  {
+    id: '4',
+    imagePath: null,
+    title: 'Automação de Cadastro de Usuários',
+    link: null,
+    description: [
+      'Centralização do fluxo de cadastro de usuários com validações preventivas, geração automática de padrões e scripts de apoio.',
+      'Redução do tempo de cadastro de aproximadamente 15–20 minutos para cerca de 2–3 minutos.',
+    ],
+    additionalLinks: null,
+    tags: ['JavaScript', 'SQL', 'Atrol', 'STT', 'SkyMail'],
+  },
+  {
+    id: '3',
+    imagePath: null,
+    title: 'Integrações EDI e Migração STT → Atrol',
+    link: null,
+    description: [
+      'Análise de arquivos EDI, validação com SQL/PostgreSQL e correção de divergências em layouts NOTFIS, CONEMB, OCOREN e DOCCOB.',
+      'Apoio na migração de aproximadamente 4.000 registros de agendamentos do sistema legado STT para o TMS Atrol.',
+    ],
+    additionalLinks: null,
+    tags: ['SQL', 'PostgreSQL', 'EDI', 'NOTFIS', 'CONEMB', 'OCOREN', 'DOCCOB', 'API/FTP'],
+  },
+  {
     id: '2',
     imagePath: '/images/guipm-dev.jpeg',
     title: 'guipm.dev',

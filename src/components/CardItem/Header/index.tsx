@@ -2,7 +2,7 @@ import Image from 'next/image'
 
 import { Experience, Project } from '@/interfaces/cardItem'
 
-import { HeaderCardItemContainer } from './styles'
+import { HeaderCardItemContainer, ProjectImagePlaceholder } from './styles'
 
 type HeaderCardItemProps =
   | { type: 'experience'; data: Experience }
@@ -44,12 +44,16 @@ export function HeaderCardItem({ type, data }: HeaderCardItemProps) {
 
       return (
         <HeaderCardItemContainer type="project">
-          <Image
-            src={imagePath}
-            alt={`${data.title} preview`}
-            width={200}
-            height={112.5}
-          />
+          {imagePath ? (
+            <Image
+              src={imagePath}
+              alt={`${data.title} preview`}
+              width={200}
+              height={112.5}
+            />
+          ) : (
+            <ProjectImagePlaceholder>interno</ProjectImagePlaceholder>
+          )}
         </HeaderCardItemContainer>
       )
     }
