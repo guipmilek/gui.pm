@@ -53,37 +53,45 @@ export function GlassWrapper({
       style={{
         borderRadius,
         position: 'relative',
+        transition: 'transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1)',
+        transform: isHovered ? 'scale(1.01)' : 'scale(1)',
       }}
     >
       <style jsx global>{`
-        /* Base state: hide glass layers */
+        /* Base state: hide glass layers and set initial scale for magnifying effect */
         .glass-ui-distortion-layer,
         .glass-ui-background-layer,
         .glass-ui-border-layer,
         .glass-ui-inner-light,
         .glass-ui-outer-light {
           opacity: 0 !important;
-          transition: opacity 0.5s cubic-bezier(0.4, 0, 0.2, 1) !important;
+          transform: scale(0.95) !important;
+          transform-origin: center !important;
+          transition: 
+            opacity 0.5s cubic-bezier(0.4, 0, 0.2, 1),
+            transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) !important;
           pointer-events: none;
         }
 
-        /* Hover state: show glass layers */
+        /* Hover state: show glass layers and scale to 1 (magnify) */
         [data-glass-hover='true'] .glass-ui-distortion-layer,
         [data-glass-hover='true'] .glass-ui-background-layer {
           opacity: 1 !important;
+          transform: scale(1) !important;
         }
 
         [data-glass-hover='true'] .glass-ui-border-layer,
         [data-glass-hover='true'] .glass-ui-inner-light {
-          opacity: 0.4 !important; /* Soften the rim light */
+          opacity: 0.4 !important;
+          transform: scale(1) !important;
         }
       `}</style>
       <GlassCard
         flexibility={flexibility}
         distortion={distortion}
         blur={blur}
-        chromaticAberration={1} /* Reduce to avoid noticeable yellow/blue fringes */
-        saturation={120} /* Slightly more natural saturation */
+        chromaticAberration={1}
+        saturation={120}
         brightness={105}
         innerLightColor="rgba(255, 255, 255, 0.3)"
         innerLightBlur={1}
