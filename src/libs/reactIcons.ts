@@ -1,4 +1,4 @@
-import { FaYoutube } from 'react-icons/fa6'
+import { FaWhatsapp, FaYoutube } from 'react-icons/fa6'
 import {
   RxChevronDown,
   RxEnvelopeClosed,
@@ -17,6 +17,7 @@ export const icons = {
   linkedin: RxLinkedinLogo,
 
   // ===== Font Awesome =====
+  whatsapp: FaWhatsapp,
   youtube: FaYoutube,
 }
 

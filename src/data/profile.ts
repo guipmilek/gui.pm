@@ -12,7 +12,8 @@ export const profile: Profile = {
   links: [
     { type: 'github', title: 'GitHub', url: 'https://github.com/guipmdev' },
     { type: 'linkedin', title: 'LinkedIn', url: 'https://www.linkedin.com/in/guilhermeprevedamilek' },
+    { type: 'whatsapp', title: 'WhatsApp', url: 'https://wa.me/5549984090926' },
     { type: 'youtube', title: 'YouTube', url: 'https://www.youtube.com/@guipmdev' },
-    { type: 'email', title: 'E-mail', url: 'mailto:guipm.dev@gmail.com' },
+    { type: 'email', title: 'E-mail', url: 'mailto:guilhermeprevedamilek@gmail.com' },
   ],
 }
