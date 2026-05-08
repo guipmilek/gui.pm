@@ -46,8 +46,10 @@ export const HomeContainer = styled('div', {
         '& a': {
           transition: 'color 0.2s',
 
-          '&:hover:not(:where(.hover-stale *)), &.scroll-hover': {
-            color: 'text',
+          '@media (hover: hover) and (pointer: fine)': {
+            '&:hover:not(:where(.hover-stale *)), &.scroll-hover': {
+              color: 'text',
+            },
           },
         },
       },

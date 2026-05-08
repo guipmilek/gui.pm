@@ -43,6 +43,10 @@ export const sectionTitleContainerStyles = cva({
 
       transition: 'opacity 0.2s ease-out',
 
+      '@media (prefers-reduced-motion: reduce)': {
+        transition: 'none',
+      },
+
       '@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px)))': {
         backgroundColor: 'background',
       },

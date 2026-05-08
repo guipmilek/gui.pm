@@ -90,7 +90,6 @@ export function DescriptionCardItem({ description }: DescriptionCardItemProps) {
           rotateIcon={isExpanded}
           style={{
             marginTop: isExpanded ? '0' : DEFAULT_BUTTON_MARGIN_TOP,
-            transition: 'color 0.2s, background-color 0.2s, margin 0.5s',
           }}
         >
           {isExpanded ? 'Ocultar' : 'Expandir'}

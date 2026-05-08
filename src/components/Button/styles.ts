@@ -24,16 +24,26 @@ export const ButtonContainer = styled('button', {
 
     transition: 'color 0.2s, background-color 0.2s, margin 0.5s',
 
-    '&:hover:not(:where(.hover-stale *)), &.scroll-hover': {
-      backgroundColor: 'title',
+    '@media (hover: hover) and (pointer: fine)': {
+      '&:hover:not(:where(.hover-stale *)), &.scroll-hover': {
+        backgroundColor: 'title',
 
-      borderColor: 'title',
+        borderColor: 'title',
 
-      color: 'background',
+        color: 'background',
+      },
     },
 
     '& svg': {
       transition: 'transform 0.5s',
+    },
+
+    '@media (prefers-reduced-motion: reduce)': {
+      transition: 'none',
+
+      '& svg': {
+        transition: 'none',
+      },
     },
   },
   variants: {

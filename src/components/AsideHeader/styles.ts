@@ -51,6 +51,14 @@ export const Bio = styled('div', {
         transform: 'none !important',
         filter: 'none !important',
         animation: 'none !important',
+
+        '& img': {
+          transition: 'none',
+        },
+
+        '& h1::before, & h1::after': {
+          animation: 'none !important',
+        },
       },
 
       lg: {
@@ -117,29 +125,31 @@ export const Bio = styled('div', {
         },
       },
 
-      '&:hover:not(:where(.hover-stale *)), &.scroll-hover': {
-        '& img': {
-          transform: 'rotate(-15deg) scale(105%)',
-        },
+      '@media (hover: hover) and (pointer: fine)': {
+        '&:hover:not(:where(.hover-stale *)), &.scroll-hover': {
+          '& img': {
+            transform: 'rotate(-15deg) scale(105%)',
+          },
 
-        '& h1::before': {
-          visibility: 'visible',
+          '& h1::before': {
+            visibility: 'visible',
 
-          left: '1px',
+            left: '1px',
 
-          textShadow: '1px 0 red',
+            textShadow: '1px 0 red',
 
-          animation: 'glitchAnimation1 2s infinite linear 0s',
-        },
+            animation: 'glitchAnimation1 2s infinite linear 0s',
+          },
 
-        '& h1::after': {
-          visibility: 'visible',
+          '& h1::after': {
+            visibility: 'visible',
 
-          left: '-1px',
+            left: '-1px',
 
-          textShadow: '-1px 0 blue',
+            textShadow: '-1px 0 blue',
 
-          animation: 'glitchAnimation2 2s infinite linear 0s',
+            animation: 'glitchAnimation2 2s infinite linear 0s',
+          },
         },
       },
     },
@@ -182,8 +192,10 @@ export const SocialLinks = styled('ul', {
 
       transition: 'color 0.2s',
 
-      '&:hover:not(:where(.hover-stale *)), &.scroll-hover': {
-        color: 'title',
+      '@media (hover: hover) and (pointer: fine)': {
+        '&:hover:not(:where(.hover-stale *)), &.scroll-hover': {
+          color: 'title',
+        },
       },
     },
 
@@ -203,11 +215,26 @@ export const SocialLinks = styled('ul', {
         animation: 'fadeSlideRight 0.7s cubic-bezier(0.22, 1, 0.36, 1) both',
       },
 
-      '&:nth-of-type(1)': { animationDelay: '560ms' },
-      '&:nth-of-type(2)': { animationDelay: '640ms' },
-      '&:nth-of-type(3)': { animationDelay: '720ms' },
-      '&:nth-of-type(4)': { animationDelay: '800ms' },
-      '&:nth-of-type(5)': { animationDelay: '880ms' },
+      '&:nth-of-type(1)': {
+        animationDelay: '360ms',
+        lg: { animationDelay: '560ms' },
+      },
+      '&:nth-of-type(2)': {
+        animationDelay: '420ms',
+        lg: { animationDelay: '640ms' },
+      },
+      '&:nth-of-type(3)': {
+        animationDelay: '480ms',
+        lg: { animationDelay: '720ms' },
+      },
+      '&:nth-of-type(4)': {
+        animationDelay: '540ms',
+        lg: { animationDelay: '800ms' },
+      },
+      '&:nth-of-type(5)': {
+        animationDelay: '600ms',
+        lg: { animationDelay: '880ms' },
+      },
     },
   },
 })

@@ -17,6 +17,10 @@ export const ParagraphCardItemContainer = styled('div', {
 
       transition: 'height 0.5s, mask-position 0.5s, -webkit-mask-position 0.5s',
 
+      '@media (prefers-reduced-motion: reduce)': {
+        transition: 'none',
+      },
+
       '& p': {
         textStyle: 'sm',
 

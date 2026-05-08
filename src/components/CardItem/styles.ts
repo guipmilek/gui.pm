@@ -5,12 +5,6 @@ export const CardItemContainer = styled('li', {
     position: 'relative',
     isolation: 'isolate',
 
-    '&:hover:not(:where(.hover-stale *)), &.scroll-hover': {
-      '& header img': {
-        borderColor: 'imageBorder.hover',
-      },
-    },
-
     '&::before': {
       opacity: 1,
 
@@ -47,6 +41,10 @@ export const CardItemContainer = styled('li', {
       },
 
       '&:hover:not(:where(.hover-stale *)), &.scroll-hover': {
+        '& header img': {
+          borderColor: 'imageBorder.hover',
+        },
+
         '&::before': {
           opacity: '100%',
         },
@@ -117,8 +115,10 @@ export const Infos = styled('div', {
 
         transition: 'color 0.2s',
 
-        '&:hover:not(:where(.hover-stale *)), &.scroll-hover': {
-          color: 'primary',
+        '@media (hover: hover) and (pointer: fine)': {
+          '&:hover:not(:where(.hover-stale *)), &.scroll-hover': {
+            color: 'primary',
+          },
         },
       },
     },

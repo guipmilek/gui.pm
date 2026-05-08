@@ -57,12 +57,14 @@ export const NavbarContainer = styled('nav', {
         },
       },
 
-      '&:hover:not(:where(.hover-stale *)), &.scroll-hover': {
-        color: 'title',
+      '@media (hover: hover) and (pointer: fine)': {
+        '&:hover:not(:where(.hover-stale *)), &.scroll-hover': {
+          color: 'title',
 
-        '& span': {
-          backgroundColor: 'title',
-          width: '64px',
+          '& span': {
+            backgroundColor: 'title',
+            width: '64px',
+          },
         },
       },
     },

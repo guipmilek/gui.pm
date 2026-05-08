@@ -51,11 +51,13 @@ export const HeadingCardItemContainer = styled('h2', {
         },
       },
 
-      '&:hover:not(:where(.hover-stale *)), &.scroll-hover': {
-        color: 'primary',
+      '@media (hover: hover) and (pointer: fine)': {
+        '&:hover:not(:where(.hover-stale *)), &.scroll-hover': {
+          color: 'primary',
 
-        '& span svg': {
-          transform: 'translate(50%, -25%)',
+          '& span svg': {
+            transform: 'translate(50%, -25%)',
+          },
         },
       },
     },

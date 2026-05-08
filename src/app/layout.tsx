@@ -26,7 +26,7 @@ export const viewport: Viewport = {
 
 export default function RootLayout({ children }: RootLayoutProps) {
   return (
-    <html lang="pt-BR" className={`${fontClassName} reveal-ready`}>
+    <html lang="pt-BR" className={fontClassName}>
       <body>
         <noscript>
           <style>

@@ -32,7 +32,13 @@ export function Navbar() {
       setTimeout(() => {
         const element = document.querySelector(hash)
         if (element) {
-          element.scrollIntoView({ behavior: 'smooth' })
+          const prefersReducedMotion = window.matchMedia(
+            '(prefers-reduced-motion: reduce)',
+          ).matches
+
+          element.scrollIntoView({
+            behavior: prefersReducedMotion ? 'auto' : 'smooth',
+          })
         }
       }, 100)
     } else {

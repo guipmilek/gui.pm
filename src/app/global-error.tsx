@@ -57,9 +57,11 @@ export default function GlobalError({
             cursor: 'pointer',
             marginTop: '0.5rem',
             transition: 'color 0.2s, background-color 0.2s',
-            '&:hover:not(:where(.hover-stale *)), &.scroll-hover': {
-              backgroundColor: 'title',
-              color: 'background',
+            '@media (hover: hover) and (pointer: fine)': {
+              '&:hover:not(:where(.hover-stale *)), &.scroll-hover': {
+                backgroundColor: 'title',
+                color: 'background',
+              },
             },
           })}
         >

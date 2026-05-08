@@ -55,13 +55,15 @@ export const customLinkStyles = cva({
       transition: 'transform 0.2s',
     },
 
-    '&:hover:not(:where(.hover-stale *)), &.scroll-hover': {
-      '& span::before': {
-        width: '100%',
-      },
+    '@media (hover: hover) and (pointer: fine)': {
+      '&:hover:not(:where(.hover-stale *)), &.scroll-hover': {
+        '& span::before': {
+          width: '100%',
+        },
 
-      '& svg': {
-        transform: 'translateX(4px)',
+        '& svg': {
+          transform: 'translateX(4px)',
+        },
       },
     },
   },
