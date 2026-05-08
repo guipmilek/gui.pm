@@ -17,7 +17,6 @@ export interface Experience {
   endMonthYear: CustomDate | null
   title: string
   companyName: string | null
-  positioning?: string | null
   summary?: string | null
   link: string | null
   location: {

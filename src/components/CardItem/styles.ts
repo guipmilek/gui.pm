@@ -228,19 +228,3 @@ export const Tags = styled('ul', {
   },
 })
 
-export const PositioningTag = styled('p', {
-  base: {
-    display: 'inline-block',
-
-    textStyle: 'xs',
-    color: 'subtitle',
-    fontWeight: 'medium',
-
-    border: '1px solid',
-    borderColor: 'subtitle',
-    borderRadius: '3.125rem',
-    opacity: 0.6,
-
-    padding: '0.125rem 0.5rem',
-  },
-})
