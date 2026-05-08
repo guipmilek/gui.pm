@@ -31,6 +31,7 @@ export function GlassWrapper({
   className,
 }: GlassWrapperProps) {
   const [isMounted, setIsMounted] = useState(false)
+  const [isHovered, setIsHovered] = useState(false)
 
   useEffect(() => {
     setIsMounted(true)
@@ -40,20 +41,33 @@ export function GlassWrapper({
     return <div className={className}>{children}</div>
   }
 
+  // On mobile/touch devices, we want the effect to be always somewhat visible or react to scroll
+  // For simplicity, let's keep it visible on mobile and hover-dependent on desktop
+  const showEffect = isHovered || (typeof window !== 'undefined' && window.matchMedia('(hover: none)').matches)
+
   return (
-    <GlassCard
-      flexibility={flexibility}
-      distortion={distortion}
-      blur={blur}
-      backgroundOpacity={backgroundOpacity}
-      backgroundColor={backgroundColor}
-      borderSize={borderSize}
-      borderColor={borderColor}
-      borderRadius={borderRadius}
-      padding={padding}
+    <div
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
       className={className}
+      style={{ borderRadius }}
     >
-      {children}
-    </GlassCard>
+      <GlassCard
+        flexibility={flexibility}
+        distortion={showEffect ? distortion : 0}
+        blur={showEffect ? blur : 0}
+        backgroundOpacity={showEffect ? backgroundOpacity : 0}
+        backgroundColor={backgroundColor}
+        borderSize={borderSize}
+        borderColor={borderColor}
+        borderOpacity={showEffect ? 0.2 : 0}
+        borderRadius={borderRadius}
+        padding={padding}
+        className={className}
+        avoidSvgCreation={!showEffect}
+      >
+        {children}
+      </GlassCard>
+    </div>
   )
 }
