@@ -2,6 +2,8 @@
 
 import { useEffect, useRef } from 'react'
 
+import { useMouseContext } from '@/contexts/MouseContext'
+
 const INTERACTIVE_SELECTOR =
   'a, button, input, select, textarea, [role="button"], [contenteditable="true"], .hoverable'
 
@@ -10,6 +12,7 @@ const SCROLL_HOVER_CLASS = 'scroll-hover'
 
 export function useMouseEvent() {
   const cursorRef = useRef<HTMLDivElement>(null)
+  const { isHoveringRef } = useMouseContext()
 
   useEffect(() => {
     if (!window.matchMedia('(pointer: fine)').matches) return
@@ -41,6 +44,7 @@ export function useMouseEvent() {
       if (nextIsHovering === isHovering) return
 
       isHovering = nextIsHovering
+      isHoveringRef.current = nextIsHovering
       cursorRef.current?.classList.toggle('hover', nextIsHovering)
     }
 

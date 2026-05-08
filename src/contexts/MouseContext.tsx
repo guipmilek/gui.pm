@@ -9,12 +9,14 @@ interface MousePosition {
 
 interface MouseContextValue {
   positionRef: React.MutableRefObject<MousePosition>
+  isHoveringRef: React.MutableRefObject<boolean>
 }
 
 const MouseContext = createContext<MouseContextValue | null>(null)
 
 export function MouseProvider({ children }: { children: ReactNode }) {
   const positionRef = useRef<MousePosition>({ x: Number.NaN, y: Number.NaN })
+  const isHoveringRef = useRef(false)
 
   useEffect(() => {
     const isCoarse = window.matchMedia('(pointer: coarse)').matches
@@ -80,16 +82,20 @@ export function MouseProvider({ children }: { children: ReactNode }) {
   }, [])
 
   return (
-    <MouseContext.Provider value={{ positionRef }}>
+    <MouseContext.Provider value={{ positionRef, isHoveringRef }}>
       {children}
     </MouseContext.Provider>
   )
 }
 
-export function useMousePosition() {
+export function useMouseContext() {
   const context = useContext(MouseContext)
   if (!context) {
-    throw new Error('useMousePosition must be used within a MouseProvider')
+    throw new Error('useMouseContext must be used within a MouseProvider')
   }
-  return context.positionRef
+  return context
+}
+
+export function useMousePosition() {
+  return useMouseContext().positionRef
 }

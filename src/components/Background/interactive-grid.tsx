@@ -2,7 +2,7 @@
 
 import { useEffect, useRef } from 'react'
 
-import { useMousePosition } from '@/contexts/MouseContext'
+import { useMouseContext } from '@/contexts/MouseContext'
 
 interface ShootingStar {
   headX: number
@@ -180,7 +180,7 @@ export function InteractiveGrid() {
   const isTouchRef = useRef(true)
   const prefersReducedMotionRef = useRef(false)
 
-  const positionRef = useMousePosition()
+  const { positionRef, isHoveringRef } = useMouseContext()
   const lastTimeRef = useRef(0)
   const lineOccupancyRef = useRef<Set<number>>(new Set())
 
@@ -553,7 +553,9 @@ export function InteractiveGrid() {
           const vmx = star.headX - scrollX
           const vmy = star.headY - scrollY
           const distToMouse = Math.sqrt((vmx - mx) ** 2 + (vmy - my) ** 2)
-          if (distToMouse < ABSORB_DIST) {
+
+          const currentAbsorbDist = isHoveringRef.current ? 16 : ABSORB_DIST
+          if (distToMouse < currentAbsorbDist) {
             star.absorbTime = timestamp
             lineOccupancyRef.current.delete(star.startPos.x)
             lineOccupancyRef.current.delete(star.startPos.y)
