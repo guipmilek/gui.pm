@@ -8,7 +8,11 @@ export async function AboutMe() {
   return (
     <AboutMeContainer>
       {about.map((paragraph, index) => {
-        return <p key={index}>{paragraph}</p>
+        return (
+          <p key={index} data-reveal="" data-reveal-delay={index}>
+            {paragraph}
+          </p>
+        )
       })}
     </AboutMeContainer>
   )

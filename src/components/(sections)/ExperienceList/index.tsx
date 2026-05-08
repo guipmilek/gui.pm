@@ -11,8 +11,13 @@ export async function ExperienceList() {
 
   return (
     <CardList>
-      {experiences.map((experience) => (
-        <CardItem key={experience.id} type="experience" data={experience} />
+      {experiences.map((experience, index) => (
+        <CardItem
+          key={experience.id}
+          type="experience"
+          data={experience}
+          revealDelay={index}
+        />
       ))}
     </CardList>
   )

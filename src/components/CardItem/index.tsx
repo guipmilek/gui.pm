@@ -10,7 +10,7 @@ import { HeaderCardItem } from './Header'
 import { HeadingCardItem } from './Heading'
 import { CardItemContainer, CardItemContent, Infos, Tags } from './styles'
 
-type CardItemProps =
+type CardItemProps = { revealDelay?: number } & (
   | {
       type: 'experience'
       data: Experience
@@ -19,9 +19,11 @@ type CardItemProps =
       type: 'project'
       data: Project
     }
+)
 
 export function CardItem(props: CardItemProps) {
   const { type, data } = props
+  const { revealDelay } = props
   const { title, link, description, additionalLinks } = data
 
   let headingTitle = title
@@ -37,7 +39,7 @@ export function CardItem(props: CardItemProps) {
   const hasTags = tags !== null
 
   return (
-    <CardItemContainer>
+    <CardItemContainer data-reveal="" data-reveal-delay={revealDelay}>
       <CardItemContent {...(type === 'project' && { type })}>
         <HeaderCardItem {...props} />
 

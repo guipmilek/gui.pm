@@ -7,6 +7,7 @@ import { seoConfig } from 'seo.config'
 
 import { Cursor } from '@/components/(cursor)/Cursor'
 import { Background } from '@/components/Background'
+import { ScrollReveal } from '@/components/ScrollReveal'
 import { MouseProvider } from '@/contexts/MouseContext'
 import { fontClassName } from '@/styles/fonts'
 
@@ -25,9 +26,22 @@ export const viewport: Viewport = {
 
 export default function RootLayout({ children }: RootLayoutProps) {
   return (
-    <html lang="pt-BR" className={fontClassName}>
+    <html lang="pt-BR" className={`${fontClassName} reveal-ready`}>
       <body>
+        <noscript>
+          <style>
+            {`
+              [data-reveal] {
+                opacity: 1 !important;
+                transform: none !important;
+                filter: none !important;
+              }
+            `}
+          </style>
+        </noscript>
+
         <MouseProvider>
+          <ScrollReveal />
           <Cursor />
 
           <BodyContent>{children}</BodyContent>

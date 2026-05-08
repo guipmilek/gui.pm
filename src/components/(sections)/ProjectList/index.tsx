@@ -11,8 +11,13 @@ export async function ProjectList() {
 
   return (
     <CardList>
-      {projects.map((project) => (
-        <CardItem key={project.id} type="project" data={project} />
+      {projects.map((project, index) => (
+        <CardItem
+          key={project.id}
+          type="project"
+          data={project}
+          revealDelay={index}
+        />
       ))}
     </CardList>
   )

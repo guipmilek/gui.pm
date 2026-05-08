@@ -36,6 +36,8 @@ export function Section({
         <Link
           href={link.url}
           className={customLinkStyles()}
+          data-reveal=""
+          data-reveal-delay={3}
           {...(isExternalURL && {
             target: '_blank',
             rel: 'noopener noreferrer',
