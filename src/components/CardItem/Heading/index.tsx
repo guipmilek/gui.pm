@@ -111,6 +111,7 @@ export async function HeadingCardItem({
           {children}
 
           {hasHeadingSubtitle && <p>{headingSubtitleText}</p>}
+          {data.positioning && <p>{data.positioning}</p>}
         </HeadingCardItemContainer>
       )
     }

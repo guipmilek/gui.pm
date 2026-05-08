@@ -97,6 +97,16 @@ export const CardItemContent = styled('div', {
 
 export const Infos = styled('div', {
   base: {
+    display: 'flex',
+    flexDirection: 'column',
+    gap: '0.75rem',
+
+    '& > p': {
+      textStyle: 'sm',
+      color: 'subtitle',
+      fontStyle: 'italic',
+    },
+
     '& ul': {
       position: 'relative',
 

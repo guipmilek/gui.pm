@@ -23,6 +23,15 @@ export const ParagraphCardItemContainer = styled('div', {
 
       '& p': {
         textStyle: 'sm',
+        paddingLeft: '0.875rem',
+        position: 'relative',
+
+        '&::before': {
+          content: '"·"',
+          position: 'absolute',
+          left: '0',
+          color: 'subtitle',
+        },
 
         '& + p': {
           marginTop: '0.25rem',

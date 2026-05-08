@@ -65,6 +65,10 @@ export function CardItem(props: CardItemProps) {
           </HeadingCardItem>
 
           <Infos>
+            {type === 'experience' && data.summary && (
+              <p>{data.summary}</p>
+            )}
+
             {hasDescription && (
               <DescriptionCardItem description={description} />
             )}
