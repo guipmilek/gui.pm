@@ -27,6 +27,10 @@ export const CardItemContainer = styled('li', {
 
       backdropBlurSafe: '4px',
 
+      '@supports (backdrop-filter: url(#liquid-glass-filter) blur(1px))': {
+        backdropFilter: 'url(#liquid-glass-filter) blur(4px)',
+      },
+
       transition: 'opacity 0.2s',
 
       '@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px)))': {

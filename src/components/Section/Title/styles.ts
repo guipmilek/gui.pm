@@ -41,6 +41,10 @@ export const sectionTitleContainerStyles = cva({
 
       backdropBlurSafe: '8px',
 
+      '@supports (backdrop-filter: url(#liquid-glass-filter) blur(1px))': {
+        backdropFilter: 'url(#liquid-glass-filter) blur(8px)',
+      },
+
       transition: 'opacity 0.2s ease-out',
 
       '@media (prefers-reduced-motion: reduce)': {
