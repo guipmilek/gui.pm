@@ -35,9 +35,12 @@ export const NavbarContainer = styled('nav', {
       '&:nth-of-type(1)': { animationDelay: '300ms' },
       '&:nth-of-type(2)': { animationDelay: '380ms' },
       '&:nth-of-type(3)': { animationDelay: '460ms' },
+      '&:nth-of-type(4)': { animationDelay: '540ms' },
+      '&:nth-of-type(5)': { animationDelay: '620ms' },
+      '&:nth-of-type(6)': { animationDelay: '700ms' },
 
       '& + a': {
-        marginTop: '1.5rem',
+        marginTop: '1rem',
       },
 
       '& span': {

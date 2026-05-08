@@ -16,7 +16,7 @@ export const AsideHeaderContainer = styled('header', {
       top: '6rem',
 
       gridArea: 'a',
-      gap: '4rem',
+      gap: '2rem',
 
       height: '100%',
       maxHeight: 'calc(100vh - (6rem * 2))',
@@ -116,7 +116,7 @@ export const Bio = styled('div', {
         fontFamily: 'mono',
         textStyle: {
           base: 'sm',
-          sm: 'xl',
+          sm: 'base',
         },
         fontWeight: 'medium',
 

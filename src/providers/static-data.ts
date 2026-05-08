@@ -1,6 +1,8 @@
 import { about } from '@/data/about'
+import { certifications } from '@/data/certifications'
 import { education } from '@/data/education'
 import { experiences } from '@/data/experiences'
+import { languages } from '@/data/languages'
 import { profile } from '@/data/profile'
 import { projects } from '@/data/projects'
 
@@ -49,6 +51,8 @@ export function createStaticDataProvider(): DataProvider {
       return Promise.resolve(result)
     },
     getEducation: () => Promise.resolve(education),
+    getCertifications: () => Promise.resolve(certifications),
+    getLanguages: () => Promise.resolve(languages),
   }
 }
 

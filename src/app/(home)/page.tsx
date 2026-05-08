@@ -1,8 +1,10 @@
 import Link from 'next/link'
 
 import { AboutMe } from '@/components/(sections)/AboutMe'
+import { CertificationList } from '@/components/(sections)/CertificationList'
 import { EducationList } from '@/components/(sections)/EducationList'
 import { ExperienceList } from '@/components/(sections)/ExperienceList'
+import { LanguageList } from '@/components/(sections)/LanguageList'
 import { ProjectList } from '@/components/(sections)/ProjectList'
 import { AsideHeader } from '@/components/AsideHeader'
 import { Section } from '@/components/Section'
@@ -32,6 +34,14 @@ export default function Home() {
 
         <Section id="education" sectionTitle="FORMAÇÃO">
           <EducationList />
+        </Section>
+
+        <Section id="certifications" sectionTitle="CERTIFICAÇÕES">
+          <CertificationList />
+        </Section>
+
+        <Section id="languages" sectionTitle="IDIOMAS">
+          <LanguageList />
         </Section>
 
         <Section
