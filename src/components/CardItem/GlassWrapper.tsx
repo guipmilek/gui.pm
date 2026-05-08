@@ -41,44 +41,55 @@ export function GlassWrapper({
     return <div className={className}>{children}</div>
   }
 
-  // On mobile/touch devices, we want the effect to be always somewhat visible or react to scroll
-  // For simplicity, let's keep it visible on mobile and hover-dependent on desktop
-  const showEffect = isHovered || (typeof window !== 'undefined' && window.matchMedia('(hover: none)').matches)
+  // On mobile/touch devices, we want the effect to be always somewhat visible
+  const isMobile = typeof window !== 'undefined' && window.matchMedia('(hover: none)').matches
 
   return (
     <div
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
       className={className}
+      data-glass-hover={isHovered || isMobile}
       style={{
         borderRadius,
-        transition: 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
+        position: 'relative',
       }}
     >
       <style jsx global>{`
-        .glass-ui-distortion-layer {
-          transition: backdrop-filter 0.4s ease, -webkit-backdrop-filter 0.4s ease, opacity 0.4s ease !important;
+        /* Base state: hide glass layers */
+        .glass-ui-distortion-layer,
+        .glass-ui-background-layer,
+        .glass-ui-border-layer,
+        .glass-ui-inner-light,
+        .glass-ui-outer-light {
+          opacity: 0 !important;
+          transition: opacity 0.5s cubic-bezier(0.4, 0, 0.2, 1) !important;
+          pointer-events: none;
         }
-        .glass-ui-background-layer {
-          transition: opacity 0.4s ease, background-color 0.4s ease !important;
+
+        /* Hover state: show glass layers */
+        [data-glass-hover='true'] .glass-ui-distortion-layer,
+        [data-glass-hover='true'] .glass-ui-background-layer {
+          opacity: 1 !important;
         }
-        .glass-ui-border-layer {
-          transition: opacity 0.4s ease !important;
+
+        [data-glass-hover='true'] .glass-ui-border-layer,
+        [data-glass-hover='true'] .glass-ui-inner-light {
+          opacity: 0.2 !important;
         }
       `}</style>
       <GlassCard
         flexibility={flexibility}
-        distortion={showEffect ? distortion : 0}
-        blur={showEffect ? blur : 0}
-        backgroundOpacity={showEffect ? backgroundOpacity : 0}
+        distortion={distortion}
+        blur={blur}
+        backgroundOpacity={backgroundOpacity}
         backgroundColor={backgroundColor}
         borderSize={borderSize}
         borderColor={borderColor}
-        borderOpacity={showEffect ? 0.2 : 0}
         borderRadius={borderRadius}
         padding={padding}
         className={className}
-        avoidSvgCreation={!showEffect}
+        avoidSvgCreation={false} // Always keep SVG in DOM for smooth opacity transition
       >
         {children}
       </GlassCard>
