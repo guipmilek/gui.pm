@@ -1,6 +1,3 @@
-'use client'
-
-import { GlassCard } from 'react-glass-ui'
 import Link from 'next/link'
 import { IconType } from 'react-icons'
 import { RxExternalLink } from 'react-icons/rx'
@@ -10,6 +7,7 @@ import { icons } from '@/libs/reactIcons'
 
 import { DescriptionCardItem } from './Description'
 import { ExpandProvider } from './ExpandContext'
+import { GlassWrapper } from './GlassWrapper'
 import { HeaderCardItem } from './Header'
 import { HeadingCardItem } from './Heading'
 import { TagsCardItem } from './Tags'
@@ -45,18 +43,7 @@ export function CardItem(props: CardItemProps) {
 
   return (
     <CardItemContainer data-reveal="" data-reveal-delay={revealDelay}>
-      <GlassCard
-        flexibility={1}
-        distortion={20}
-        blur={4}
-        backgroundOpacity={1}
-        backgroundColor="var(--colors-card-background)"
-        borderSize={1}
-        borderColor="var(--colors-card-border)"
-        borderRadius={6}
-        padding="0"
-        className="glass-card-wrapper"
-      >
+      <GlassWrapper className="glass-card-wrapper">
         <CardItemContent {...(type === 'project' && { type })}>
           <HeaderCardItem {...props} />
 
@@ -128,7 +115,7 @@ export function CardItem(props: CardItemProps) {
             )}
           </div>
         </CardItemContent>
-      </GlassCard>
+      </GlassWrapper>
     </CardItemContainer>
   )
 }

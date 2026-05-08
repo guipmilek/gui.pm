@@ -1,10 +1,10 @@
 'use client'
 
-import { GlassCard } from 'react-glass-ui'
 import Link from 'next/link'
 import { useRef } from 'react'
 import { useIntersectionObserver } from 'usehooks-ts'
 
+import { GlassWrapper } from '../../CardItem/GlassWrapper'
 import { sectionTitleContainerStyles } from './styles'
 
 interface SectionTitleProps {
@@ -34,7 +34,7 @@ export function SectionTitle({ sectionId, sectionTitle }: SectionTitleProps) {
       className={`${sectionTitleContainerStyles()}${isPinned ? ' pinned' : ''}`}
     >
       {isPinned ? (
-        <GlassCard
+        <GlassWrapper
           distortion={10}
           blur={8}
           backgroundOpacity={1}
@@ -44,7 +44,7 @@ export function SectionTitle({ sectionId, sectionTitle }: SectionTitleProps) {
           className="header-glass-card"
         >
           <h2>{sectionTitle}</h2>
-        </GlassCard>
+        </GlassWrapper>
       ) : (
         <h2>{sectionTitle}</h2>
       )}
