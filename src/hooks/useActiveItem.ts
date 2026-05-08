@@ -111,14 +111,6 @@ export function useActiveItem(
           if (entry.isIntersecting) {
             const newId = entry.target.id
 
-            if (
-              explicitHashTargetRef.current &&
-              !explicitHashReachedRef.current &&
-              explicitHashTargetRef.current !== newId
-            ) {
-              return
-            }
-
             if (explicitHashTargetRef.current === newId) {
               explicitHashReachedRef.current = true
             } else {
