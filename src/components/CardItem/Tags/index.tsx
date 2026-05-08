@@ -39,43 +39,49 @@ export function TagsCardItem({ tags }: TagsCardItemProps) {
 
   // FLIP da largura: detecta mudança no estado e anima do valor capturado no render anterior
   useLayoutEffect(() => {
+    if (!badgeRef.current || !hasOverflow) return
+    const el = badgeRef.current
+
+    // 1. Mede a largura natural do NOVO estado (DOM já atualizado pelo React)
+    const originalWidth = el.style.width
+    const originalTransition = el.style.transition
+
+    el.style.transition = 'none'
+    el.style.width = 'auto'
+    const naturalWidth = el.getBoundingClientRect().width
+
     const wasExpanded = prevExpandedRef.current
     prevExpandedRef.current = isTagsExpanded
 
-    if (wasExpanded === isTagsExpanded) return
-    if (!badgeRef.current || !hasOverflow || lastWidthRef.current === null) return
+    // 2. Se o estado mudou, inicia a animação FLIP
+    if (wasExpanded !== isTagsExpanded && lastWidthRef.current !== null) {
+      const oldWidth = lastWidthRef.current
 
-    const el = badgeRef.current
-    const oldWidth = lastWidthRef.current
+      if (Math.abs(oldWidth - naturalWidth) > 0.5) {
+        // Congela na largura ANTIGA
+        el.style.width = `${oldWidth}px`
 
-    // Mede a largura com o novo texto (DOM já atualizado pelo React)
-    el.style.transition = 'none'
-    el.style.width = 'auto'
-    const newWidth = el.getBoundingClientRect().width
-
-    if (Math.abs(oldWidth - newWidth) < 0.5) return
-
-    // Congela na largura ANTIGA — isso é o que o browser vai pintar no próximo frame
-    el.style.width = `${oldWidth}px`
-
-    // Double rAF: garante que o browser pintou o estado "congelado"
-    // antes de iniciar a transição para a nova largura
-    requestAnimationFrame(() => {
-      requestAnimationFrame(() => {
-        if (!badgeRef.current) return
-        badgeRef.current.style.transition = 'width 0.3s ease'
-        badgeRef.current.style.width = `${newWidth}px`
-      })
-    })
-  }, [isTagsExpanded, hasOverflow])
-
-  // Captura a largura a cada renderização para estar pronto para o próximo toggle
-  useLayoutEffect(() => {
-    if (badgeRef.current) {
-      // Importante: medir sem o override de width do FLIP se ele estiver rodando
-      // mas como useLayoutEffect roda síncrono, o valor aqui será o pós-render
-      lastWidthRef.current = badgeRef.current.getBoundingClientRect().width
+        // Double rAF para garantir que o browser pintou a largura antiga antes de transicionar
+        requestAnimationFrame(() => {
+          requestAnimationFrame(() => {
+            if (!badgeRef.current) return
+            badgeRef.current.style.transition = 'width 0.3s ease'
+            badgeRef.current.style.width = `${naturalWidth}px`
+          })
+        })
+      } else {
+        // Se a largura não mudou significativamente, restaura o estado
+        el.style.width = originalWidth
+        el.style.transition = originalTransition
+      }
+    } else {
+      // 3. Se não mudou o estado, restaura o que estava (para não interferir com outros renders)
+      el.style.width = originalWidth
+      el.style.transition = originalTransition
     }
+
+    // 4. Salva a largura natural (estável) para o próximo ciclo
+    lastWidthRef.current = naturalWidth
   })
 
   return (
