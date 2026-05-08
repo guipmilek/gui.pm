@@ -1,6 +1,7 @@
 import Link from 'next/link'
 
 import { AboutMe } from '@/components/(sections)/AboutMe'
+import { EducationList } from '@/components/(sections)/EducationList'
 import { ExperienceList } from '@/components/(sections)/ExperienceList'
 import { ProjectList } from '@/components/(sections)/ProjectList'
 import { AsideHeader } from '@/components/AsideHeader'
@@ -27,6 +28,10 @@ export default function Home() {
           }}
         >
           <ExperienceList />
+        </Section>
+
+        <Section id="education" sectionTitle="FORMAÇÃO">
+          <EducationList />
         </Section>
 
         <Section

@@ -1,4 +1,5 @@
 import { about } from '@/data/about'
+import { education } from '@/data/education'
 import { experiences } from '@/data/experiences'
 import { profile } from '@/data/profile'
 import { projects } from '@/data/projects'
@@ -47,6 +48,7 @@ export function createStaticDataProvider(): DataProvider {
 
       return Promise.resolve(result)
     },
+    getEducation: () => Promise.resolve(education),
   }
 }
 

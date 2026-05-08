@@ -15,6 +15,7 @@ interface SectionInfo {
 const sectionInfos: SectionInfo[] = [
   { id: 'about', text: 'SOBRE' },
   { id: 'experience', text: 'EXPERIÊNCIA' },
+  { id: 'education', text: 'FORMAÇÃO' },
   { id: 'projects', text: 'PROJETOS' },
 ]
 const sectionsIds = sectionInfos.map((sectionInfo) => sectionInfo.id)

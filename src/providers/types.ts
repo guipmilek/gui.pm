@@ -1,4 +1,5 @@
 import type { Experience, Link, Project } from '@/interfaces/cardItem'
+import type { EducationItem } from '@/interfaces/education'
 
 export interface Profile {
   headline: string
@@ -17,4 +18,5 @@ export interface DataProvider {
   getAbout(): Promise<string[]>
   getExperiences(options?: QueryOptions<Experience>): Promise<Experience[]>
   getProjects(options?: QueryOptions<Project>): Promise<Project[]>
+  getEducation(): Promise<EducationItem[]>
 }
