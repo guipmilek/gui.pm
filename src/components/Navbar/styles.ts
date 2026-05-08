@@ -52,10 +52,10 @@ export const NavbarContainer = styled('nav', {
       },
 
       '&.active': {
-        color: 'title',
+        color: 'primary',
 
         '& span': {
-          backgroundColor: 'title',
+          backgroundColor: 'primary',
           width: '64px',
         },
       },
