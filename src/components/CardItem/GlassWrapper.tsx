@@ -50,8 +50,22 @@ export function GlassWrapper({
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
       className={className}
-      style={{ borderRadius }}
+      style={{
+        borderRadius,
+        transition: 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
+      }}
     >
+      <style jsx global>{`
+        .glass-ui-distortion-layer {
+          transition: backdrop-filter 0.4s ease, -webkit-backdrop-filter 0.4s ease, opacity 0.4s ease !important;
+        }
+        .glass-ui-background-layer {
+          transition: opacity 0.4s ease, background-color 0.4s ease !important;
+        }
+        .glass-ui-border-layer {
+          transition: opacity 0.4s ease !important;
+        }
+      `}</style>
       <GlassCard
         flexibility={flexibility}
         distortion={showEffect ? distortion : 0}
