@@ -5,31 +5,37 @@ import { useEffect, useRef } from 'react'
 import { useMousePosition } from '@/contexts/MouseContext'
 
 interface ShootingStar {
+  headX: number
+  headY: number
   dir: 'h' | 'v'
-  forward: boolean
-  pos: number
-  from: number
-  to: number
+  moveSign: number
   speed: number
+  waypoints: { x: number; y: number }[]
+  startPos: { x: number; y: number }
+  totalDist: number
+  guided: boolean
   color: string
   startTime: number
+  absorbTime?: number
 }
 
 const BIG_SIZE = 80
 const SMALL_SIZE = 20
-const TRAIL_LENGTH = 150
-const MAX_STARS = 6
-const STAR_THICKNESS = 1
+const TRAIL_LENGTH = 160
+const MAX_STARS = 20
+const STAR_THICKNESS = 1.2
 
-const STAR_SPAWN_MIN = 1200
-const STAR_SPAWN_MAX = 2400
-const STAR_SPEED_MIN = 6000
-const STAR_SPEED_MAX = 10000
+const STAR_SPAWN_MIN = 350
+const STAR_SPAWN_MAX = 800
+const STAR_SPEED = 0.40 // px/ms
+const STAR_LIFETIME = 8000 // ms
+const ABSORB_DIST = 55
+const ABSORB_FADE = 300 // ms
 
 const GRID_BIG = 'rgba(113, 113, 122, 0.15)'
 const GRID_SMALL = 'rgba(113, 113, 122, 0.07)'
 const HOVER_RADIUS = 280
-const STAR_COLOR = 'rgba(148, 163, 184, 0.85)'
+const STAR_COLOR = 'rgba(148, 163, 184, 0.45)'
 const MAX_CANVAS_DPR = 1.5
 
 function drawGrid(
@@ -72,48 +78,80 @@ function drawStars(
   for (let i = stars.length - 1; i >= 0; i--) {
     const star = stars[i]
     const elapsed = now - star.startTime
-    const progress = elapsed / star.speed
+    let alpha = 1 - Math.pow(elapsed / STAR_LIFETIME, 2)
 
-    if (progress >= 1) {
-      stars.splice(i, 1)
-      continue
+    if (star.absorbTime) {
+      const absorbElapsed = now - star.absorbTime
+      const absorbAlpha = 1 - absorbElapsed / ABSORB_FADE
+      alpha = Math.min(alpha, absorbAlpha)
     }
 
-    const alpha = 1 - progress * progress
+    if (alpha <= 0) continue
+
     ctx.globalAlpha = alpha
 
-    if (star.dir === 'h') {
-      const y = star.pos - scrollY
-      if (y < -STAR_THICKNESS || y > h + STAR_THICKNESS) continue
+    const trailPoints = [
+      { x: star.headX, y: star.headY },
+      ...star.waypoints,
+      star.startPos,
+    ]
 
-      const cx = star.from + (star.to - star.from) * progress - scrollX
+    let remainingLength = TRAIL_LENGTH
+    let currentDist = 0
 
-      const sx = star.forward ? cx - TRAIL_LENGTH : cx + TRAIL_LENGTH
-      const grad = ctx.createLinearGradient(sx, y, cx, y)
-      grad.addColorStop(0, 'transparent')
-      grad.addColorStop(0.7, star.color)
-      grad.addColorStop(1, 'rgba(255,255,255,0.8)')
+    for (let j = 0; j < trailPoints.length - 1; j++) {
+      const p1 = trailPoints[j]
+      const p2 = trailPoints[j + 1]
+      const dx = p2.x - p1.x
+      const dy = p2.y - p1.y
+      const segLen = Math.sqrt(dx * dx + dy * dy)
 
-      ctx.fillStyle = grad
-      const left = Math.min(sx, cx)
-      const tw = Math.abs(cx - sx)
-      ctx.fillRect(left, y - STAR_THICKNESS / 2, tw, STAR_THICKNESS)
-    } else {
-      const x = star.pos - scrollX
-      if (x < -STAR_THICKNESS || x > w + STAR_THICKNESS) continue
+      if (segLen <= 0) continue
 
-      const cy = star.from + (star.to - star.from) * progress - scrollY
+      const drawLen = Math.min(segLen, remainingLength)
+      const ratio = drawLen / segLen
+      const p2v = {
+        x: p1.x + dx * ratio - scrollX,
+        y: p1.y + dy * ratio - scrollY,
+      }
+      const p1v = { x: p1.x - scrollX, y: p1.y - scrollY }
 
-      const sy = star.forward ? cy - TRAIL_LENGTH : cy + TRAIL_LENGTH
-      const grad = ctx.createLinearGradient(x, sy, x, cy)
-      grad.addColorStop(0, 'transparent')
-      grad.addColorStop(0.7, star.color)
-      grad.addColorStop(1, 'rgba(255,255,255,0.8)')
+      if (
+        !Number.isFinite(p1v.x) ||
+        !Number.isFinite(p1v.y) ||
+        !Number.isFinite(p2v.x) ||
+        !Number.isFinite(p2v.y)
+      ) {
+        remainingLength -= drawLen
+        currentDist += drawLen
+        if (remainingLength <= 0) break
+        continue
+      }
 
-      ctx.fillStyle = grad
-      const top = Math.min(sy, cy)
-      const th = Math.abs(cy - sy)
-      ctx.fillRect(x - STAR_THICKNESS / 2, top, STAR_THICKNESS, th)
+      // Skip if completely off-screen
+
+      const getStopColor = (d: number) => {
+        const p = 1 - d / TRAIL_LENGTH
+        if (p > 0.7) return `rgba(255, 255, 255, ${p})`
+        if (p > 0) return star.color.replace('0.85', (p * 0.85).toFixed(2))
+        return 'transparent'
+      }
+
+      const grad = ctx.createLinearGradient(p2v.x, p2v.y, p1v.x, p1v.y)
+      grad.addColorStop(0, getStopColor(currentDist + drawLen))
+      grad.addColorStop(1, getStopColor(currentDist))
+
+      ctx.strokeStyle = grad
+      ctx.lineWidth = STAR_THICKNESS
+      ctx.lineCap = 'round'
+      ctx.beginPath()
+      ctx.moveTo(p1v.x, p1v.y)
+      ctx.lineTo(p2v.x, p2v.y)
+      ctx.stroke()
+
+      remainingLength -= drawLen
+      currentDist += drawLen
+      if (remainingLength <= 0) break
     }
   }
 
@@ -143,6 +181,8 @@ export function InteractiveGrid() {
   const prefersReducedMotionRef = useRef(false)
 
   const positionRef = useMousePosition()
+  const lastTimeRef = useRef(0)
+  const lineOccupancyRef = useRef<Set<number>>(new Set())
 
   useEffect(() => {
     // B1: On touch/coarse devices the CSS GridFallback handles everything.
@@ -273,33 +313,87 @@ export function InteractiveGrid() {
       if (w === 0 || h === 0) return
       if (starsRef.current.length >= maxStars) return
 
-      const dir: 'h' | 'v' = Math.random() > 0.5 ? 'h' : 'v'
-      const forward = Math.random() > 0.5
-      const speed =
-        STAR_SPEED_MIN + Math.random() * (STAR_SPEED_MAX - STAR_SPEED_MIN)
-
       const scrollX = window.scrollX
       const scrollY = window.scrollY
-      const axisScroll = dir === 'h' ? scrollX : scrollY
-      const axisSize = dir === 'h' ? w : h
-      const pos =
-        dir === 'h'
-          ? randomGridLine(scrollY, h)
-          : randomGridLine(scrollX, w)
-      const from = forward
-        ? axisScroll - TRAIL_LENGTH
-        : axisScroll + axisSize + TRAIL_LENGTH
-      const to = forward
-        ? axisScroll + axisSize + TRAIL_LENGTH
-        : axisScroll - TRAIL_LENGTH
 
+      const mx = positionRef.current.x
+      const my = positionRef.current.y
+      const hasPointer = Number.isFinite(mx) && Number.isFinite(my)
+      const inBounds = hasPointer && mx > 0 && my > 0 && mx < w && my < h
+      const guided = !isTouchRef.current && isMouseInside && inBounds
+
+      let headX = 0
+      let headY = 0
+      let dir: 'h' | 'v' = 'h'
+      let moveSign = 1
+      let lineValue = 0
+
+      const findUnoccupiedLine = (scroll: number, size: number) => {
+        for (let attempt = 0; attempt < 10; attempt++) {
+          const line = randomGridLine(scroll, size)
+          if (!lineOccupancyRef.current.has(line)) return line
+        }
+        return randomGridLine(scroll, size)
+      }
+
+      if (guided) {
+        const edge = (Math.random() * 4) | 0
+        if (edge === 0) {
+          // Top
+          headX = findUnoccupiedLine(scrollX, w)
+          headY = scrollY - 100
+          dir = 'v'
+          moveSign = 1
+          lineValue = headX
+        } else if (edge === 1) {
+          // Bottom
+          headX = findUnoccupiedLine(scrollX, w)
+          headY = scrollY + h + 100
+          dir = 'v'
+          moveSign = -1
+          lineValue = headX
+        } else if (edge === 2) {
+          // Left
+          headX = scrollX - 100
+          headY = findUnoccupiedLine(scrollY, h)
+          dir = 'h'
+          moveSign = 1
+          lineValue = headY
+        } else {
+          // Right
+          headX = scrollX + w + 100
+          headY = findUnoccupiedLine(scrollY, h)
+          dir = 'h'
+          moveSign = -1
+          lineValue = headY
+        }
+      } else {
+        const side: 'h' | 'v' = Math.random() > 0.5 ? 'h' : 'v'
+        const forward = Math.random() > 0.5
+        dir = side
+        moveSign = forward ? 1 : -1
+        if (side === 'h') {
+          headY = findUnoccupiedLine(scrollY, h)
+          headX = forward ? scrollX - 100 : scrollX + w + 100
+          lineValue = headY
+        } else {
+          headX = findUnoccupiedLine(scrollX, w)
+          headY = forward ? scrollY - 100 : scrollY + h + 100
+          lineValue = headX
+        }
+      }
+
+      lineOccupancyRef.current.add(lineValue)
       starsRef.current.push({
+        headX,
+        headY,
         dir,
-        forward,
-        pos,
-        from,
-        to,
-        speed,
+        moveSign,
+        speed: STAR_SPEED,
+        waypoints: [],
+        startPos: { x: headX, y: headY },
+        totalDist: 0,
+        guided,
         color: STAR_COLOR,
         startTime: performance.now(),
       })
@@ -328,15 +422,21 @@ export function InteractiveGrid() {
         return
       }
 
+      const dt = lastTimeRef.current === 0 ? 16.6 : timestamp - lastTimeRef.current
+      lastTimeRef.current = timestamp
+
       if (window.scrollX !== lastScrollX || window.scrollY !== lastScrollY) {
         drawGlowGrid(w, h)
       }
 
       ctx.clearRect(0, 0, w, h)
 
+      const scrollX = window.scrollX
+      const scrollY = window.scrollY
+      const mx = positionRef.current.x
+      const my = positionRef.current.y
+
       if (!isTouchRef.current) {
-        const mx = positionRef.current.x
-        const my = positionRef.current.y
         const hasPointerPosition = Number.isFinite(mx) && Number.isFinite(my)
         const inBounds =
           hasPointerPosition && mx > 0 && my > 0 && mx < w && my < h
@@ -423,14 +523,86 @@ export function InteractiveGrid() {
         }
       }
 
+      // Update Stars
+      const hasPointer = Number.isFinite(mx) && Number.isFinite(my)
+      const tx = hasPointer ? mx + scrollX : 0
+      const ty = hasPointer ? my + scrollY : 0
+
+      for (let i = starsRef.current.length - 1; i >= 0; i--) {
+        const star = starsRef.current[i]
+        const elapsed = timestamp - star.startTime
+
+        if (star.absorbTime) {
+          if (timestamp - star.absorbTime > ABSORB_FADE) {
+            starsRef.current.splice(i, 1)
+          }
+          continue
+        }
+
+        if (elapsed > STAR_LIFETIME) {
+          lineOccupancyRef.current.delete(star.startPos.x)
+          lineOccupancyRef.current.delete(star.startPos.y)
+          starsRef.current.splice(i, 1)
+          continue
+        }
+
+        const step = star.speed * dt
+        star.totalDist += step
+
+        if (star.guided && hasPointer) {
+          const vmx = star.headX - scrollX
+          const vmy = star.headY - scrollY
+          const distToMouse = Math.sqrt((vmx - mx) ** 2 + (vmy - my) ** 2)
+          if (distToMouse < ABSORB_DIST) {
+            star.absorbTime = timestamp
+            lineOccupancyRef.current.delete(star.startPos.x)
+            lineOccupancyRef.current.delete(star.startPos.y)
+            continue
+          }
+
+          const targetGridX = Math.round(tx / BIG_SIZE) * BIG_SIZE
+          const targetGridY = Math.round(ty / BIG_SIZE) * BIG_SIZE
+
+          if (star.dir === 'h') {
+            const dx = targetGridX - star.headX
+            if (Math.abs(dx) < step) {
+              star.headX = targetGridX
+              if (Math.abs(targetGridY - star.headY) > 1) {
+                star.waypoints.unshift({ x: star.headX, y: star.headY })
+                star.dir = 'v'
+              }
+            } else {
+              star.headX += Math.sign(dx) * step
+            }
+          } else {
+            const dy = targetGridY - star.headY
+            if (Math.abs(dy) < step) {
+              star.headY = targetGridY
+              if (Math.abs(targetGridX - star.headX) > 1) {
+                star.waypoints.unshift({ x: star.headX, y: star.headY })
+                star.dir = 'h'
+              }
+            } else {
+              star.headY += Math.sign(dy) * step
+            }
+          }
+        } else {
+          if (star.dir === 'h') {
+            star.headX += star.moveSign * step
+          } else {
+            star.headY += star.moveSign * step
+          }
+        }
+      }
+
       drawStars(
         ctx,
         w,
         h,
         timestamp,
         starsRef.current,
-        window.scrollX,
-        window.scrollY,
+        scrollX,
+        scrollY,
       )
 
       animRef.current = requestAnimationFrame(frame)
