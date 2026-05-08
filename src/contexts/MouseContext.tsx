@@ -19,7 +19,7 @@ export function MouseProvider({ children }: { children: ReactNode }) {
   const isHoveringRef = useRef(false)
 
   useEffect(() => {
-    if (!window.matchMedia('(pointer: fine)').matches) return
+    const isFinePointer = window.matchMedia('(pointer: fine)').matches
 
     const hideStyle = document.createElement('style')
     hideStyle.id = 'custom-cursor-hide'

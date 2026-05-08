@@ -197,9 +197,10 @@ export function InteractiveGrid() {
   const edgeHistoryRef = useRef<number[]>([])
 
   useEffect(() => {
-    // B1: On touch/coarse devices the CSS GridFallback handles everything.
-    // No need for canvas rAF — zero CPU/battery waste on mobile.
-    if (!window.matchMedia('(pointer: fine)').matches) return
+    // B1: On touch/coarse devices the CSS GridFallback handles the base grid.
+    // We allow the canvas to run for stars, but limit count on mobile.
+    const isFinePointer = window.matchMedia('(pointer: fine)').matches
+    isTouchRef.current = !isFinePointer
 
     const canvas = canvasRef.current
     if (!canvas) return

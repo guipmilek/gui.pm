@@ -71,6 +71,12 @@ export function useMouseEvent() {
     // Drive cursor position directly from pointermove, committed once per
     // animation frame. No spring accumulation = no multi-frame lag buildup.
     const onPointerMove = (event: PointerEvent) => {
+      if (event.pointerType !== 'mouse' && event.pointerType !== 'pen') {
+        hasPointerPosition = false
+        cursorRef.current?.classList.remove('visible')
+        return
+      }
+
       pendingX = event.clientX
       pendingY = event.clientY
       isMouseInside = true
