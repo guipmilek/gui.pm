@@ -41,6 +41,10 @@ export const sectionTitleContainerStyles = cva({
 
       backdropBlurSafe: '8px',
 
+      '@supports (backdrop-filter: url(#liquid-glass-filter) blur(1px))': {
+        backdropFilter: 'url(#liquid-glass-filter) blur(8px)',
+      },
+
       transition: 'opacity 0.2s ease-out',
 
       '@media (prefers-reduced-motion: reduce)': {
@@ -59,22 +63,7 @@ export const sectionTitleContainerStyles = cva({
     },
 
     '&.pinned::before': {
-      display: 'none',
-    },
-
-    '& .header-glass-card': {
-      width: 'calc(100% + (1.5rem * 2))',
-      marginLeft: '-1.5rem',
-
-      md: {
-        width: 'calc(100% + (3rem * 2))',
-        marginLeft: '-3rem',
-      },
-
-      '& .glass-ui-card-content': {
-        padding: '1.25rem 1.5rem',
-        md: { padding: '1.25rem 3rem' },
-      },
+      opacity: 1,
     },
   },
 })

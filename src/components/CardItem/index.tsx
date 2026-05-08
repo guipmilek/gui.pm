@@ -1,4 +1,3 @@
-import { GlassCard } from 'react-glass-ui'
 import Link from 'next/link'
 import { IconType } from 'react-icons'
 import { RxExternalLink } from 'react-icons/rx'
@@ -43,90 +42,77 @@ export function CardItem(props: CardItemProps) {
 
   return (
     <CardItemContainer data-reveal="" data-reveal-delay={revealDelay}>
-      <GlassCard
-        flexibility={1}
-        distortion={20}
-        blur={4}
-        backgroundOpacity={1}
-        backgroundColor="var(--colors-card-background)"
-        borderSize={1}
-        borderColor="var(--colors-card-border)"
-        borderRadius={6}
-        padding="0"
-        className="glass-card-wrapper"
-      >
-        <CardItemContent {...(type === 'project' && { type })}>
-          <HeaderCardItem {...props} />
+      <CardItemContent {...(type === 'project' && { type })}>
+        <HeaderCardItem {...props} />
 
-          <div>
-            <HeadingCardItem {...props}>
-              {hasLink ? (
-                <Link href={link} target="_blank" rel="noopener noreferrer">
-                  <span>
-                    {headingTitle}
+        <div>
+          <HeadingCardItem {...props}>
+            {hasLink ? (
+              <Link href={link} target="_blank" rel="noopener noreferrer">
+                <span>
+                  {headingTitle}
 
-                    <span className="icon">
-                      <div>
-                        <RxExternalLink size={9} />
-                      </div>
-                    </span>
+                  <span className="icon">
+                    <div>
+                      <RxExternalLink size={9} />
+                    </div>
                   </span>
+                </span>
 
-                  <span className="hoverable"></span>
-                </Link>
-              ) : (
-                <span>{headingTitle}</span>
-              )}
-            </HeadingCardItem>
-
-            <ExpandProvider>
-              <Infos>
-                {type === 'experience' && data.summary && (
-                  <p>{data.summary}</p>
-                )}
-
-                {hasDescription && (
-                  <DescriptionCardItem description={description} />
-                )}
-
-                {hasAdditionalLinks && (
-                  <ul>
-                    {additionalLinks.map((link) => {
-                      const Icon: IconType = icons[link.type]
-
-                      return (
-                        <li key={link.url}>
-                          <Link
-                            href={link.url}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                          >
-                            <Icon size={12} /> {link.title}
-                          </Link>
-                        </li>
-                      )
-                    })}
-                  </ul>
-                )}
-              </Infos>
-
-              {hasTags && type === 'experience' && (
-                <TagsCardItem tags={tags} />
-              )}
-            </ExpandProvider>
-
-            {hasTags && type === 'project' && (
-              <Tags>
-                {tags.map((tag) => (
-                  <li key={tag}>
-                    <span>{tag}</span>
-                  </li>
-                ))}
-              </Tags>
+                <span className="hoverable"></span>
+              </Link>
+            ) : (
+              <span>{headingTitle}</span>
             )}
-          </div>
-        </CardItemContent>
-      </GlassCard>
+          </HeadingCardItem>
+
+          <ExpandProvider>
+            <Infos>
+              {type === 'experience' && data.summary && (
+                <p>{data.summary}</p>
+              )}
+
+              {hasDescription && (
+                <DescriptionCardItem description={description} />
+              )}
+
+              {hasAdditionalLinks && (
+                <ul>
+                  {additionalLinks.map((link) => {
+                    const Icon: IconType = icons[link.type]
+
+                    return (
+                      <li key={link.url}>
+                        <Link
+                          href={link.url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                        >
+                          <Icon size={12} /> {link.title}
+                        </Link>
+                      </li>
+                    )
+                  })}
+                </ul>
+              )}
+            </Infos>
+
+            {hasTags && type === 'experience' && (
+              <TagsCardItem tags={tags} />
+            )}
+          </ExpandProvider>
+
+          {hasTags && type === 'project' && (
+            <Tags>
+              {tags.map((tag) => (
+                <li key={tag}>
+                  <span>{tag}</span>
+                </li>
+              ))}
+            </Tags>
+          )}
+        </div>
+      </CardItemContent>
     </CardItemContainer>
   )
 }

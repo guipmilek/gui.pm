@@ -3,33 +3,53 @@ import { styled } from '@/styled-system/jsx'
 export const CardItemContainer = styled('li', {
   base: {
     position: 'relative',
+    isolation: 'isolate',
 
-    '& .glass-card-wrapper': {
-      // Replicate the inset and padding of the old ::before
-      margin: { base: '-1rem', md: '-1.5rem' },
+    '&::before': {
+      opacity: 1,
+
+      position: 'absolute',
+      inset: { base: '-1rem', md: '-1.5rem' },
+      zIndex: 0,
+
+      backgroundColor: 'cardBackground',
+      width: { base: 'calc(100% + (1rem * 2))', md: 'calc(100% + (1.5rem * 2))' },
+      height: { base: 'calc(100% + (1rem * 2))', md: 'calc(100% + (1.5rem * 2))' },
+
       padding: { base: '1rem', md: '1.5rem' },
-
-      opacity: 0,
-      transition: 'opacity 0.2s',
+      border: '1px solid',
+      borderColor: 'cardBorder',
+      borderRadius: '6px',
 
       boxShadow: 'card',
 
-      // Ensure the distortion layer is above the background grid but below content
-      zIndex: 0,
+      content: "''",
 
-      '& .glass-ui-card-content': {
-        zIndex: 1,
+      backdropBlurSafe: '4px',
+
+      '@supports (backdrop-filter: url(#liquid-glass-filter) blur(1px))': {
+        backdropFilter: 'url(#liquid-glass-filter) blur(4px)',
+      },
+
+      transition: 'opacity 0.2s',
+
+      '@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px)))': {
+        backgroundColor: 'slateDark.slate2',
       },
     },
 
     '@media (hover: hover) and (pointer: fine)': {
+      '&::before': {
+        opacity: 0,
+      },
+
       '&:hover:not(:where(.hover-stale *)), &.scroll-hover': {
         '& header img': {
           borderColor: 'imageBorder.hover',
         },
 
-        '& .glass-card-wrapper': {
-          opacity: 1,
+        '&::before': {
+          opacity: '100%',
         },
       },
     },
