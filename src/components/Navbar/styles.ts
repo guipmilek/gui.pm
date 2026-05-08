@@ -58,6 +58,17 @@ export const NavbarContainer = styled('nav', {
           backgroundColor: 'primary',
           width: '64px',
         },
+
+        '@media (hover: hover) and (pointer: fine)': {
+          '&:hover:not(:where(.hover-stale *)), &.scroll-hover': {
+            color: 'primary',
+
+            '& span': {
+              backgroundColor: 'primary',
+              width: '80px',
+            },
+          },
+        },
       },
 
       '@media (hover: hover) and (pointer: fine)': {
