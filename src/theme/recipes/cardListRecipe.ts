@@ -15,7 +15,7 @@ const cardListRecipe = cva({
       },
 
       '@media (hover: hover) and (pointer: fine)': {
-        '&:hover:not(:where(.hover-stale *)) > li:not(:hover), &.scroll-hover > li:not(.scroll-hover)': {
+        '&:hover:not(:where(.hover-stale *)) > li.is-revealed:not(:hover), &.scroll-hover > li.is-revealed:not(.scroll-hover)': {
           opacity: '50%',
         },
       },
