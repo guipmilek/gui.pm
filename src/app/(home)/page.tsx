@@ -63,7 +63,8 @@ export default function Home() {
           <SafeFluentEmoji emoji="💙" type="anim" size={16} /> por{' '}
           <Link href="https://guipm.dev" className="footer-link">
             <strong>guipm.dev</strong>
-          </Link>.
+          </Link>
+          .
         </div>
 
         <p>
