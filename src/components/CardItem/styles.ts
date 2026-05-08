@@ -19,6 +19,7 @@ export const CardItemContainer = styled('li', {
 
       '& .glass-ui-card-content': {
         zIndex: 1,
+        overflow: 'visible',
       },
     },
 
