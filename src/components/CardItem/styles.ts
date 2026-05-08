@@ -9,14 +9,14 @@ export const CardItemContainer = styled('li', {
       opacity: 1,
 
       position: 'absolute',
-      inset: '-1.5rem',
+      inset: { base: '-1rem', md: '-1.5rem' },
       zIndex: 0,
 
       backgroundColor: 'cardBackground',
-      width: 'calc(100% + (1.5rem * 2))',
-      height: 'calc(100% + (1.5rem * 2))',
+      width: { base: 'calc(100% + (1rem * 2))', md: 'calc(100% + (1.5rem * 2))' },
+      height: { base: 'calc(100% + (1rem * 2))', md: 'calc(100% + (1.5rem * 2))' },
 
-      padding: '1.5rem',
+      padding: { base: '1rem', md: '1.5rem' },
       borderTop: '1px solid',
       borderColor: 'cardTopBorder',
       borderRadius: '6px',

@@ -22,9 +22,9 @@ export const customLinkStyles = cva({
     color: 'title',
     fontWeight: 'semibold',
 
-    lg: {
-      marginTop: '1.5rem',
-    },
+    marginTop: '1.5rem',
+
+
 
     '& span': {
       position: 'relative',

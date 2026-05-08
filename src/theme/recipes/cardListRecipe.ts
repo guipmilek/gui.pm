@@ -5,7 +5,7 @@ const cardListRecipe = cva({
   base: {
     display: 'flex',
     flexDirection: 'column',
-    gap: '3rem',
+    gap: { base: '2.5rem', md: '3rem' },
 
     width: '100%',
 
