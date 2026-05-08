@@ -16,6 +16,7 @@ interface ShootingStar {
   totalDist: number
   lastTurnDist: number
   lastGridSize: number
+  currentSize: number
   guided: boolean
   color: string
   startTime: number
@@ -98,7 +99,7 @@ function drawStars(
     // Draw the "Spark" head - softer and smaller
     ctx.fillStyle = 'rgba(255, 255, 255, 0.4)'
     ctx.beginPath()
-    ctx.arc(star.headX - scrollX, star.headY - scrollY, STAR_HEAD_SIZE, 0, Math.PI * 2)
+    ctx.arc(star.headX - scrollX, star.headY - scrollY, star.currentSize, 0, Math.PI * 2)
     ctx.fill()
 
     const trailPoints = [
@@ -153,7 +154,7 @@ function drawStars(
       grad.addColorStop(1, getStopColor(currentDist))
 
       ctx.strokeStyle = grad
-      ctx.lineWidth = STAR_THICKNESS
+      ctx.lineWidth = star.currentSize
       ctx.lineCap = 'round'
       ctx.beginPath()
       ctx.moveTo(p1v.x, p1v.y)
@@ -441,6 +442,7 @@ export function InteractiveGrid() {
         totalDist: 0,
         lastTurnDist: 0,
         lastGridSize: BIG_SIZE,
+        currentSize: STAR_THICKNESS,
         guided,
         color: STAR_COLOR,
         startTime: performance.now(),
@@ -592,7 +594,20 @@ export function InteractiveGrid() {
         const step = star.speed * dt
         star.totalDist += step
 
-        if (star.guided && hasPointer && isMouseInside) {
+        // Dynamically upgrade stars to 'guided' if a pointer is now available.
+        // This makes existing background stars shift focus to the mouse.
+        if (!star.guided && hasPointer && isMouseInside && !isTouchRef.current) {
+          star.guided = true
+        }
+
+        const isActivelyGuided = star.guided && hasPointer && isMouseInside
+
+        // Update dynamic size: match small grid (1.0) only when guided and on small grid,
+        // otherwise revert to original STAR_THICKNESS (1.2).
+        const targetSize = (isActivelyGuided && star.lastGridSize === SMALL_SIZE) ? 1.0 : STAR_THICKNESS
+        star.currentSize += (targetSize - star.currentSize) * 0.12
+
+        if (isActivelyGuided) {
           const vmx = star.headX - scrollX
           const vmy = star.headY - scrollY
           const distToMouse = Math.sqrt((vmx - mx) ** 2 + (vmy - my) ** 2)
