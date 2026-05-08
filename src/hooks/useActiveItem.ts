@@ -33,7 +33,8 @@ export function useActiveItem(
     const setExplicitHashTarget = (hashId: string) => {
       explicitHashTargetRef.current = hashId
       explicitHashReachedRef.current = hashId === topItemId && isAtPageTop()
-      setActiveId(hashId)
+      // Do not set activeId here to allow IntersectionObserver to animate
+      // through sections during scroll.
     }
 
     const preserveExplicitTopHash = () => {
@@ -95,6 +96,7 @@ export function useActiveItem(
       const hashId = getCurrentHashId()
       if (itemIds.includes(hashId)) {
         setExplicitHashTarget(hashId)
+        setActiveId(hashId)
       }
     }
 
