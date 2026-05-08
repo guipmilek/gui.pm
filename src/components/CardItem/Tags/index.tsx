@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useRef } from 'react'
+import { useEffect, useLayoutEffect, useRef } from 'react'
 
 import { useExpand } from '../ExpandContext'
 import { ExtraTags, TagsBadge, TagsList, TagsWrapper } from '../styles'
@@ -13,12 +13,30 @@ const VISIBLE_LIMIT = 6
 
 export function TagsCardItem({ tags }: TagsCardItemProps) {
   const { isTagsExpanded, toggleTags } = useExpand()
+
   const extraRef = useRef<HTMLUListElement | null>(null)
+  const badgeRef = useRef<HTMLButtonElement | null>(null)
+  // Largura capturada ANTES do click (antes do React re-renderizar)
+  const widthBeforeToggle = useRef<number | null>(null)
 
   const visibleTags = tags.slice(0, VISIBLE_LIMIT)
   const hiddenTags = tags.slice(VISIBLE_LIMIT)
   const hasOverflow = hiddenTags.length > 0
 
+  const badgeText = isTagsExpanded ? '−' : `+${hiddenTags.length}`
+
+  // Captura a largura atual ANTES de qualquer mudança de estado
+  function handleToggle() {
+    if (badgeRef.current) {
+      // Remove width fixo para medir a largura natural atual
+      badgeRef.current.style.transition = 'none'
+      badgeRef.current.style.width = 'auto'
+      widthBeforeToggle.current = badgeRef.current.getBoundingClientRect().width
+    }
+    toggleTags()
+  }
+
+  // Anima a altura da lista extra
   useEffect(() => {
     if (!extraRef.current) return
     if (isTagsExpanded) {
@@ -27,6 +45,37 @@ export function TagsCardItem({ tags }: TagsCardItemProps) {
       extraRef.current.style.height = '0'
     }
   }, [isTagsExpanded])
+
+  // FLIP da largura: roda depois que o React atualizou o DOM (novo texto),
+  // mas antes do browser pintar (useLayoutEffect)
+  useLayoutEffect(() => {
+    if (!badgeRef.current || !hasOverflow) return
+    if (widthBeforeToggle.current === null) return
+
+    const el = badgeRef.current
+    const oldWidth = widthBeforeToggle.current
+    widthBeforeToggle.current = null
+
+    // Mede a largura com o novo texto (DOM já atualizado pelo React)
+    el.style.transition = 'none'
+    el.style.width = 'auto'
+    const newWidth = el.getBoundingClientRect().width
+
+    if (Math.abs(oldWidth - newWidth) < 0.5) return
+
+    // Congela na largura ANTIGA — isso é o que o browser vai pintar no próximo frame
+    el.style.width = `${oldWidth}px`
+
+    // Double rAF: garante que o browser pintou o estado "congelado"
+    // antes de iniciar a transição para a nova largura
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        if (!badgeRef.current) return
+        badgeRef.current.style.transition = 'width 0.3s ease'
+        badgeRef.current.style.width = `${newWidth}px`
+      })
+    })
+  }, [isTagsExpanded, hasOverflow])
 
   return (
     <TagsWrapper>
@@ -39,8 +88,19 @@ export function TagsCardItem({ tags }: TagsCardItemProps) {
 
         {hasOverflow && (
           <li>
-            <TagsBadge onClick={toggleTags} data-expanded={isTagsExpanded}>
-              {isTagsExpanded ? '−' : `+${hiddenTags.length}`}
+            <TagsBadge
+              ref={badgeRef}
+              onClick={handleToggle}
+              data-expanded={isTagsExpanded}
+              style={{
+                display: 'inline-flex',
+                justifyContent: 'center',
+                alignItems: 'center',
+                overflow: 'hidden',
+                whiteSpace: 'nowrap',
+              }}
+            >
+              {badgeText}
             </TagsBadge>
           </li>
         )}
@@ -48,8 +108,17 @@ export function TagsCardItem({ tags }: TagsCardItemProps) {
 
       {hasOverflow && (
         <ExtraTags ref={extraRef} style={{ height: '0' }}>
-          {hiddenTags.map((tag) => (
-            <li key={tag}>
+          {hiddenTags.map((tag, index) => (
+            <li
+              key={tag}
+              style={{
+                opacity: isTagsExpanded ? 1 : 0,
+                transform: isTagsExpanded ? 'translateY(0)' : 'translateY(-8px)',
+                transition: isTagsExpanded
+                  ? `opacity 0.4s ease ${index * 0.04 + 0.05}s, transform 0.4s ease ${index * 0.04 + 0.05}s`
+                  : 'opacity 0.2s ease, transform 0.2s ease',
+              }}
+            >
               <span>{tag}</span>
             </li>
           ))}
