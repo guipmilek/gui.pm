@@ -9,7 +9,7 @@ export const CardItemContainer = styled('li', {
       margin: { base: '-1rem', md: '-1.5rem' },
       padding: { base: '1rem', md: '1.5rem' },
 
-      opacity: 0,
+      opacity: 1,
       transition: 'opacity 0.2s',
 
       boxShadow: 'card',
@@ -19,11 +19,15 @@ export const CardItemContainer = styled('li', {
 
       '& .glass-ui-card-content': {
         zIndex: 1,
-        overflow: 'visible',
+        overflow: 'hidden !important',
       },
     },
 
     '@media (hover: hover) and (pointer: fine)': {
+      '& .glass-card-wrapper': {
+        opacity: 0,
+      },
+
       '&:hover:not(:where(.hover-stale *)), &.scroll-hover': {
         '& header img': {
           borderColor: 'imageBorder.hover',
