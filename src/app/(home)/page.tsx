@@ -58,7 +58,7 @@ export default function Home() {
       </main>
 
       <footer>
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.25rem', marginBottom: '0.5rem', fontSize: '0.875rem' }}>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', flexWrap: 'wrap', gap: '0.25rem', marginBottom: '0.5rem', fontSize: '0.875rem' }}>
           Design e desenvolvimento feito com{' '}
           <SafeFluentEmoji emoji="💙" type="anim" size={16} /> por{' '}
           <strong>guipm.dev</strong>.
