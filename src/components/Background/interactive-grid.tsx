@@ -193,6 +193,7 @@ export function InteractiveGrid() {
     let lastMy = -1
     let lastGlowLeft = -R
     let lastGlowTop = -R
+    let hasGlowPosition = false
     let lastScrollX = Number.NaN
     let lastScrollY = Number.NaN
 
@@ -336,20 +337,42 @@ export function InteractiveGrid() {
       if (!isTouchRef.current) {
         const mx = positionRef.current.x
         const my = positionRef.current.y
+        const hasPointerPosition = Number.isFinite(mx) && Number.isFinite(my)
+        const inBounds =
+          hasPointerPosition && mx > 0 && my > 0 && mx < w && my < h
 
         const EASING = 0.20
-        smoothRef.current.x += (mx - smoothRef.current.x) * EASING
-        smoothRef.current.y += (my - smoothRef.current.y) * EASING
+        if (hasPointerPosition && inBounds) {
+          if (!hasGlowPosition || glowOpacity < 0.01) {
+            smoothRef.current.x = mx
+            smoothRef.current.y = my
+            hasGlowPosition = true
+          } else {
+            smoothRef.current.x += (mx - smoothRef.current.x) * EASING
+            smoothRef.current.y += (my - smoothRef.current.y) * EASING
+          }
+        }
 
-        const inBounds = mx > 0 && my > 0 && mx < w && my < h
         const targetOpacity = isMouseInside && inBounds ? 1 : 0
-        glowOpacity += (targetOpacity - glowOpacity) * 0.15
+        const opacityEasing = targetOpacity > glowOpacity ? 0.18 : 0.12
+        glowOpacity += (targetOpacity - glowOpacity) * opacityEasing
 
-        const mouseStill = Math.abs(mx - lastMx) < 0.5 && Math.abs(my - lastMy) < 0.5
-        const isSmoothSettled = Math.abs(mx - smoothRef.current.x) < 0.5 && Math.abs(my - smoothRef.current.y) < 0.5
-        const glowSettled = glowOpacity < 0.01 || Math.abs(targetOpacity - glowOpacity) < 0.005
+        const mouseStill =
+          hasPointerPosition &&
+          Math.abs(mx - lastMx) < 0.5 &&
+          Math.abs(my - lastMy) < 0.5
+        const isSmoothSettled =
+          hasPointerPosition &&
+          Math.abs(mx - smoothRef.current.x) < 0.5 &&
+          Math.abs(my - smoothRef.current.y) < 0.5
+        const glowSettled =
+          glowOpacity < 0.01 || Math.abs(targetOpacity - glowOpacity) < 0.005
 
-        if (glowOpacity > 0.01 && !(mouseStill && isSmoothSettled && glowSettled)) {
+        if (
+          glowOpacity > 0.01 &&
+          hasGlowPosition &&
+          !(mouseStill && isSmoothSettled && glowSettled)
+        ) {
           lastMx = mx
           lastMy = my
 
@@ -391,8 +414,12 @@ export function InteractiveGrid() {
           glowCtx.globalCompositeOperation = 'source-over'
 
           ctx.drawImage(glowCanvas, left, top, glowSize, glowSize)
-        } else if (glowOpacity > 0.01) {
+        } else if (glowOpacity > 0.01 && hasGlowPosition) {
           ctx.drawImage(glowCanvas, lastGlowLeft, lastGlowTop, R * 2, R * 2)
+        }
+
+        if (targetOpacity === 0 && glowOpacity < 0.01) {
+          hasGlowPosition = false
         }
       }
 

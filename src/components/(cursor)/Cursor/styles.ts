@@ -7,7 +7,8 @@ export const CursorContainer = styled('div', {
     left: 0,
     zIndex: 10,
 
-    willChange: 'transform',
+    transform: 'translate3d(-9999px, -9999px, 0)',
+    willChange: 'transform, opacity',
     contain: 'layout style',
 
     display: {
@@ -21,13 +22,32 @@ export const CursorContainer = styled('div', {
     pointerEvents: 'none',
 
     opacity: 0,
-    transition: 'opacity 0.2s',
+    transition: 'opacity 0.24s ease-out',
+
+    '& .dot': {
+      opacity: 0,
+      scale: '0.25',
+      filter: 'blur(5px)',
+    },
+
+    '& .solidOutline': {
+      opacity: 0,
+      scale: '0.45',
+      filter: 'blur(8px)',
+    },
+
+    '& .dashedOutline': {
+      opacity: 0,
+      scale: '0.7',
+      clipPath: 'circle(18% at center)',
+      filter: 'blur(10px)',
+    },
 
     '@media (prefers-reduced-motion: reduce)': {
       '& .dashedOutline': {
         animation: 'none',
       },
-      '& .dot, & .solidOutline': {
+      '&, & .dot, & .solidOutline, & .dashedOutline': {
         transition: 'none',
       },
     },
@@ -38,6 +58,25 @@ export const CursorContainer = styled('div', {
 
     '&.visible': {
       opacity: 1,
+
+      '& .dot': {
+        opacity: 1,
+        scale: '1',
+        filter: 'blur(0)',
+      },
+
+      '& .solidOutline': {
+        opacity: 1,
+        scale: '1',
+        filter: 'blur(0)',
+      },
+
+      '& .dashedOutline': {
+        opacity: 0.75,
+        scale: '1',
+        clipPath: 'circle(50% at center)',
+        filter: 'blur(0)',
+      },
     },
 
     '&.hover': {
@@ -51,7 +90,7 @@ export const CursorContainer = styled('div', {
       },
 
       '& .solidOutline': {
-        transform: 'scale(0%)',
+        transform: 'scale(0)',
       },
 
       '& .dashedOutline': {
@@ -63,6 +102,17 @@ export const CursorContainer = styled('div', {
     },
 
     '&.clicking': {
+      '& .dot': {
+        transform: 'scale(0.6)',
+      },
+
+      '& .solidOutline': {
+        transform: 'scale(0.85)',
+        borderColor: 'title',
+      },
+    },
+
+    '&.hover.clicking': {
       '& .dot': {
         transform: 'scale(0.6)',
       },
@@ -94,7 +144,7 @@ export const CursorPart = styled('span', {
       zIndex: 3,
 
       transition:
-        'width 0.5s, height 0.5s, border-color 0.5s, background-color 0.5s, transform 0.15s',
+        'opacity 0.2s ease-out, filter 0.32s ease-out, scale 0.32s cubic-bezier(0.16, 1, 0.3, 1), width 0.5s, height 0.5s, border-color 0.5s, background-color 0.5s, transform 0.15s',
     },
 
     '&.solidOutline': {
@@ -106,7 +156,8 @@ export const CursorPart = styled('span', {
 
       zIndex: 2,
 
-      transition: 'transform 0.75s, border-color 0.3s',
+      transition:
+        'opacity 0.28s ease-out, filter 0.45s ease-out, scale 0.5s cubic-bezier(0.16, 1, 0.3, 1), transform 0.75s, border-color 0.3s',
     },
 
     '&.dashedOutline': {
@@ -118,7 +169,8 @@ export const CursorPart = styled('span', {
 
       zIndex: 1,
 
-      transition: 'width 0.75s, height 0.75s',
+      transition:
+        'opacity 0.38s ease-out, filter 0.5s ease-out, scale 0.55s cubic-bezier(0.16, 1, 0.3, 1), clip-path 0.55s cubic-bezier(0.16, 1, 0.3, 1), width 0.75s, height 0.75s',
 
       animation: 'spin 15s infinite linear',
     },

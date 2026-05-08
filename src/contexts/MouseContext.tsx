@@ -14,7 +14,7 @@ interface MouseContextValue {
 const MouseContext = createContext<MouseContextValue | null>(null)
 
 export function MouseProvider({ children }: { children: ReactNode }) {
-  const positionRef = useRef<MousePosition>({ x: -52.5, y: -52.5 })
+  const positionRef = useRef<MousePosition>({ x: Number.NaN, y: Number.NaN })
 
   useEffect(() => {
     const isCoarse = window.matchMedia('(pointer: coarse)').matches
@@ -35,6 +35,8 @@ export function MouseProvider({ children }: { children: ReactNode }) {
       if (hideStyle.parentNode) hideStyle.remove()
     }
 
+    let hasPointerPosition = false
+
     const onPointerMove = (event: PointerEvent) => {
       const last =
         'getCoalescedEvents' in event
@@ -42,29 +44,30 @@ export function MouseProvider({ children }: { children: ReactNode }) {
           : event
       positionRef.current.x = last.clientX
       positionRef.current.y = last.clientY
+      hasPointerPosition = true
+      hideNativeCursor()
     }
 
     const onMouseEnter = () => {
-      hideNativeCursor()
+      if (hasPointerPosition) hideNativeCursor()
     }
     const onMouseLeave = () => {
+      hasPointerPosition = false
       showNativeCursor()
-    }
-
-    function restore() {
-      hideNativeCursor()
-      document.documentElement.addEventListener('mouseenter', onMouseEnter)
-      document.documentElement.addEventListener('mouseleave', onMouseLeave)
-      window.addEventListener('pointermove', onPointerMove, { passive: true })
     }
 
     const onPageShow = (event: PageTransitionEvent) => {
       if (event.persisted) {
-        restore()
+        hasPointerPosition = false
+        positionRef.current.x = Number.NaN
+        positionRef.current.y = Number.NaN
+        showNativeCursor()
       }
     }
 
-    restore()
+    document.documentElement.addEventListener('mouseenter', onMouseEnter)
+    document.documentElement.addEventListener('mouseleave', onMouseLeave)
+    window.addEventListener('pointermove', onPointerMove, { passive: true })
     window.addEventListener('pageshow', onPageShow)
 
     return () => {

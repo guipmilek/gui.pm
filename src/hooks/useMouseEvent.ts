@@ -19,6 +19,7 @@ export function useMouseEvent() {
     let pendingY = 0
     let isHovering = false
     let isClicking = false
+    let isMouseInside = false
     let hasPointerPosition = false
     let scrollRafPending = false
     let scrollHoverElements: Element[] = []
@@ -68,6 +69,7 @@ export function useMouseEvent() {
     const onPointerMove = (event: PointerEvent) => {
       pendingX = event.clientX
       pendingY = event.clientY
+      isMouseInside = true
       hasPointerPosition = true
       clearScrollHover()
       setHoverStale(false)
@@ -80,6 +82,10 @@ export function useMouseEvent() {
           if (!container) return
           container.style.transform =
             `translate3d(${pendingX - HALF}px, ${pendingY - HALF}px, 0)`
+          container.classList.toggle(
+            'visible',
+            hasPointerPosition && isMouseInside,
+          )
         })
       }
     }
@@ -119,9 +125,11 @@ export function useMouseEvent() {
     }
 
     const onMouseEnter = () => {
-      cursorRef.current?.classList.add('visible')
+      isMouseInside = true
+      if (hasPointerPosition) cursorRef.current?.classList.add('visible')
     }
     const onMouseLeave = () => {
+      isMouseInside = false
       cursorRef.current?.classList.remove('visible')
       hasPointerPosition = false
       clearScrollHover()
@@ -131,15 +139,15 @@ export function useMouseEvent() {
 
     const onPageShow = (event: PageTransitionEvent) => {
       if (event.persisted) {
-        document.documentElement.addEventListener('mouseenter', onMouseEnter)
-        document.documentElement.addEventListener('mouseleave', onMouseLeave)
-        cursorRef.current?.classList.add('visible')
+        isMouseInside = false
+        hasPointerPosition = false
+        cursorRef.current?.classList.remove('visible')
+        clearScrollHover()
+        setHovering(false)
+        setHoverStale(false)
       }
     }
 
-    // Immediately show on fine-pointer devices so the cursor is visible even
-    // when the mouse was already inside the viewport on first load.
-    cursorRef.current?.classList.add('visible')
     document.documentElement.addEventListener('mouseenter', onMouseEnter)
     document.documentElement.addEventListener('mouseleave', onMouseLeave)
     document.addEventListener('mousedown', onMouseDown)
