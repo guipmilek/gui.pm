@@ -154,7 +154,7 @@ export const Bio = styled('div', {
       },
     },
 
-    '& > p': {
+    '& .bio-text': {
       opacity: 0,
 
       animation: 'fadeSlideUp 0.7s cubic-bezier(0.22, 1, 0.36, 1) both',

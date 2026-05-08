@@ -8,6 +8,7 @@ import { LanguageList } from '@/components/(sections)/LanguageList'
 import { ProjectList } from '@/components/(sections)/ProjectList'
 import { AsideHeader } from '@/components/AsideHeader'
 import { Section } from '@/components/Section'
+import { SafeFluentEmoji } from '@/components/SafeFluentEmoji'
 
 import { HomeContainer } from './styles'
 
@@ -57,9 +58,11 @@ export default function Home() {
       </main>
 
       <footer>
-        <p>
-          Design e desenvolvimento feito com 💙 por <strong>guipm.dev</strong>.
-        </p>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.25rem', marginBottom: '0.5rem', fontSize: '0.875rem' }}>
+          Design e desenvolvimento feito com{' '}
+          <SafeFluentEmoji emoji="💙" type="anim" size={16} /> por{' '}
+          <strong>guipm.dev</strong>.
+        </div>
 
         <p>
           Inspirado em{' '}

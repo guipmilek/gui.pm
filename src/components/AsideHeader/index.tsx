@@ -1,5 +1,6 @@
 import Image from 'next/image'
 import Link from 'next/link'
+import { Fragment } from 'react'
 import { IconType } from 'react-icons'
 import { RxDownload } from 'react-icons/rx'
 
@@ -8,6 +9,7 @@ import { icons } from '@/libs/reactIcons'
 import { staticDataProvider } from '@/providers'
 
 import { Navbar } from '../Navbar'
+import { SafeFluentEmoji } from '../SafeFluentEmoji'
 import { AsideHeaderContainer, Bio, ResumeButton, SocialLinks } from './styles'
 
 export async function AsideHeader() {
@@ -16,6 +18,9 @@ export async function AsideHeader() {
   const { headline, bio, links } = profile
 
   const hasLinks = links.length > 0
+
+  // Replace 👋 with SafeFluentEmoji
+  const bioParts = bio.split('👋')
 
   return (
     <AsideHeaderContainer>
@@ -31,7 +36,25 @@ export async function AsideHeader() {
           </div>
         </div>
 
-        <p>{bio}</p>
+        <div className="bio-text">
+          {bioParts.map((part, index) => (
+            <Fragment key={index}>
+              {part}
+              {index < bioParts.length - 1 && (
+                <SafeFluentEmoji
+                  emoji="👋"
+                  type="anim"
+                  size={20}
+                  style={{
+                    display: 'inline-block',
+                    verticalAlign: 'middle',
+                    marginRight: '0.25rem',
+                  }}
+                />
+              )}
+            </Fragment>
+          ))}
+        </div>
       </Bio>
 
       <Navbar />
