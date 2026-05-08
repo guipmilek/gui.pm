@@ -8,6 +8,8 @@ interface ShootingStar {
   dir: 'h' | 'v'
   forward: boolean
   pos: number
+  from: number
+  to: number
   speed: number
   color: string
   startTime: number
@@ -64,6 +66,8 @@ function drawStars(
   h: number,
   now: number,
   stars: ShootingStar[],
+  scrollX: number,
+  scrollY: number,
 ) {
   for (let i = stars.length - 1; i >= 0; i--) {
     const star = stars[i]
@@ -79,13 +83,13 @@ function drawStars(
     ctx.globalAlpha = alpha
 
     if (star.dir === 'h') {
-      const total = w + TRAIL_LENGTH * 2
-      const cx = star.forward
-        ? -TRAIL_LENGTH + total * progress
-        : w + TRAIL_LENGTH - total * progress
+      const y = star.pos - scrollY
+      if (y < -STAR_THICKNESS || y > h + STAR_THICKNESS) continue
+
+      const cx = star.from + (star.to - star.from) * progress - scrollX
 
       const sx = star.forward ? cx - TRAIL_LENGTH : cx + TRAIL_LENGTH
-      const grad = ctx.createLinearGradient(sx, star.pos, cx, star.pos)
+      const grad = ctx.createLinearGradient(sx, y, cx, y)
       grad.addColorStop(0, 'transparent')
       grad.addColorStop(0.7, star.color)
       grad.addColorStop(1, 'rgba(255,255,255,0.8)')
@@ -93,15 +97,15 @@ function drawStars(
       ctx.fillStyle = grad
       const left = Math.min(sx, cx)
       const tw = Math.abs(cx - sx)
-      ctx.fillRect(left, star.pos - STAR_THICKNESS / 2, tw, STAR_THICKNESS)
+      ctx.fillRect(left, y - STAR_THICKNESS / 2, tw, STAR_THICKNESS)
     } else {
-      const total = h + TRAIL_LENGTH * 2
-      const cy = star.forward
-        ? -TRAIL_LENGTH + total * progress
-        : h + TRAIL_LENGTH - total * progress
+      const x = star.pos - scrollX
+      if (x < -STAR_THICKNESS || x > w + STAR_THICKNESS) continue
+
+      const cy = star.from + (star.to - star.from) * progress - scrollY
 
       const sy = star.forward ? cy - TRAIL_LENGTH : cy + TRAIL_LENGTH
-      const grad = ctx.createLinearGradient(star.pos, sy, star.pos, cy)
+      const grad = ctx.createLinearGradient(x, sy, x, cy)
       grad.addColorStop(0, 'transparent')
       grad.addColorStop(0.7, star.color)
       grad.addColorStop(1, 'rgba(255,255,255,0.8)')
@@ -109,7 +113,7 @@ function drawStars(
       ctx.fillStyle = grad
       const top = Math.min(sy, cy)
       const th = Math.abs(cy - sy)
-      ctx.fillRect(star.pos - STAR_THICKNESS / 2, top, STAR_THICKNESS, th)
+      ctx.fillRect(x - STAR_THICKNESS / 2, top, STAR_THICKNESS, th)
     }
   }
 
@@ -118,6 +122,13 @@ function drawStars(
 
 function gridOffset(scroll: number, size: number) {
   return -(((scroll % size) + size) % size)
+}
+
+function randomGridLine(scroll: number, viewportSize: number) {
+  const firstLine = Math.floor(scroll / BIG_SIZE) * BIG_SIZE
+  const lineCount = Math.ceil((viewportSize + scroll - firstLine) / BIG_SIZE) + 1
+
+  return firstLine + ((Math.random() * lineCount) | 0) * BIG_SIZE
 }
 
 export function InteractiveGrid() {
@@ -266,15 +277,27 @@ export function InteractiveGrid() {
       const speed =
         STAR_SPEED_MIN + Math.random() * (STAR_SPEED_MAX - STAR_SPEED_MIN)
 
+      const scrollX = window.scrollX
+      const scrollY = window.scrollY
+      const axisScroll = dir === 'h' ? scrollX : scrollY
+      const axisSize = dir === 'h' ? w : h
       const pos =
         dir === 'h'
-          ? ((Math.random() * (h / BIG_SIZE + 1)) | 0) * BIG_SIZE
-          : ((Math.random() * (w / BIG_SIZE + 1)) | 0) * BIG_SIZE
+          ? randomGridLine(scrollY, h)
+          : randomGridLine(scrollX, w)
+      const from = forward
+        ? axisScroll - TRAIL_LENGTH
+        : axisScroll + axisSize + TRAIL_LENGTH
+      const to = forward
+        ? axisScroll + axisSize + TRAIL_LENGTH
+        : axisScroll - TRAIL_LENGTH
 
       starsRef.current.push({
         dir,
         forward,
         pos,
+        from,
+        to,
         speed,
         color: STAR_COLOR,
         startTime: performance.now(),
@@ -373,7 +396,15 @@ export function InteractiveGrid() {
         }
       }
 
-      drawStars(ctx, w, h, timestamp, starsRef.current)
+      drawStars(
+        ctx,
+        w,
+        h,
+        timestamp,
+        starsRef.current,
+        window.scrollX,
+        window.scrollY,
+      )
 
       animRef.current = requestAnimationFrame(frame)
     }

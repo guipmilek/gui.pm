@@ -11,6 +11,23 @@ interface DescriptionCardItemProps {
   description: string[]
 }
 
+const LINE_HEIGHT_IN_REM = 1.25
+const INITIAL_VISIBLE_LINES_NUMBER = 10
+const DEFAULT_COLLAPSED_HEIGHT = `calc(${LINE_HEIGHT_IN_REM}rem * ${INITIAL_VISIBLE_LINES_NUMBER})`
+const DEFAULT_BUTTON_MARGIN_TOP = 'calc((2.625rem + 0.75rem) * -1)'
+
+// Use concrete px values so Firefox interpolates numbers, not calc() exprs.
+// calc() heights force a full layout recalc every animation frame.
+function getCollapsedHeight() {
+  if (typeof window === 'undefined') {
+    return DEFAULT_COLLAPSED_HEIGHT
+  }
+  const remSizeInPx = parseFloat(
+    getComputedStyle(document.documentElement).fontSize,
+  )
+  return `${LINE_HEIGHT_IN_REM * INITIAL_VISIBLE_LINES_NUMBER * remSizeInPx}px`
+}
+
 export function DescriptionCardItem({ description }: DescriptionCardItemProps) {
   const divRef = useRef<HTMLDivElement | null>(null)
 
@@ -20,23 +37,7 @@ export function DescriptionCardItem({ description }: DescriptionCardItemProps) {
   const [hasOverflow, setHasOverflow] = useState(isLikelyToOverflow)
   const [isExpanded, setIsExpanded] = useState(false)
 
-  const lineHeightInRem = 1.25
-  const initialVisibleLinesNumber = 10
-  const defaultButtonMarginTop = 'calc((2.625rem + 0.75rem) * -1)'
-
-  // Use concrete px values so Firefox interpolates numbers, not calc() exprs.
-  // calc() heights force a full layout recalc every animation frame.
-  function getCollapsedHeight() {
-    if (typeof window === 'undefined') {
-      return `calc(${lineHeightInRem}rem * ${initialVisibleLinesNumber})`
-    }
-    const remSizeInPx = parseFloat(
-      getComputedStyle(document.documentElement).fontSize,
-    )
-    return `${lineHeightInRem * initialVisibleLinesNumber * remSizeInPx}px`
-  }
-
-  const [height, setHeight] = useState<string>(() => getCollapsedHeight())
+  const [height, setHeight] = useState<string>(DEFAULT_COLLAPSED_HEIGHT)
 
   function handleToggleDescription() {
     if (!divRef.current) return
@@ -64,7 +65,6 @@ export function DescriptionCardItem({ description }: DescriptionCardItemProps) {
       // Resolve the initial collapsed height now that fonts are loaded.
       setHeight(getCollapsedHeight())
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   return (
@@ -89,7 +89,7 @@ export function DescriptionCardItem({ description }: DescriptionCardItemProps) {
           onClick={handleToggleDescription}
           rotateIcon={isExpanded}
           style={{
-            marginTop: isExpanded ? '0' : defaultButtonMarginTop,
+            marginTop: isExpanded ? '0' : DEFAULT_BUTTON_MARGIN_TOP,
             transition: 'color 0.2s, background-color 0.2s, margin 0.5s',
           }}
         >
