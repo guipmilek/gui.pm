@@ -17,14 +17,13 @@ export const CardItemContainer = styled('li', {
       height: { base: 'calc(100% + (1rem * 2))', md: 'calc(100% + (1.5rem * 2))' },
 
       padding: { base: '1rem', md: '1.5rem' },
-      borderTop: '1px solid',
-      borderColor: 'cardTopBorder',
+      border: '1px solid',
+      borderColor: 'cardBorder',
       borderRadius: '6px',
 
       boxShadow: 'card',
 
       content: "''",
-      pointerEvents: 'none',
 
       backdropBlurSafe: '4px',
 
@@ -47,14 +46,6 @@ export const CardItemContainer = styled('li', {
 
         '&::before': {
           opacity: '100%',
-        },
-
-        '& h2 a': {
-          color: 'primary',
-
-          '& span svg': {
-            transform: 'translate(50%, -25%)',
-          },
         },
       },
     },
