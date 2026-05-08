@@ -62,5 +62,29 @@ export const keyframes = defineKeyframes({
     '0%, 100%': { opacity: '1' },
     '50%': { opacity: '0.4' },
   },
+  fadeSlideUp: {
+    from: {
+      opacity: '0',
+      transform: 'translate3d(0, 1rem, 0)',
+      filter: 'blur(6px)',
+    },
+    to: {
+      opacity: '1',
+      transform: 'translate3d(0, 0, 0)',
+      filter: 'blur(0)',
+    },
+  },
+  fadeSlideRight: {
+    from: {
+      opacity: '0',
+      transform: 'translate3d(-1rem, 0, 0)',
+      filter: 'blur(6px)',
+    },
+    to: {
+      opacity: '1',
+      transform: 'translate3d(0, 0, 0)',
+      filter: 'blur(0)',
+    },
+  },
 })
 

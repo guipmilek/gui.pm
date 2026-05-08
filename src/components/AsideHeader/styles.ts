@@ -29,6 +29,8 @@ export const AsideHeaderContainer = styled('header', {
 export const Bio = styled('div', {
   base: {
     '& .logo': {
+      opacity: 0,
+
       display: 'flex',
       alignItems: 'center',
       gap: '1rem',
@@ -40,6 +42,20 @@ export const Bio = styled('div', {
       color: 'title',
 
       cursor: 'default',
+
+      animation: 'fadeSlideUp 0.7s cubic-bezier(0.22, 1, 0.36, 1) both',
+      animationDelay: '80ms',
+
+      '@media (prefers-reduced-motion: reduce)': {
+        opacity: '1 !important',
+        transform: 'none !important',
+        filter: 'none !important',
+        animation: 'none !important',
+      },
+
+      lg: {
+        animation: 'fadeSlideRight 0.7s cubic-bezier(0.22, 1, 0.36, 1) both',
+      },
 
       sm: {
         width: '100%',
@@ -127,6 +143,24 @@ export const Bio = styled('div', {
         },
       },
     },
+
+    '& > p': {
+      opacity: 0,
+
+      animation: 'fadeSlideUp 0.7s cubic-bezier(0.22, 1, 0.36, 1) both',
+      animationDelay: '180ms',
+
+      '@media (prefers-reduced-motion: reduce)': {
+        opacity: '1 !important',
+        transform: 'none !important',
+        filter: 'none !important',
+        animation: 'none !important',
+      },
+
+      lg: {
+        animation: 'fadeSlideRight 0.7s cubic-bezier(0.22, 1, 0.36, 1) both',
+      },
+    },
   },
 })
 
@@ -151,6 +185,29 @@ export const SocialLinks = styled('ul', {
       '&:hover:not(:where(.hover-stale *)), &.scroll-hover': {
         color: 'title',
       },
+    },
+
+    '& li': {
+      opacity: 0,
+
+      animation: 'fadeSlideUp 0.7s cubic-bezier(0.22, 1, 0.36, 1) both',
+
+      '@media (prefers-reduced-motion: reduce)': {
+        opacity: '1 !important',
+        transform: 'none !important',
+        filter: 'none !important',
+        animation: 'none !important',
+      },
+
+      lg: {
+        animation: 'fadeSlideRight 0.7s cubic-bezier(0.22, 1, 0.36, 1) both',
+      },
+
+      '&:nth-of-type(1)': { animationDelay: '560ms' },
+      '&:nth-of-type(2)': { animationDelay: '640ms' },
+      '&:nth-of-type(3)': { animationDelay: '720ms' },
+      '&:nth-of-type(4)': { animationDelay: '800ms' },
+      '&:nth-of-type(5)': { animationDelay: '880ms' },
     },
   },
 })
