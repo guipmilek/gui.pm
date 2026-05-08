@@ -594,13 +594,18 @@ export function InteractiveGrid() {
         const step = star.speed * dt
         star.totalDist += step
 
+        const vmx = star.headX - scrollX
+        const vmy = star.headY - scrollY
+        const distToMouse = Math.sqrt((vmx - mx) ** 2 + (vmy - my) ** 2)
+
         // Dynamically upgrade stars to 'guided' if a pointer is now available.
         // This makes existing background stars shift focus to the mouse.
         if (!star.guided && hasPointer && isMouseInside && !isTouchRef.current) {
           star.guided = true
         }
 
-        const isActivelyGuided = star.guided && hasPointer && isMouseInside
+        // B2: Stars only "react" and start trying to reach the cursor when near it (within HOVER_RADIUS).
+        const isActivelyGuided = star.guided && hasPointer && isMouseInside && distToMouse < HOVER_RADIUS
 
         // Update dynamic size: match small grid (1.0) only when guided and on small grid,
         // otherwise revert to original STAR_THICKNESS (1.2).
@@ -608,10 +613,6 @@ export function InteractiveGrid() {
         star.currentSize += (targetSize - star.currentSize) * 0.12
 
         if (isActivelyGuided) {
-          const vmx = star.headX - scrollX
-          const vmy = star.headY - scrollY
-          const distToMouse = Math.sqrt((vmx - mx) ** 2 + (vmy - my) ** 2)
-
           const currentAbsorbDist = isHoveringRef.current ? 16 : ABSORB_DIST
           if (distToMouse < currentAbsorbDist) {
             star.absorbTime = timestamp
@@ -623,10 +624,11 @@ export function InteractiveGrid() {
           const bty = Math.round(ty / BIG_SIZE) * BIG_SIZE
           const distToBigGrid = Math.sqrt((tx - btx) ** 2 + (ty - bty) ** 2)
 
-          // Grid size hysteresis to prevent flipping
+          // Grid size hysteresis to prevent flipping.
+          // B3: Only enter the smaller grid for fine-tuned guidance when very close to the cursor.
           let gridSize = star.lastGridSize || BIG_SIZE
-          const switchToSmall = distToBigGrid > currentAbsorbDist - 5
-          const switchToBig = distToBigGrid < currentAbsorbDist - 15
+          const switchToSmall = (distToBigGrid > currentAbsorbDist - 5) && (distToMouse < 160)
+          const switchToBig = (distToBigGrid < currentAbsorbDist - 15) || (distToMouse > 190)
           if (gridSize === BIG_SIZE && switchToSmall) gridSize = SMALL_SIZE
           else if (gridSize === SMALL_SIZE && switchToBig) gridSize = BIG_SIZE
           star.lastGridSize = gridSize
