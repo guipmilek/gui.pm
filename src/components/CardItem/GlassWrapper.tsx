@@ -1,7 +1,7 @@
 'use client'
 
 import { GlassCard } from 'react-glass-ui'
-import { ReactNode } from 'react'
+import { ReactNode, useEffect, useState } from 'react'
 
 interface GlassWrapperProps {
   children: ReactNode
@@ -30,6 +30,16 @@ export function GlassWrapper({
   padding = '0',
   className,
 }: GlassWrapperProps) {
+  const [isMounted, setIsMounted] = useState(false)
+
+  useEffect(() => {
+    setIsMounted(true)
+  }, [])
+
+  if (!isMounted) {
+    return <div className={className}>{children}</div>
+  }
+
   return (
     <GlassCard
       flexibility={flexibility}
