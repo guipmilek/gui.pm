@@ -191,6 +191,7 @@ export function InteractiveGrid() {
   const { positionRef, isHoveringRef } = useMouseContext()
   const lastTimeRef = useRef(0)
   const lineOccupancyRef = useRef<Set<string>>(new Set())
+  const edgeHistoryRef = useRef<number[]>([])
 
   useEffect(() => {
     // B1: On touch/coarse devices the CSS GridFallback handles everything.
@@ -346,14 +347,24 @@ export function InteractiveGrid() {
         return { line, key: `${orientation}-${line}` }
       }
 
+      // Pick an edge, avoiding the most recent ones if possible
+      const availableEdges = [0, 1, 2, 3].filter(e => !edgeHistoryRef.current.includes(e))
+      const edge = (availableEdges.length > 0
+        ? availableEdges[(Math.random() * availableEdges.length) | 0]
+        : (Math.random() * 4) | 0) as number
+
+      edgeHistoryRef.current.push(edge)
+      if (edgeHistoryRef.current.length > 2) edgeHistoryRef.current.shift()
+
+      const entryDepth = 100 + Math.random() * 150 // Randomize entry distance (100-250px)
+
       if (guided) {
-        const edge = (Math.random() * 4) | 0
         if (edge === 0) {
           // Top
           const { line, key } = findUnoccupiedLine(scrollX, w, 'v')
           headX = line
           occupancyKey = key
-          headY = scrollY - 100
+          headY = scrollY - entryDepth
           dir = 'v'
           moveSign = 1
         } else if (edge === 1) {
@@ -361,12 +372,12 @@ export function InteractiveGrid() {
           const { line, key } = findUnoccupiedLine(scrollX, w, 'v')
           headX = line
           occupancyKey = key
-          headY = scrollY + h + 100
+          headY = scrollY + h + entryDepth
           dir = 'v'
           moveSign = -1
         } else if (edge === 2) {
           // Left
-          headX = scrollX - 100
+          headX = scrollX - entryDepth
           const { line, key } = findUnoccupiedLine(scrollY, h, 'h')
           headY = line
           occupancyKey = key
@@ -374,7 +385,7 @@ export function InteractiveGrid() {
           moveSign = 1
         } else {
           // Right
-          headX = scrollX + w + 100
+          headX = scrollX + w + entryDepth
           const { line, key } = findUnoccupiedLine(scrollY, h, 'h')
           headY = line
           occupancyKey = key
@@ -382,20 +393,26 @@ export function InteractiveGrid() {
           moveSign = -1
         }
       } else {
-        const side: 'h' | 'v' = Math.random() > 0.5 ? 'h' : 'v'
         const forward = Math.random() > 0.5
-        dir = side
         moveSign = forward ? 1 : -1
-        if (side === 'h') {
+        if (edge === 2 || edge === 3) {
+          // Left or Right
+          const side = edge === 2 ? 'left' : 'right'
           const { line, key } = findUnoccupiedLine(scrollY, h, 'h')
           headY = line
           occupancyKey = key
-          headX = forward ? scrollX - 100 : scrollX + w + 100
+          headX = side === 'left' ? scrollX - entryDepth : scrollX + w + entryDepth
+          dir = 'h'
+          moveSign = side === 'left' ? 1 : -1
         } else {
+          // Top or Bottom
+          const side = edge === 0 ? 'top' : 'bottom'
           const { line, key } = findUnoccupiedLine(scrollX, w, 'v')
           headX = line
           occupancyKey = key
-          headY = forward ? scrollY - 100 : scrollY + h + 100
+          headY = side === 'top' ? scrollY - entryDepth : scrollY + h + entryDepth
+          dir = 'v'
+          moveSign = side === 'top' ? 1 : -1
         }
       }
 
