@@ -19,8 +19,7 @@ export function MouseProvider({ children }: { children: ReactNode }) {
   const isHoveringRef = useRef(false)
 
   useEffect(() => {
-    const isCoarse = window.matchMedia('(pointer: coarse)').matches
-    if (isCoarse) return
+    if (!window.matchMedia('(pointer: fine)').matches) return
 
     const hideStyle = document.createElement('style')
     hideStyle.id = 'custom-cursor-hide'
@@ -40,6 +39,14 @@ export function MouseProvider({ children }: { children: ReactNode }) {
     let hasPointerPosition = false
 
     const onPointerMove = (event: PointerEvent) => {
+      if (event.pointerType !== 'mouse' && event.pointerType !== 'pen') {
+        hasPointerPosition = false
+        positionRef.current.x = Number.NaN
+        positionRef.current.y = Number.NaN
+        showNativeCursor()
+        return
+      }
+
       const last =
         'getCoalescedEvents' in event
           ? (event.getCoalescedEvents().at(-1) ?? event)
@@ -48,6 +55,15 @@ export function MouseProvider({ children }: { children: ReactNode }) {
       positionRef.current.y = last.clientY
       hasPointerPosition = true
       hideNativeCursor()
+    }
+
+    const onPointerDown = (event: PointerEvent) => {
+      if (event.pointerType === 'touch') {
+        hasPointerPosition = false
+        positionRef.current.x = Number.NaN
+        positionRef.current.y = Number.NaN
+        showNativeCursor()
+      }
     }
 
     const onMouseEnter = () => {
@@ -70,12 +86,14 @@ export function MouseProvider({ children }: { children: ReactNode }) {
     document.documentElement.addEventListener('mouseenter', onMouseEnter)
     document.documentElement.addEventListener('mouseleave', onMouseLeave)
     window.addEventListener('pointermove', onPointerMove, { passive: true })
+    window.addEventListener('pointerdown', onPointerDown, { passive: true })
     window.addEventListener('pageshow', onPageShow)
 
     return () => {
       document.documentElement.removeEventListener('mouseenter', onMouseEnter)
       document.documentElement.removeEventListener('mouseleave', onMouseLeave)
       window.removeEventListener('pointermove', onPointerMove)
+      window.removeEventListener('pointerdown', onPointerDown)
       window.removeEventListener('pageshow', onPageShow)
       showNativeCursor()
     }
