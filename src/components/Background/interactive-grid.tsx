@@ -29,13 +29,13 @@ const STAR_SPAWN_MIN = 350
 const STAR_SPAWN_MAX = 800
 const STAR_SPEED = 0.40 // px/ms
 const STAR_LIFETIME = 8000 // ms
-const ABSORB_DIST = 55
+const ABSORB_DIST = 62
 const ABSORB_FADE = 300 // ms
 
 const GRID_BIG = 'rgba(113, 113, 122, 0.15)'
 const GRID_SMALL = 'rgba(113, 113, 122, 0.07)'
 const HOVER_RADIUS = 280
-const STAR_COLOR = 'rgba(148, 163, 184, 0.45)'
+const STAR_COLOR = 'rgba(148, 163, 184, 0.25)'
 const MAX_CANVAS_DPR = 1.5
 
 function drawGrid(
@@ -562,14 +562,22 @@ export function InteractiveGrid() {
             continue
           }
 
-          const targetGridX = Math.round(tx / BIG_SIZE) * BIG_SIZE
-          const targetGridY = Math.round(ty / BIG_SIZE) * BIG_SIZE
+          const btx = Math.round(tx / BIG_SIZE) * BIG_SIZE
+          const bty = Math.round(ty / BIG_SIZE) * BIG_SIZE
+          const distToBigGrid = Math.sqrt((tx - btx) ** 2 + (ty - bty) ** 2)
+
+          // Only use the smaller grid if the big grid lines are too far to reach the cursor
+          const useSmallGrid = distToBigGrid > currentAbsorbDist - 5
+          const gridSize = useSmallGrid ? SMALL_SIZE : BIG_SIZE
+
+          const targetGridX = Math.round(tx / gridSize) * gridSize
+          const targetGridY = Math.round(ty / gridSize) * gridSize
 
           if (star.dir === 'h') {
             const dx = targetGridX - star.headX
             if (Math.abs(dx) < step) {
               star.headX = targetGridX
-              if (Math.abs(targetGridY - star.headY) > 1) {
+              if (Math.abs(targetGridY - star.headY) >= gridSize) {
                 star.waypoints.unshift({ x: star.headX, y: star.headY })
                 star.dir = 'v'
               }
@@ -580,7 +588,7 @@ export function InteractiveGrid() {
             const dy = targetGridY - star.headY
             if (Math.abs(dy) < step) {
               star.headY = targetGridY
-              if (Math.abs(targetGridX - star.headX) > 1) {
+              if (Math.abs(targetGridX - star.headX) >= gridSize) {
                 star.waypoints.unshift({ x: star.headX, y: star.headY })
                 star.dir = 'h'
               }
