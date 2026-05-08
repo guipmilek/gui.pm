@@ -438,11 +438,6 @@ export function InteractiveGrid() {
       const delay =
         STAR_SPAWN_MIN + Math.random() * (STAR_SPAWN_MAX - STAR_SPAWN_MIN)
 
-      if (document.visibilityState !== 'visible') {
-        spawnIdRef.current = setTimeout(scheduleNext, delay)
-        return
-      }
-
       doSpawn()
       spawnIdRef.current = setTimeout(scheduleNext, delay)
     }
@@ -723,11 +718,9 @@ export function InteractiveGrid() {
     const onVisibility = () => {
       if (document.hidden) {
         cancelAnimationFrame(animRef.current)
-        clearTimeout(spawnIdRef.current)
-        spawnIdRef.current = undefined
       } else {
+        lastTimeRef.current = 0
         animRef.current = requestAnimationFrame(frame)
-        scheduleNext()
       }
     }
 
