@@ -24,10 +24,45 @@ export const viewport: Viewport = {
   colorScheme: 'dark',
 }
 
+const revealPreloadScript = `
+  if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    document.documentElement.classList.add('reveal-preload')
+    setTimeout(function () {
+      document.documentElement.classList.remove('reveal-preload')
+    }, 4000)
+  }
+`
+
 export default function RootLayout({ children }: RootLayoutProps) {
   return (
     <html lang="pt-BR" className={fontClassName}>
       <body>
+        <style>
+          {`
+            html.reveal-preload [data-reveal] {
+              opacity: 0;
+              transform: translate3d(0, 0.75rem, 0);
+              filter: none;
+            }
+
+            @media (min-width: 1024px) {
+              html.reveal-preload [data-reveal] {
+                transform: translate3d(0, 1rem, 0);
+                filter: blur(6px);
+              }
+            }
+
+            @media (prefers-reduced-motion: reduce) {
+              html.reveal-preload [data-reveal] {
+                opacity: 1 !important;
+                transform: none !important;
+                filter: none !important;
+              }
+            }
+          `}
+        </style>
+        <script dangerouslySetInnerHTML={{ __html: revealPreloadScript }} />
+
         <noscript>
           <style>
             {`

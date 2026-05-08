@@ -3,9 +3,11 @@
 import { useEffect } from 'react'
 
 const REVEAL_SELECTOR = '[data-reveal]'
+const REVEAL_PRELOAD_CLASS = 'reveal-preload'
 const REVEAL_PENDING_CLASS = 'reveal-pending'
 const REVEALED_CLASS = 'is-revealed'
 const STAGGER_MS = 80
+const INITIAL_STAGGER_MS = 140
 
 function setRevealDelay(element: HTMLElement) {
   const delayIndex = Number(element.dataset.revealDelay ?? 0)
@@ -23,11 +25,15 @@ function isInitiallyVisible(element: HTMLElement) {
 
 export function ScrollReveal() {
   useEffect(() => {
+    const root = document.documentElement
     const elements = Array.from(
       document.querySelectorAll<HTMLElement>(REVEAL_SELECTOR),
     )
 
-    if (elements.length === 0) return
+    if (elements.length === 0) {
+      root.classList.remove(REVEAL_PRELOAD_CLASS)
+      return
+    }
 
     const prefersReducedMotion = window.matchMedia(
       '(prefers-reduced-motion: reduce)',
@@ -37,8 +43,11 @@ export function ScrollReveal() {
 
     if (prefersReducedMotion || !('IntersectionObserver' in window)) {
       elements.forEach((element) => element.classList.add(REVEALED_CLASS))
+      root.classList.remove(REVEAL_PRELOAD_CLASS)
       return
     }
+
+    const initiallyVisibleElements: HTMLElement[] = []
 
     const observer = new IntersectionObserver(
       (entries) => {
@@ -56,16 +65,40 @@ export function ScrollReveal() {
     )
 
     elements.forEach((element) => {
+      element.classList.add(REVEAL_PENDING_CLASS)
+
       if (isInitiallyVisible(element)) {
-        element.classList.add(REVEALED_CLASS)
+        initiallyVisibleElements.push(element)
         return
       }
 
-      element.classList.add(REVEAL_PENDING_CLASS)
       observer.observe(element)
     })
 
-    return () => observer.disconnect()
+    root.classList.remove(REVEAL_PRELOAD_CLASS)
+
+    const revealTimeouts: Array<ReturnType<typeof setTimeout>> = []
+    let revealFrame = 0
+    const pendingFrame = requestAnimationFrame(() => {
+      revealFrame = requestAnimationFrame(() => {
+        initiallyVisibleElements.forEach((element, index) => {
+          element.style.setProperty('--reveal-delay', '0ms')
+
+          const timeout = setTimeout(() => {
+            element.classList.add(REVEALED_CLASS)
+          }, index * INITIAL_STAGGER_MS)
+
+          revealTimeouts.push(timeout)
+        })
+      })
+    })
+
+    return () => {
+      cancelAnimationFrame(pendingFrame)
+      cancelAnimationFrame(revealFrame)
+      revealTimeouts.forEach(clearTimeout)
+      observer.disconnect()
+    }
   }, [])
 
   return null
