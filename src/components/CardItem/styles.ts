@@ -135,24 +135,96 @@ export const Infos = styled('div', {
   },
 })
 
-export const Tags = styled('ul', {
+const pillBase = {
+  display: 'block',
+  background: 'primaryDark',
+  border: '1px solid transparent',
+  padding: '0.2rem 0.5rem',
+  borderRadius: '3.125rem',
+  color: 'primary',
+  textStyle: 'xs',
+  lineHeight: '1.4',
+}
+
+export const TagsWrapper = styled('div', {
+  base: {
+    display: 'flex',
+    flexDirection: 'column',
+    gap: '0.375rem',
+  },
+})
+
+export const TagsList = styled('ul', {
+  base: {
+    display: 'flex',
+    flexWrap: 'wrap',
+    alignItems: 'center',
+    gap: '0.375rem',
+
+    '& li': {
+      display: 'flex',
+      alignItems: 'center',
+    },
+
+    '& span': pillBase,
+  },
+})
+
+export const TagsBadge = styled('button', {
+  base: {
+    cursor: 'pointer',
+    appearance: 'none',
+    WebkitAppearance: 'none',
+    display: 'block',
+
+    background: 'transparent',
+    border: '1px solid',
+    borderColor: 'subtitle',
+    borderRadius: '3.125rem',
+    padding: '0.2rem 0.5rem',
+
+    color: 'subtitle',
+    textStyle: 'xs',
+    lineHeight: '1.4',
+    fontWeight: 'medium',
+    opacity: 0.65,
+
+    transition: 'opacity 0.2s',
+
+    '@media (hover: hover) and (pointer: fine)': {
+      '&:hover:not(:where(.hover-stale *))': {
+        opacity: 1,
+      },
+    },
+  },
+})
+
+export const ExtraTags = styled('ul', {
   base: {
     display: 'flex',
     flexWrap: 'wrap',
     gap: '0.375rem',
+    overflow: 'hidden',
 
-    '& span': {
-      display: 'block',
-      flexWrap: 'wrap',
+    transition: 'height 0.4s ease',
 
-      background: 'primaryDark',
-
-      padding: '0.25rem 0.5rem',
-      borderRadius: '3.125rem',
-
-      color: 'primary',
-      textStyle: 'xs',
+    '@media (prefers-reduced-motion: reduce)': {
+      transition: 'none',
     },
+
+    '& span': pillBase,
+  },
+})
+
+// kept for Projects (tags rendered without limit)
+export const Tags = styled('ul', {
+  base: {
+    display: 'flex',
+    flexWrap: 'wrap',
+    alignItems: 'center',
+    gap: '0.375rem',
+
+    '& span': pillBase,
   },
 })
 

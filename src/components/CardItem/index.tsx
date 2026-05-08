@@ -6,8 +6,10 @@ import { Experience, Project } from '@/interfaces/cardItem'
 import { icons } from '@/libs/reactIcons'
 
 import { DescriptionCardItem } from './Description'
+import { ExpandProvider } from './ExpandContext'
 import { HeaderCardItem } from './Header'
 import { HeadingCardItem } from './Heading'
+import { TagsCardItem } from './Tags'
 import { CardItemContainer, CardItemContent, Infos, PositioningTag, Tags } from './styles'
 
 type CardItemProps = { revealDelay?: number } & (
@@ -64,41 +66,47 @@ export function CardItem(props: CardItemProps) {
             )}
           </HeadingCardItem>
 
-          <Infos>
-            {type === 'experience' && data.positioning && (
-              <PositioningTag>{data.positioning}</PositioningTag>
+          <ExpandProvider>
+            <Infos>
+              {type === 'experience' && data.positioning && (
+                <PositioningTag>{data.positioning}</PositioningTag>
+              )}
+
+              {type === 'experience' && data.summary && (
+                <p>{data.summary}</p>
+              )}
+
+              {hasDescription && (
+                <DescriptionCardItem description={description} />
+              )}
+
+              {hasAdditionalLinks && (
+                <ul>
+                  {additionalLinks.map((link) => {
+                    const Icon: IconType = icons[link.type]
+
+                    return (
+                      <li key={link.url}>
+                        <Link
+                          href={link.url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                        >
+                          <Icon size={12} /> {link.title}
+                        </Link>
+                      </li>
+                    )
+                  })}
+                </ul>
+              )}
+            </Infos>
+
+            {hasTags && type === 'experience' && (
+              <TagsCardItem tags={tags} />
             )}
+          </ExpandProvider>
 
-            {type === 'experience' && data.summary && (
-              <p>{data.summary}</p>
-            )}
-
-            {hasDescription && (
-              <DescriptionCardItem description={description} />
-            )}
-
-            {hasAdditionalLinks && (
-              <ul>
-                {additionalLinks.map((link) => {
-                  const Icon: IconType = icons[link.type]
-
-                  return (
-                    <li key={link.url}>
-                      <Link
-                        href={link.url}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                      >
-                        <Icon size={12} /> {link.title}
-                      </Link>
-                    </li>
-                  )
-                })}
-              </ul>
-            )}
-          </Infos>
-
-          {hasTags && (
+          {hasTags && type === 'project' && (
             <Tags>
               {tags.map((tag) => (
                 <li key={tag}>

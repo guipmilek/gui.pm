@@ -28,6 +28,8 @@ export function HeaderCardItem({ type, data }: HeaderCardItemProps) {
         headerContent += ` — ${getMonthName(endMonthYear.month)} de ${
           endMonthYear.year
         }`
+      } else {
+        headerContent += ' — atualmente'
       }
 
       return (

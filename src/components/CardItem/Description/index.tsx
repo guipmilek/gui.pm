@@ -5,6 +5,7 @@ import { RxChevronDown } from 'react-icons/rx'
 
 import { Button } from '@/components/Button'
 
+import { useExpand } from '../ExpandContext'
 import { ParagraphCardItemContainer } from './styles'
 
 interface DescriptionCardItemProps {
@@ -35,21 +36,18 @@ export function DescriptionCardItem({ description }: DescriptionCardItemProps) {
   const isLikelyToOverflow = estimatedChars > 350 || description.length > 5
 
   const [hasOverflow, setHasOverflow] = useState(isLikelyToOverflow)
-  const [isExpanded, setIsExpanded] = useState(false)
+  const { isDescriptionExpanded, toggleDescription } = useExpand()
 
   const [height, setHeight] = useState<string>(DEFAULT_COLLAPSED_HEIGHT)
 
-  function handleToggleDescription() {
-    if (!divRef.current) return
-
-    if (isExpanded) {
-      setHeight(getCollapsedHeight())
-    } else {
+  useEffect(() => {
+    if (!divRef.current || !hasOverflow) return
+    if (isDescriptionExpanded) {
       setHeight(`${divRef.current.scrollHeight}px`)
+    } else {
+      setHeight(getCollapsedHeight())
     }
-
-    setIsExpanded((prev) => !prev)
-  }
+  }, [isDescriptionExpanded, hasOverflow])
 
   useEffect(() => {
     const div = divRef.current
@@ -73,7 +71,7 @@ export function DescriptionCardItem({ description }: DescriptionCardItemProps) {
         ref={divRef}
         style={{ height }}
         data-overflow={hasOverflow}
-        data-expanded={isExpanded}
+        data-expanded={isDescriptionExpanded}
       >
         {description.map((paragraph, index) =>
           paragraph.length ? (
@@ -86,13 +84,13 @@ export function DescriptionCardItem({ description }: DescriptionCardItemProps) {
 
       {hasOverflow && (
         <Button
-          onClick={handleToggleDescription}
-          rotateIcon={isExpanded}
+          onClick={toggleDescription}
+          rotateIcon={isDescriptionExpanded}
           style={{
-            marginTop: isExpanded ? '0' : DEFAULT_BUTTON_MARGIN_TOP,
+            marginTop: isDescriptionExpanded ? '0' : DEFAULT_BUTTON_MARGIN_TOP,
           }}
         >
-          {isExpanded ? 'Ocultar' : 'Expandir'}
+          {isDescriptionExpanded ? 'Ocultar' : 'Expandir'}
           <RxChevronDown size={12} />
         </Button>
       )}
