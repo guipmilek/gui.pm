@@ -4,6 +4,7 @@ import {
   RxEnvelopeClosed,
   RxFigmaLogo,
   RxGithubLogo,
+  RxGlobe,
   RxLink1,
   RxLinkedinLogo,
 } from 'react-icons/rx'
@@ -15,6 +16,7 @@ export const icons = {
   github: RxGithubLogo,
   link: RxLink1,
   linkedin: RxLinkedinLogo,
+  website: RxGlobe,
 
   // ===== Font Awesome =====
   whatsapp: FaWhatsapp,

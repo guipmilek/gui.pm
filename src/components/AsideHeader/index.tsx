@@ -1,13 +1,12 @@
-import Image from 'next/image'
 import Link from 'next/link'
 import { Fragment } from 'react'
 import { IconType } from 'react-icons'
 import { RxDownload } from 'react-icons/rx'
 
-import guipmdevLogo from '@/assets/guipmdev-logo.svg'
 import { icons } from '@/libs/reactIcons'
 import { staticDataProvider } from '@/providers'
 
+import { InteractiveLogo } from '../InteractiveLogo'
 import { Navbar } from '../Navbar'
 import { SafeFluentEmoji } from '../SafeFluentEmoji'
 import { AsideHeaderContainer, Bio, ResumeButton, SocialLinks } from './styles'
@@ -15,7 +14,7 @@ import { AsideHeaderContainer, Bio, ResumeButton, SocialLinks } from './styles'
 export async function AsideHeader() {
   const profile = await staticDataProvider.getProfile()
 
-  const { headline, bio, links } = profile
+  const { name, headline, bio, links } = profile
 
   const hasLinks = links.length > 0
 
@@ -26,13 +25,11 @@ export async function AsideHeader() {
     <AsideHeaderContainer>
       <Bio>
         <div className="logo">
-          <Image src={guipmdevLogo} alt="" title="Logotipo por graphitepoint" priority />
+          <InteractiveLogo />
 
           <div>
-            <h1>GUIPM.DEV</h1>
-            <strong>
-              <span>&lt;</span>{headline} <span>/&gt;</span>
-            </strong>
+            <h1>{name}</h1>
+            <strong>{headline}</strong>
           </div>
         </div>
 

@@ -118,6 +118,23 @@ export const CursorContainer = styled('div', {
         borderColor: 'title',
       },
     },
+
+    '&.blocked': {
+      animation: 'shake 0.4s cubic-bezier(.36,.07,.19,.97) both',
+
+      '& .dot': {
+        backgroundColor: '#ef4444',
+        borderColor: 'transparent',
+      },
+
+      '& .solidOutline': {
+        borderColor: '#ef4444',
+      },
+
+      '& .dashedOutline': {
+        borderColor: '#ef4444',
+      },
+    },
   },
 })
 

@@ -122,6 +122,9 @@ export const globalCss = defineGlobalStyles({
     width: '100vw',
     maxWidth: '100%',
     minHeight: '100vh',
+
+    userSelect: 'none',
+    WebkitUserSelect: 'none',
   },
 
 })

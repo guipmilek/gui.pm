@@ -4,6 +4,8 @@ import type { EducationItem } from '@/interfaces/education'
 import type { LanguageItem } from '@/interfaces/language'
 
 export interface Profile {
+  name: string
+  fullName: string
   headline: string
   bio: string
   links: Link[]

@@ -1,15 +1,15 @@
 import type { Metadata } from 'next'
 
-const SITE_URL = 'https://guipm.dev'
-const SITE_TITLE = 'guipm.dev - Full-stack | React/Next.js | Node.js'
+const SITE_URL = 'https://gui.pm'
+const SITE_TITLE = 'gui.pm — Guilherme Milék'
 const SITE_DESCRIPTION =
-  'Portfolio de Guilherme Milék — desenvolvedor full-stack especializado em React, Next.js e Node.js.'
+  'Currículo digital de Guilherme Milék — suporte técnico, desenvolvimento interno, diagnóstico, SQL, automações e sistemas internos.'
 
 const defineMetadata = <T extends Metadata>(metadata: T) => metadata
 
 export const seoConfig = defineMetadata({
   title: {
-    template: '%s - guipm.dev',
+    template: '%s — Guilherme Milék',
     default: SITE_TITLE,
   },
   description: SITE_DESCRIPTION,
@@ -34,7 +34,7 @@ export const seoConfig = defineMetadata({
   openGraph: {
     type: 'website',
     url: SITE_URL,
-    siteName: 'guipm.dev',
+    siteName: 'gui.pm — Guilherme Milék',
     title: SITE_TITLE,
     description: SITE_DESCRIPTION,
   },
@@ -44,4 +44,5 @@ export const seoConfig = defineMetadata({
     description: SITE_DESCRIPTION,
   },
 })
+
 

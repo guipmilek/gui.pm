@@ -52,14 +52,6 @@ export const Bio = styled('div', {
         transform: 'none !important',
         filter: 'none !important',
         animation: 'none !important',
-
-        '& img': {
-          transition: 'none',
-        },
-
-        '& h1::before, & h1::after': {
-          animation: 'none !important',
-        },
       },
 
       lg: {
@@ -72,86 +64,24 @@ export const Bio = styled('div', {
         margin: '0 0 1rem',
       },
 
-      '& img': {
-        width: {
-          base: '2.8125rem',
-          sm: '4.0625rem',
-        },
-        height: 'auto',
-
-        transform: 'rotate(0deg)',
-
-        transition: 'transform 1s',
-      },
-
       '& h1': {
-        position: 'relative',
-
+        whiteSpace: 'nowrap',
         textStyle: {
-          base: '3xl',
-          sm: '5xl',
+          base: '2xl',
+          sm: '4xl',
         },
         fontWeight: 'black',
-
-        animation: 'glitchAnimation1 2s infinite linear 0s alternate-reverse',
-
-        '@media (prefers-reduced-motion: reduce)': {
-          animation: 'none',
-        },
-
-        '&::before, &::after': {
-          visibility: 'hidden',
-
-          position: 'absolute',
-          inset: 0,
-
-          overflow: 'hidden',
-          width: '100%',
-          height: '100%',
-
-          content: '"GUIPM.DEV"',
-        },
       },
 
       '& strong': {
-        fontFamily: 'mono',
+        display: 'block',
+        whiteSpace: 'nowrap',
         textStyle: {
-          base: 'sm',
-          sm: 'base',
+          base: 'xs',
+          sm: 'sm',
         },
         fontWeight: 'medium',
-
-        '& span': {
-          color: 'primary',
-        },
-      },
-
-      '@media (hover: hover) and (pointer: fine)': {
-        '&:hover:not(:where(.hover-stale *)), &.scroll-hover': {
-          '& img': {
-            transform: 'rotate(-15deg) scale(105%)',
-          },
-
-          '& h1::before': {
-            visibility: 'visible',
-
-            left: '1px',
-
-            textShadow: '1px 0 red',
-
-            animation: 'glitchAnimation1 2s infinite linear 0s',
-          },
-
-          '& h1::after': {
-            visibility: 'visible',
-
-            left: '-1px',
-
-            textShadow: '-1px 0 blue',
-
-            animation: 'glitchAnimation2 2s infinite linear 0s',
-          },
-        },
+        color: 'text',
       },
     },
 

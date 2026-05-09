@@ -137,6 +137,21 @@ export function useMouseEvent() {
       }
     }
 
+    const onContextMenu = (event: MouseEvent) => {
+      event.preventDefault()
+      
+      const container = cursorRef.current
+      if (!container) return
+      
+      container.classList.remove('blocked')
+      void container.offsetWidth
+      container.classList.add('blocked')
+
+      setTimeout(() => {
+        container.classList.remove('blocked')
+      }, 400)
+    }
+
     const onMouseEnter = () => {
       isMouseInside = true
       if (hasPointerPosition) cursorRef.current?.classList.add('visible')
@@ -165,6 +180,7 @@ export function useMouseEvent() {
     document.documentElement.addEventListener('mouseleave', onMouseLeave)
     document.addEventListener('mousedown', onMouseDown)
     document.addEventListener('mouseup', onMouseUp)
+    document.addEventListener('contextmenu', onContextMenu)
     window.addEventListener('pointermove', onPointerMove, { passive: true })
     window.addEventListener('scroll', onScroll, { passive: true })
     document.addEventListener('pointerover', onPointerOver)
@@ -177,6 +193,7 @@ export function useMouseEvent() {
       document.documentElement.removeEventListener('mouseleave', onMouseLeave)
       document.removeEventListener('mousedown', onMouseDown)
       document.removeEventListener('mouseup', onMouseUp)
+      document.removeEventListener('contextmenu', onContextMenu)
       window.removeEventListener('pointermove', onPointerMove)
       window.removeEventListener('scroll', onScroll)
       document.removeEventListener('pointerover', onPointerOver)
