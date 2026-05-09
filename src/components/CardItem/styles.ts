@@ -47,11 +47,15 @@ export const CardItemContent = styled('div', {
 
     sm: {
       display: 'grid',
-      gridTemplateColumns: 'minmax(200px, 20%) 1fr',
+      gridTemplateColumns: 'minmax(8.5rem, 24%) minmax(0, 1fr)',
+    },
+
+    md: {
+      gridTemplateColumns: 'minmax(10rem, 22%) minmax(0, 1fr)',
     },
 
     lg: {
-      gridTemplateColumns: 'minmax(120px, 20%) 1fr',
+      gridTemplateColumns: 'minmax(7.5rem, 20%) minmax(0, 1fr)',
     },
 
     '& > div': {

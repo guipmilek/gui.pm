@@ -9,17 +9,18 @@ export const AsideHeaderContainer = styled('header', {
 
     width: '100%',
 
-    marginBottom: '6rem',
+    marginBottom: 'clamp(4rem, 10svh, 6rem)',
 
     lg: {
       position: 'sticky',
-      top: '6rem',
+      top: 'var(--layout-y)',
 
       gridArea: 'a',
-      gap: '2rem',
+      gap: 'clamp(1.5rem, 3svh, 2rem)',
 
-      height: '100%',
-      maxHeight: 'calc(100vh - (6rem * 2))',
+      // Keep a small bottom buffer so sticky never hits its lower boundary.
+      height: 'calc(100svh - (var(--layout-y) * 2) - 0.75rem)',
+      maxHeight: 'calc(100svh - (var(--layout-y) * 2) - 0.75rem)',
 
       marginBottom: 0,
     },

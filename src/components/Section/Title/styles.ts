@@ -28,14 +28,9 @@ export const sectionTitleContainerStyles = cva({
       '--section-header-glass-opacity': '0',
       '--section-header-glass-y': '-0.375rem',
 
-      width: 'calc(100% + (1.5rem * 2))',
-      marginLeft: '-1.5rem',
+      width: 'calc(100% + (var(--layout-x) * 2))',
+      marginLeft: 'calc(var(--layout-x) * -1)',
       borderRadius: '0 !important',
-
-      md: {
-        width: 'calc(100% + (3rem * 2))',
-        marginLeft: '-3rem',
-      },
 
       '& .glass-liquid-surface': {
         opacity: 'var(--section-header-glass-opacity)',
@@ -46,8 +41,7 @@ export const sectionTitleContainerStyles = cva({
       '& .glass-ui-card-content': {
         position: 'relative',
         zIndex: 1,
-        padding: '1.25rem 1.5rem',
-        md: { padding: '1.25rem 3rem' },
+        padding: '1.25rem var(--layout-x)',
         overflow: 'hidden !important',
       },
     },

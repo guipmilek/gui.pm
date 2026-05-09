@@ -11,7 +11,7 @@ export const SectionContainer = styled('section', {
     },
     gap: '1rem',
 
-    paddingBottom: { base: '6rem', lg: '0' },
+    paddingBottom: { base: 'clamp(4.5rem, 12svh, 6rem)', lg: '0' },
   },
 })
 
