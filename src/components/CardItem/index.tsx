@@ -2,7 +2,13 @@ import Link from 'next/link'
 import { IconType } from 'react-icons'
 import { RxExternalLink } from 'react-icons/rx'
 
-import { Experience, Project } from '@/interfaces/cardItem'
+import { LIQUID_GLASS_RADIUS } from '@/components/LiquidGlass/engine'
+import {
+  CertificationItem,
+  EducationItem,
+  Experience,
+  Project,
+} from '@/interfaces/cardItem'
 import { icons } from '@/libs/reactIcons'
 
 import { DescriptionCardItem } from './Description'
@@ -10,7 +16,14 @@ import { ExpandProvider } from './ExpandContext'
 import { GlassWrapper } from './GlassWrapper'
 import { HeaderCardItem } from './Header'
 import { HeadingCardItem } from './Heading'
-import { CardItemContainer, CardItemContent, Infos, Tags } from './styles'
+import {
+  CardItemContainer,
+  CardItemContent,
+  EducationCardStatus,
+  EducationDescription,
+  Infos,
+  Tags,
+} from './styles'
 import { TagsCardItem } from './Tags'
 
 type CardItemProps = { revealDelay?: number } & (
@@ -22,35 +35,76 @@ type CardItemProps = { revealDelay?: number } & (
       type: 'project'
       data: Project
     }
+  | {
+      type: 'certification'
+      data: CertificationItem
+    }
+  | {
+      type: 'education'
+      data: EducationItem
+    }
 )
 
 export function CardItem(props: CardItemProps) {
   const { type, data } = props
   const { revealDelay } = props
-  const { title, link, description, additionalLinks } = data
 
-  let headingTitle = title
-  if (type === 'experience' && data.companyName !== null) {
-    headingTitle += ` · ${data.companyName}`
+  let headingTitle = ''
+  let link: string | null = null
+  let description: string[] | null = null
+  let additionalLinks: { type: string; title: string; url: string }[] | null =
+    null
+
+  switch (type) {
+    case 'experience':
+      headingTitle = data.title
+      if (data.companyName !== null) {
+        headingTitle += ` · ${data.companyName}`
+      }
+      link = data.link
+      description = data.description
+      additionalLinks = data.additionalLinks as any
+      break
+    case 'project':
+      headingTitle = data.title
+      link = data.link
+      description = data.description
+      additionalLinks = data.additionalLinks as any
+      break
+    case 'certification':
+      headingTitle = data.name
+      link = data.url ?? null
+      break
+    case 'education':
+      headingTitle = `${data.course} · ${data.institution}`
+      break
   }
 
   const hasLink = link !== null
-  const hasDescription = description !== null
-  const hasAdditionalLinks = additionalLinks !== null
+  const hasDescription = description !== null && description.length > 0
+  const hasAdditionalLinks = additionalLinks !== null && additionalLinks.length > 0
 
-  const tags = type === 'experience' ? data.skills : data.tags
-  const hasTags = tags !== null
+  const tags =
+    type === 'experience'
+      ? data.skills
+      : type === 'project'
+      ? data.tags
+      : null
+  const hasTags = tags !== null && tags.length > 0
 
   return (
     <CardItemContainer data-reveal="" data-reveal-delay={revealDelay}>
-      <GlassWrapper className="glass-card-wrapper">
+      <GlassWrapper
+        borderRadius={LIQUID_GLASS_RADIUS}
+        className="glass-card-wrapper"
+      >
         <CardItemContent {...(type === 'project' && { type })}>
           <HeaderCardItem {...props} />
 
           <div>
             <HeadingCardItem {...props}>
               {hasLink ? (
-                <Link href={link} target="_blank" rel="noopener noreferrer">
+                <Link href={link!} target="_blank" rel="noopener noreferrer">
                   <span>
                     {headingTitle}
 
@@ -74,14 +128,24 @@ export function CardItem(props: CardItemProps) {
                   <p>{data.summary}</p>
                 )}
 
+                {type === 'education' && data.status === 'Em andamento' && (
+                  <EducationCardStatus>{data.status}</EducationCardStatus>
+                )}
+
+                {type === 'education' && (
+                  <EducationDescription>
+                    {data.description}
+                  </EducationDescription>
+                )}
+
                 {hasDescription && (
-                  <DescriptionCardItem description={description} />
+                  <DescriptionCardItem description={description!} />
                 )}
 
                 {hasAdditionalLinks && (
                   <ul>
-                    {additionalLinks.map((link) => {
-                      const Icon: IconType = icons[link.type]
+                    {additionalLinks!.map((link) => {
+                      const Icon: IconType = icons[link.type as keyof typeof icons]
 
                       return (
                         <li key={link.url}>

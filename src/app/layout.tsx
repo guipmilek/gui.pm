@@ -7,6 +7,7 @@ import { seoConfig } from 'seo.config'
 
 import { Cursor } from '@/components/(cursor)/Cursor'
 import { Background } from '@/components/Background'
+import { LiquidGlassWebGLLayer } from '@/components/LiquidGlass/WebGLLayer'
 import { ScrollReveal } from '@/components/ScrollReveal'
 import { MouseProvider } from '@/contexts/MouseContext'
 import { fontClassName } from '@/styles/fonts'
@@ -79,6 +80,7 @@ export default function RootLayout({ children }: RootLayoutProps) {
           <ScrollReveal />
           <Cursor />
 
+          <LiquidGlassWebGLLayer />
           <BodyContent>{children}</BodyContent>
 
           <Background />

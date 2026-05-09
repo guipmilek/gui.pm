@@ -1,5 +1,10 @@
 import { Icons } from '@/libs/reactIcons'
 
+import { CertificationItem } from './certification'
+import { EducationItem } from './education'
+
+export type { CertificationItem, EducationItem }
+
 interface CustomDate {
   month: number
   year: number

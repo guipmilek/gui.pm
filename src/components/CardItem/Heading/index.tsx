@@ -1,6 +1,11 @@
 import { cache, ReactNode } from 'react'
 
-import { Experience, Project } from '@/interfaces/cardItem'
+import {
+  CertificationItem,
+  EducationItem,
+  Experience,
+  Project,
+} from '@/interfaces/cardItem'
 
 import { HeadingCardItemContainer } from './styles'
 
@@ -16,6 +21,14 @@ type ConditionalProps =
   | {
       type: 'project'
       data: Project
+    }
+  | {
+      type: 'certification'
+      data: CertificationItem
+    }
+  | {
+      type: 'education'
+      data: EducationItem
     }
 
 type HeadingCardItemProps = CommonProps & ConditionalProps
@@ -113,6 +126,26 @@ export async function HeadingCardItem({
           {children}
 
           {hasHeadingSubtitle && <p>{headingSubtitleText}</p>}
+        </HeadingCardItemContainer>
+      )
+    }
+
+    case 'certification': {
+      return (
+        <HeadingCardItemContainer type="experience">
+          {children}
+
+          <p>{data.issuer}</p>
+        </HeadingCardItemContainer>
+      )
+    }
+
+    case 'education': {
+      return (
+        <HeadingCardItemContainer type="experience">
+          {children}
+
+          <p>{data.locationText || data.focus}</p>
         </HeadingCardItemContainer>
       )
     }

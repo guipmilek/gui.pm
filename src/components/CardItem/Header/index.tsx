@@ -1,12 +1,19 @@
 import Image from 'next/image'
 
-import { Experience, Project } from '@/interfaces/cardItem'
+import {
+  CertificationItem,
+  EducationItem,
+  Experience,
+  Project,
+} from '@/interfaces/cardItem'
 
 import { HeaderCardItemContainer, ProjectImagePlaceholder } from './styles'
 
 type HeaderCardItemProps =
   | { type: 'experience'; data: Experience }
   | { type: 'project'; data: Project }
+  | { type: 'certification'; data: CertificationItem }
+  | { type: 'education'; data: EducationItem }
 
 function getMonthName(monthNumber: number) {
   const date = new Date()
@@ -54,6 +61,22 @@ export function HeaderCardItem({ type, data }: HeaderCardItemProps) {
           ) : (
             <ProjectImagePlaceholder>interno</ProjectImagePlaceholder>
           )}
+        </HeaderCardItemContainer>
+      )
+    }
+
+    case 'certification': {
+      return (
+        <HeaderCardItemContainer type="experience">
+          <span>{data.date}</span>
+        </HeaderCardItemContainer>
+      )
+    }
+
+    case 'education': {
+      return (
+        <HeaderCardItemContainer type="experience">
+          <span>{data.period}</span>
         </HeaderCardItemContainer>
       )
     }

@@ -72,6 +72,8 @@ export const sectionTitleContainerStyles = cva({
       },
 
       '& .glass-ui-card-content': {
+        position: 'relative',
+        zIndex: 1,
         padding: '1.25rem 1.5rem',
         md: { padding: '1.25rem 3rem' },
         overflow: 'hidden !important',

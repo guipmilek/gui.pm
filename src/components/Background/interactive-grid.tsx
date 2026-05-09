@@ -2,6 +2,7 @@
 
 import { useEffect, useRef } from 'react'
 
+import { INTERACTIVE_GRID_CANVAS_ID } from '@/components/LiquidGlass/engine'
 import { useMouseContext } from '@/contexts/MouseContext'
 
 interface ShootingStar {
@@ -217,6 +218,10 @@ export function InteractiveGrid() {
     const glowGridCtx = glowGridCanvas.getContext('2d')
     if (!glowGridCtx) return
 
+    const baseGridCanvas = document.createElement('canvas')
+    const baseGridCtx = baseGridCanvas.getContext('2d')
+    if (!baseGridCtx) return
+
     // Cache the radial mask; the glow tile reuses it every frame.
     const R = HOVER_RADIUS
     const maskCanvas = document.createElement('canvas')
@@ -259,6 +264,31 @@ export function InteractiveGrid() {
     const drawGlowGrid = (w: number, h: number) => {
       const scrollX = window.scrollX
       const scrollY = window.scrollY
+
+      baseGridCtx.clearRect(0, 0, w, h)
+      baseGridCtx.fillStyle =
+        getComputedStyle(document.body).backgroundColor || '#0a0a0f'
+      baseGridCtx.fillRect(0, 0, w, h)
+      drawGrid(
+        baseGridCtx,
+        w,
+        h,
+        SMALL_SIZE,
+        GRID_SMALL,
+        1,
+        gridOffset(scrollX, SMALL_SIZE),
+        gridOffset(scrollY, SMALL_SIZE),
+      )
+      drawGrid(
+        baseGridCtx,
+        w,
+        h,
+        BIG_SIZE,
+        GRID_BIG,
+        1,
+        gridOffset(scrollX, BIG_SIZE),
+        gridOffset(scrollY, BIG_SIZE),
+      )
 
       glowGridCtx.clearRect(0, 0, w, h)
       drawGrid(
@@ -315,6 +345,11 @@ export function InteractiveGrid() {
       glowGridCanvas.width = pixelW
       glowGridCanvas.height = pixelH
       glowGridCtx.setTransform(dpr, 0, 0, dpr, 0, 0)
+
+      baseGridCanvas.width = pixelW
+      baseGridCanvas.height = pixelH
+      baseGridCtx.setTransform(dpr, 0, 0, dpr, 0, 0)
+
       drawGlowGrid(w, h)
 
       dprRef.current = dpr
@@ -476,6 +511,7 @@ export function InteractiveGrid() {
       }
 
       ctx.clearRect(0, 0, w, h)
+      ctx.drawImage(baseGridCanvas, 0, 0, w, h)
 
       const scrollX = window.scrollX
       const scrollY = window.scrollY
@@ -786,6 +822,9 @@ export function InteractiveGrid() {
 
     updateSize()
 
+    const fallback = document.getElementById('grid-fallback')
+    fallback?.setAttribute('hidden', '')
+
     let resizeTimeout: ReturnType<typeof setTimeout>
     const scheduleResize = () => {
       clearTimeout(resizeTimeout)
@@ -813,11 +852,13 @@ export function InteractiveGrid() {
       window.removeEventListener('pageshow', onPageShow)
       document.documentElement.removeEventListener('mouseenter', onMouseEnter)
       document.documentElement.removeEventListener('mouseleave', onMouseLeave)
+      fallback?.removeAttribute('hidden')
     }
-  }, [positionRef])
+  }, [isHoveringRef, positionRef])
 
   return (
     <canvas
+      id={INTERACTIVE_GRID_CANVAS_ID}
       ref={canvasRef}
       style={{
         position: 'fixed',
