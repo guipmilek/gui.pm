@@ -62,4 +62,18 @@ export const globalCss = defineGlobalStyles({
     maxWidth: '100%',
     minHeight: '100vh',
   },
+
+  /* ── liquid-glass-react Tailwind compat ── */
+  '.relative': { position: 'relative' },
+  '.bg-black': { background: 'black' },
+  '.text-white': { color: 'white' },
+  '.pointer-events-none': { pointerEvents: 'none' },
+  '.cursor-pointer': { cursor: 'pointer' },
+  '.transition-all': { transitionProperty: 'all' },
+  '.duration-150': { transitionDuration: '150ms' },
+  '.ease-in-out': { transitionTimingFunction: 'ease-in-out' },
+  '.opacity-0': { opacity: '0' },
+  '.opacity-20': { opacity: '0.2' },
+  '.opacity-100': { opacity: '1' },
+  '.mix-blend-overlay': { mixBlendMode: 'overlay' },
 })

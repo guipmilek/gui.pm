@@ -2,8 +2,9 @@
 
 import { useEffect, useRef } from 'react'
 
-import { INTERACTIVE_GRID_CANVAS_ID } from '@/components/LiquidGlass/engine'
 import { useMouseContext } from '@/contexts/MouseContext'
+
+const INTERACTIVE_GRID_CANVAS_ID = 'interactive-grid-canvas'
 
 interface ShootingStar {
   headX: number
