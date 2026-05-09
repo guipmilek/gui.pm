@@ -21,20 +21,16 @@ export const globalCss = defineGlobalStyles({
 
   '[data-reveal].reveal-pending': {
     opacity: 0,
-    transform: 'translate3d(0, 0.75rem, 0)',
-    filter: 'none',
+    transform: 'translate3d(0, 1.125rem, 0) scale(0.985)',
+    filter: 'blur(8px)',
 
     transition:
-      'opacity 0.7s cubic-bezier(0.22, 1, 0.36, 1), transform 0.7s cubic-bezier(0.22, 1, 0.36, 1)',
+      'opacity 0.9s cubic-bezier(0.16, 1, 0.3, 1), transform 0.9s cubic-bezier(0.16, 1, 0.3, 1), filter 0.9s cubic-bezier(0.16, 1, 0.3, 1)',
     transitionDelay: 'var(--reveal-delay, 0ms)',
-    willChange: 'opacity, transform',
+    willChange: 'opacity, transform, filter',
 
     lg: {
-      transform: 'translate3d(0, 1rem, 0)',
-      filter: 'blur(6px)',
-      transition:
-        'opacity 0.7s cubic-bezier(0.22, 1, 0.36, 1), transform 0.7s cubic-bezier(0.22, 1, 0.36, 1), filter 0.7s cubic-bezier(0.22, 1, 0.36, 1)',
-      willChange: 'opacity, transform, filter',
+      transform: 'translate3d(1.25rem, 0, 0) scale(0.985)',
     },
 
     '@media (prefers-reduced-motion: reduce)': {
@@ -69,32 +65,28 @@ export const globalCss = defineGlobalStyles({
 
     '& .glass-liquid-surface': {
       opacity: 0,
-      transform: 'translate3d(0, 0.75rem, 0) scale(0.985)',
+      transform: 'translate3d(0, 1rem, 0) scale(0.975)',
       transition:
-        'opacity 0.7s cubic-bezier(0.22, 1, 0.36, 1), transform 0.7s cubic-bezier(0.22, 1, 0.36, 1)',
+        'opacity 0.85s cubic-bezier(0.16, 1, 0.3, 1), transform 0.95s cubic-bezier(0.16, 1, 0.3, 1)',
       transitionDelay: 'var(--reveal-delay, 0ms)',
       willChange: 'opacity, transform',
 
       lg: {
-        transform: 'translate3d(0, 1rem, 0) scale(0.985)',
+        transform: 'translate3d(1.1rem, 0, 0) scale(0.975)',
       },
     },
 
     '& .glass-ui-card-content': {
       opacity: 0,
-      transform: 'translate3d(0, 0.75rem, 0)',
-      filter: 'none',
+      transform: 'translate3d(0, 0.875rem, 0) scale(0.99)',
+      filter: 'blur(8px)',
       transition:
-        'opacity 0.7s cubic-bezier(0.22, 1, 0.36, 1), transform 0.7s cubic-bezier(0.22, 1, 0.36, 1)',
-      transitionDelay: 'var(--reveal-delay, 0ms)',
-      willChange: 'opacity, transform',
+        'opacity 0.82s cubic-bezier(0.16, 1, 0.3, 1), transform 0.88s cubic-bezier(0.16, 1, 0.3, 1), filter 0.88s cubic-bezier(0.16, 1, 0.3, 1)',
+      transitionDelay: 'calc(var(--reveal-delay, 0ms) + 70ms)',
+      willChange: 'opacity, transform, filter',
 
       lg: {
-        transform: 'translate3d(0, 1rem, 0)',
-        filter: 'blur(6px)',
-        transition:
-          'opacity 0.7s cubic-bezier(0.22, 1, 0.36, 1), transform 0.7s cubic-bezier(0.22, 1, 0.36, 1), filter 0.7s cubic-bezier(0.22, 1, 0.36, 1)',
-        willChange: 'opacity, transform, filter',
+        transform: 'translate3d(0.85rem, 0, 0) scale(0.99)',
       },
     },
 

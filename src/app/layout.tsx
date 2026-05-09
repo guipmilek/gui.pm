@@ -41,8 +41,8 @@ export default function RootLayout({ children }: RootLayoutProps) {
           {`
             html.reveal-preload [data-reveal] {
               opacity: 0;
-              transform: translate3d(0, 0.75rem, 0);
-              filter: none;
+              transform: translate3d(0, 1.125rem, 0) scale(0.985);
+              filter: blur(8px);
             }
 
             html.reveal-preload [data-glass-reveal] {
@@ -53,19 +53,18 @@ export default function RootLayout({ children }: RootLayoutProps) {
 
             html.reveal-preload [data-glass-reveal] .glass-liquid-surface {
               opacity: 0;
-              transform: translate3d(0, 0.75rem, 0) scale(0.985);
+              transform: translate3d(0, 1rem, 0) scale(0.975);
             }
 
             html.reveal-preload [data-glass-reveal] .glass-ui-card-content {
               opacity: 0;
-              transform: translate3d(0, 0.75rem, 0);
-              filter: none;
+              transform: translate3d(0, 0.875rem, 0) scale(0.99);
+              filter: blur(8px);
             }
 
             @media (min-width: 1024px) {
               html.reveal-preload [data-reveal] {
-                transform: translate3d(0, 1rem, 0);
-                filter: blur(6px);
+                transform: translate3d(1.25rem, 0, 0) scale(0.985);
               }
 
               html.reveal-preload [data-glass-reveal] {
@@ -74,12 +73,11 @@ export default function RootLayout({ children }: RootLayoutProps) {
               }
 
               html.reveal-preload [data-glass-reveal] .glass-liquid-surface {
-                transform: translate3d(0, 1rem, 0) scale(0.985);
+                transform: translate3d(1.1rem, 0, 0) scale(0.975);
               }
 
               html.reveal-preload [data-glass-reveal] .glass-ui-card-content {
-                transform: translate3d(0, 1rem, 0);
-                filter: blur(6px);
+                transform: translate3d(0.85rem, 0, 0) scale(0.99);
               }
             }
 
