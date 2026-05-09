@@ -62,9 +62,14 @@ export const sectionTitleContainerStyles = cva({
       display: 'none',
     },
 
+    '&.pinned': {
+      padding: 0,
+    },
+
     '& .header-glass-card': {
       width: 'calc(100% + (1.5rem * 2))',
       marginLeft: '-1.5rem',
+      borderRadius: '0 !important',
 
       md: {
         width: 'calc(100% + (3rem * 2))',

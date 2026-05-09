@@ -91,12 +91,19 @@ export function CardItem(props: CardItemProps) {
       ? data.tags
       : null
   const hasTags = tags !== null && tags.length > 0
+  const glassVariant =
+    type === 'certification' || type === 'education' ? 'compact' : 'default'
 
   return (
-    <CardItemContainer data-reveal="" data-reveal-delay={revealDelay}>
+    <CardItemContainer
+      data-reveal=""
+      data-glass-reveal=""
+      data-reveal-delay={revealDelay}
+    >
       <GlassWrapper
         borderRadius={LIQUID_GLASS_RADIUS}
         className="glass-card-wrapper"
+        variant={glassVariant}
       >
         <CardItemContent {...(type === 'project' && { type })}>
           <HeaderCardItem {...props} />

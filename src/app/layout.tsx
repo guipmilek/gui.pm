@@ -45,8 +45,39 @@ export default function RootLayout({ children }: RootLayoutProps) {
               filter: none;
             }
 
+            html.reveal-preload [data-glass-reveal] {
+              opacity: 1;
+              transform: none;
+              filter: none;
+            }
+
+            html.reveal-preload [data-glass-reveal] .glass-liquid-surface {
+              opacity: 0;
+              transform: translate3d(0, 0.75rem, 0) scale(0.985);
+            }
+
+            html.reveal-preload [data-glass-reveal] .glass-ui-card-content {
+              opacity: 0;
+              transform: translate3d(0, 0.75rem, 0);
+              filter: none;
+            }
+
             @media (min-width: 1024px) {
               html.reveal-preload [data-reveal] {
+                transform: translate3d(0, 1rem, 0);
+                filter: blur(6px);
+              }
+
+              html.reveal-preload [data-glass-reveal] {
+                transform: none;
+                filter: none;
+              }
+
+              html.reveal-preload [data-glass-reveal] .glass-liquid-surface {
+                transform: translate3d(0, 1rem, 0) scale(0.985);
+              }
+
+              html.reveal-preload [data-glass-reveal] .glass-ui-card-content {
                 transform: translate3d(0, 1rem, 0);
                 filter: blur(6px);
               }
@@ -54,6 +85,13 @@ export default function RootLayout({ children }: RootLayoutProps) {
 
             @media (prefers-reduced-motion: reduce) {
               html.reveal-preload [data-reveal] {
+                opacity: 1 !important;
+                transform: none !important;
+                filter: none !important;
+              }
+
+              html.reveal-preload [data-glass-reveal] .glass-liquid-surface,
+              html.reveal-preload [data-glass-reveal] .glass-ui-card-content {
                 opacity: 1 !important;
                 transform: none !important;
                 filter: none !important;
@@ -67,6 +105,13 @@ export default function RootLayout({ children }: RootLayoutProps) {
           <style>
             {`
               [data-reveal] {
+                opacity: 1 !important;
+                transform: none !important;
+                filter: none !important;
+              }
+
+              [data-glass-reveal] .glass-liquid-surface,
+              [data-glass-reveal] .glass-ui-card-content {
                 opacity: 1 !important;
                 transform: none !important;
                 filter: none !important;

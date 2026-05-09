@@ -53,6 +53,75 @@ export const globalCss = defineGlobalStyles({
     willChange: 'auto',
   },
 
+  '[data-glass-reveal].reveal-pending': {
+    opacity: 1,
+    transform: 'none',
+    filter: 'none',
+    transition: 'none',
+    willChange: 'auto',
+
+    lg: {
+      transform: 'none',
+      filter: 'none',
+      transition: 'none',
+      willChange: 'auto',
+    },
+
+    '& .glass-liquid-surface': {
+      opacity: 0,
+      transform: 'translate3d(0, 0.75rem, 0) scale(0.985)',
+      transition:
+        'opacity 0.7s cubic-bezier(0.22, 1, 0.36, 1), transform 0.7s cubic-bezier(0.22, 1, 0.36, 1)',
+      transitionDelay: 'var(--reveal-delay, 0ms)',
+      willChange: 'opacity, transform',
+
+      lg: {
+        transform: 'translate3d(0, 1rem, 0) scale(0.985)',
+      },
+    },
+
+    '& .glass-ui-card-content': {
+      opacity: 0,
+      transform: 'translate3d(0, 0.75rem, 0)',
+      filter: 'none',
+      transition:
+        'opacity 0.7s cubic-bezier(0.22, 1, 0.36, 1), transform 0.7s cubic-bezier(0.22, 1, 0.36, 1)',
+      transitionDelay: 'var(--reveal-delay, 0ms)',
+      willChange: 'opacity, transform',
+
+      lg: {
+        transform: 'translate3d(0, 1rem, 0)',
+        filter: 'blur(6px)',
+        transition:
+          'opacity 0.7s cubic-bezier(0.22, 1, 0.36, 1), transform 0.7s cubic-bezier(0.22, 1, 0.36, 1), filter 0.7s cubic-bezier(0.22, 1, 0.36, 1)',
+        willChange: 'opacity, transform, filter',
+      },
+    },
+
+    '@media (prefers-reduced-motion: reduce)': {
+      '& .glass-liquid-surface, & .glass-ui-card-content': {
+        opacity: '1 !important',
+        transform: 'none !important',
+        filter: 'none !important',
+        transition: 'none !important',
+        willChange: 'auto',
+      },
+    },
+  },
+
+  '[data-glass-reveal].reveal-pending.is-revealed .glass-liquid-surface': {
+    opacity: 1,
+    transform: 'none',
+    willChange: 'auto',
+  },
+
+  '[data-glass-reveal].reveal-pending.is-revealed .glass-ui-card-content': {
+    opacity: 1,
+    transform: 'none',
+    filter: 'none',
+    willChange: 'auto',
+  },
+
   body: {
     position: 'relative',
 
@@ -63,17 +132,4 @@ export const globalCss = defineGlobalStyles({
     minHeight: '100vh',
   },
 
-  /* ── liquid-glass-react Tailwind compat ── */
-  '.relative': { position: 'relative' },
-  '.bg-black': { background: 'black' },
-  '.text-white': { color: 'white' },
-  '.pointer-events-none': { pointerEvents: 'none' },
-  '.cursor-pointer': { cursor: 'pointer' },
-  '.transition-all': { transitionProperty: 'all' },
-  '.duration-150': { transitionDuration: '150ms' },
-  '.ease-in-out': { transitionTimingFunction: 'ease-in-out' },
-  '.opacity-0': { opacity: '0' },
-  '.opacity-20': { opacity: '0.2' },
-  '.opacity-100': { opacity: '1' },
-  '.mix-blend-overlay': { mixBlendMode: 'overlay' },
 })

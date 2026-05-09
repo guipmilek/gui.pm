@@ -36,12 +36,15 @@ export function SectionTitle({ sectionId, sectionTitle }: SectionTitleProps) {
       {isPinned ? (
         <GlassWrapper
           distortion={10}
-          blur={8}
-          backgroundOpacity={1}
+          blur={6}
+          backgroundOpacity={0.86}
           backgroundColor="var(--colors-section-title-background)"
           borderSize={0}
+          borderRadius={0}
           padding="0"
           className="header-glass-card"
+          enableWebGLEnhancement={false}
+          variant="header"
         >
           <h2>{sectionTitle}</h2>
         </GlassWrapper>

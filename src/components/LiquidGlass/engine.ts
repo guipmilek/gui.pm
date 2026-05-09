@@ -1,6 +1,6 @@
 'use client'
 
-export const LIQUID_GLASS_RADIUS = 42
+export const LIQUID_GLASS_RADIUS = 18
 
 export function getLiquidGlassRadius(
   width: number,
