@@ -98,6 +98,11 @@ export function GlassWrapper({
     ...DEFAULT_POINTER_STATE,
   })
   const pointerAnimationRef = useRef<number | null>(null)
+  const focusSyncFrameRef = useRef<number | null>(null)
+  const lastPointerPositionRef = useRef<{
+    clientX: number
+    clientY: number
+  } | null>(null)
   const isCoarsePointer = useMediaQuery('(hover: none)')
   const prefersReducedMotion = useMediaQuery('(prefers-reduced-motion: reduce)')
   const [isHovered, setIsHovered] = useState(false)
@@ -122,8 +127,53 @@ export function GlassWrapper({
       if (pointerAnimationRef.current !== null) {
         cancelAnimationFrame(pointerAnimationRef.current)
       }
+
+      if (focusSyncFrameRef.current !== null) {
+        cancelAnimationFrame(focusSyncFrameRef.current)
+      }
     }
   }, [])
+
+  useEffect(() => {
+    if (!isFinePointer || typeof ResizeObserver === 'undefined') return
+
+    const element = wrapperRef.current
+    if (!element) return
+
+    let resizeFrame: number | null = null
+
+    const observer = new ResizeObserver(() => {
+      if (!isHovered || resizeFrame !== null) return
+
+      resizeFrame = requestAnimationFrame(() => {
+        resizeFrame = null
+
+        const pointer = lastPointerPositionRef.current
+        if (!pointer) return
+
+        const rect = element.getBoundingClientRect()
+        const isPointerInside =
+          pointer.clientX >= rect.left &&
+          pointer.clientX <= rect.right &&
+          pointer.clientY >= rect.top &&
+          pointer.clientY <= rect.bottom
+
+        if (!isPointerInside) {
+          setIsHovered(false)
+        }
+      })
+    })
+
+    observer.observe(element)
+
+    return () => {
+      observer.disconnect()
+
+      if (resizeFrame !== null) {
+        cancelAnimationFrame(resizeFrame)
+      }
+    }
+  }, [isFinePointer, isHovered])
 
   function writePointerVars({
     x,
@@ -252,24 +302,59 @@ export function GlassWrapper({
 
   function handlePointerEnter(event: PointerEvent<HTMLDivElement>) {
     if (!isFinePointer) return
+    lastPointerPositionRef.current = {
+      clientX: event.clientX,
+      clientY: event.clientY,
+    }
     setPointerVars(event.clientX, event.clientY, true)
     setIsHovered(true)
   }
 
   function handlePointerMove(event: PointerEvent<HTMLDivElement>) {
     if (!isFinePointer) return
+    lastPointerPositionRef.current = {
+      clientX: event.clientX,
+      clientY: event.clientY,
+    }
     setPointerVars(event.clientX, event.clientY)
   }
 
   function handlePointerLeave() {
     if (!isFinePointer) return
+    lastPointerPositionRef.current = null
     setIsHovered(false)
+    syncFocusWithin()
+  }
+
+  function hasVisibleFocusWithin() {
+    const element = wrapperRef.current
+    if (!element) return false
+
+    try {
+      return element.querySelector(':focus-visible') !== null
+    } catch {
+      return element.contains(document.activeElement)
+    }
+  }
+
+  function syncFocusWithin() {
+    if (focusSyncFrameRef.current !== null) {
+      cancelAnimationFrame(focusSyncFrameRef.current)
+    }
+
+    focusSyncFrameRef.current = requestAnimationFrame(() => {
+      focusSyncFrameRef.current = null
+      setIsFocusWithin(hasVisibleFocusWithin())
+    })
   }
 
   function handleBlur(event: FocusEvent<HTMLDivElement>) {
     if (!event.currentTarget.contains(event.relatedTarget)) {
       setIsFocusWithin(false)
+      return
     }
+
+    syncFocusWithin()
   }
 
   const contentStyle: CSSProperties | undefined =
@@ -281,7 +366,8 @@ export function GlassWrapper({
       onPointerEnter={handlePointerEnter}
       onPointerMove={handlePointerMove}
       onPointerLeave={handlePointerLeave}
-      onFocusCapture={() => setIsFocusWithin(true)}
+      onPointerCancel={handlePointerLeave}
+      onFocusCapture={syncFocusWithin}
       onBlurCapture={handleBlur}
       className={className}
       data-glass-active={isActive ? 'true' : 'false'}

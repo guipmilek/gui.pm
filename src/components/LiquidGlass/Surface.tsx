@@ -65,7 +65,7 @@ export function LiquidGlassSurface({
           ? '0 12px 34px rgba(0, 0, 0, 0.18), inset 0 1px 0 rgba(255, 255, 255, 0.06)'
           : '0 6px 18px rgba(0, 0, 0, 0.1), inset 0 1px 0 rgba(255, 255, 255, 0.04)',
         transition:
-          'box-shadow 0.65s cubic-bezier(0.22, 1, 0.36, 1)',
+          'opacity 0.55s cubic-bezier(0.22, 1, 0.36, 1), transform 0.55s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.65s cubic-bezier(0.22, 1, 0.36, 1)',
       }}
     >
       {enableWebGLEnhancement ? (

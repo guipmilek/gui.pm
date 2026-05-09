@@ -33,24 +33,20 @@ export function SectionTitle({ sectionId, sectionTitle }: SectionTitleProps) {
       href={sectionLink}
       className={`${sectionTitleContainerStyles()}${isPinned ? ' pinned' : ''}`}
     >
-      {isPinned ? (
-        <GlassWrapper
-          distortion={10}
-          blur={6}
-          backgroundOpacity={0.86}
-          backgroundColor="var(--colors-section-title-background)"
-          borderSize={0}
-          borderRadius={0}
-          padding="0"
-          className="header-glass-card"
-          enableWebGLEnhancement={false}
-          variant="header"
-        >
-          <h2>{sectionTitle}</h2>
-        </GlassWrapper>
-      ) : (
+      <GlassWrapper
+        distortion={10}
+        blur={6}
+        backgroundOpacity={0.86}
+        backgroundColor="var(--colors-section-title-background)"
+        borderSize={0}
+        borderRadius={0}
+        padding="0"
+        className="header-glass-card"
+        enableWebGLEnhancement={false}
+        variant="header"
+      >
         <h2>{sectionTitle}</h2>
-      )}
+      </GlassWrapper>
     </Link>
   )
 }
