@@ -15,8 +15,6 @@ export function useMouseEvent() {
   const { isHoveringRef } = useMouseContext()
 
   useEffect(() => {
-    if (!window.matchMedia('(pointer: fine)').matches) return
-
     let rafPending = false
     let pendingX = 0
     let pendingY = 0
@@ -73,7 +71,12 @@ export function useMouseEvent() {
     const onPointerMove = (event: PointerEvent) => {
       if (event.pointerType !== 'mouse' && event.pointerType !== 'pen') {
         hasPointerPosition = false
+        isMouseInside = false
         cursorRef.current?.classList.remove('visible')
+        cursorRef.current?.classList.remove('clicking')
+        clearScrollHover()
+        setHovering(false)
+        setHoverStale(false)
         return
       }
 
@@ -179,7 +182,7 @@ export function useMouseEvent() {
       document.removeEventListener('pointerover', onPointerOver)
       window.removeEventListener('pageshow', onPageShow)
     }
-  }, [])
+  }, [isHoveringRef])
 
   return cursorRef
 }

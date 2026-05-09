@@ -52,10 +52,6 @@ export const CursorContainer = styled('div', {
       },
     },
 
-    '@media (pointer: coarse)': {
-      display: 'none',
-    },
-
     '&.visible': {
       opacity: 1,
 

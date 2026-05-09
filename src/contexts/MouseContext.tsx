@@ -19,7 +19,7 @@ export function MouseProvider({ children }: { children: ReactNode }) {
   const isHoveringRef = useRef(false)
 
   useEffect(() => {
-    const isFinePointer = window.matchMedia('(pointer: fine)').matches
+    const desktopCursorMedia = window.matchMedia('(min-width: 1024px)')
 
     const hideStyle = document.createElement('style')
     hideStyle.id = 'custom-cursor-hide'
@@ -27,6 +27,11 @@ export function MouseProvider({ children }: { children: ReactNode }) {
       'html :not(input):not(textarea):not([contenteditable]) { cursor: none !important; }'
 
     function hideNativeCursor() {
+      if (!desktopCursorMedia.matches) {
+        showNativeCursor()
+        return
+      }
+
       if (!document.getElementById('custom-cursor-hide')) {
         document.head.appendChild(hideStyle)
       }
@@ -83,11 +88,26 @@ export function MouseProvider({ children }: { children: ReactNode }) {
       }
     }
 
+    const onDesktopCursorMediaChange = () => {
+      if (desktopCursorMedia.matches && hasPointerPosition) {
+        hideNativeCursor()
+        return
+      }
+
+      showNativeCursor()
+    }
+
     document.documentElement.addEventListener('mouseenter', onMouseEnter)
     document.documentElement.addEventListener('mouseleave', onMouseLeave)
     window.addEventListener('pointermove', onPointerMove, { passive: true })
     window.addEventListener('pointerdown', onPointerDown, { passive: true })
     window.addEventListener('pageshow', onPageShow)
+
+    if (typeof desktopCursorMedia.addEventListener === 'function') {
+      desktopCursorMedia.addEventListener('change', onDesktopCursorMediaChange)
+    } else {
+      desktopCursorMedia.addListener(onDesktopCursorMediaChange)
+    }
 
     return () => {
       document.documentElement.removeEventListener('mouseenter', onMouseEnter)
@@ -95,6 +115,16 @@ export function MouseProvider({ children }: { children: ReactNode }) {
       window.removeEventListener('pointermove', onPointerMove)
       window.removeEventListener('pointerdown', onPointerDown)
       window.removeEventListener('pageshow', onPageShow)
+
+      if (typeof desktopCursorMedia.removeEventListener === 'function') {
+        desktopCursorMedia.removeEventListener(
+          'change',
+          onDesktopCursorMediaChange,
+        )
+      } else {
+        desktopCursorMedia.removeListener(onDesktopCursorMediaChange)
+      }
+
       showNativeCursor()
     }
   }, [])
