@@ -5,6 +5,7 @@ import { useEffect, useRef } from 'react'
 import { useMouseContext } from '@/contexts/MouseContext'
 
 const INTERACTIVE_GRID_CANVAS_ID = 'interactive-grid-canvas'
+const LOGO_IGNITE_EVENT = 'guipm:logo-ignite'
 
 interface ShootingStar {
   headX: number
@@ -24,6 +25,22 @@ interface ShootingStar {
   startTime: number
   absorbTime?: number
   occupancyKey?: string
+  burst?: boolean
+  lifetime?: number
+  burstTurns?: BurstTurn[]
+  burstTurnIndex?: number
+}
+
+interface LogoIgniteDetail {
+  x: number
+  y: number
+}
+
+interface BurstTurn {
+  distance: number
+  dir: 'h' | 'v'
+  moveSignX: number
+  moveSignY: number
 }
 
 const BIG_SIZE = 80
@@ -86,7 +103,8 @@ function drawStars(
   for (let i = stars.length - 1; i >= 0; i--) {
     const star = stars[i]
     const elapsed = now - star.startTime
-    let alpha = 1 - Math.pow(elapsed / STAR_LIFETIME, 2)
+    const lifetime = star.lifetime ?? STAR_LIFETIME
+    let alpha = 1 - Math.pow(elapsed / lifetime, star.burst ? 1.35 : 2)
 
     if (star.absorbTime) {
       const absorbElapsed = now - star.absorbTime
@@ -98,10 +116,18 @@ function drawStars(
 
     ctx.globalAlpha = alpha
 
-    // Draw the "Spark" head - softer and smaller
-    ctx.fillStyle = 'rgba(255, 255, 255, 0.4)'
+    // Draw the "Spark" head - brighter only for logo-triggered bursts.
+    ctx.fillStyle = star.burst
+      ? 'rgba(255, 255, 255, 0.78)'
+      : 'rgba(255, 255, 255, 0.4)'
     ctx.beginPath()
-    ctx.arc(star.headX - scrollX, star.headY - scrollY, star.currentSize, 0, Math.PI * 2)
+    ctx.arc(
+      star.headX - scrollX,
+      star.headY - scrollY,
+      star.currentSize * (star.burst ? 1.3 : 1),
+      0,
+      Math.PI * 2,
+    )
     ctx.fill()
 
     const trailPoints = [
@@ -146,6 +172,12 @@ function drawStars(
 
       const getStopColor = (d: number) => {
         const p = 1 - d / TRAIL_LENGTH
+        if (star.burst) {
+          if (p > 0.72) return `rgba(240, 249, 255, ${p * 0.7})`
+          if (p > 0) return `rgba(125, 211, 252, ${p * 0.32})`
+          return 'transparent'
+        }
+
         if (p > 0.8) return `rgba(226, 232, 240, ${p * 0.4})`
         if (p > 0) return `rgba(148, 163, 184, ${p * 0.2})`
         return 'transparent'
@@ -156,7 +188,7 @@ function drawStars(
       grad.addColorStop(1, getStopColor(currentDist))
 
       ctx.strokeStyle = grad
-      ctx.lineWidth = star.currentSize
+      ctx.lineWidth = star.currentSize * (star.burst ? 1.2 : 1)
       ctx.lineCap = 'round'
       ctx.beginPath()
       ctx.moveTo(p1v.x, p1v.y)
@@ -486,6 +518,135 @@ export function InteractiveGrid() {
       })
     }
 
+    const spawnLogoBurst = (clientX: number, clientY: number) => {
+      if (prefersReducedMotionRef.current) return
+
+      const { w, h } = sizeRef.current
+      if (w === 0 || h === 0) return
+      if (!Number.isFinite(clientX) || !Number.isFinite(clientY)) return
+
+      const scrollX = window.scrollX
+      const scrollY = window.scrollY
+      const originX = Math.round((clientX + scrollX) / SMALL_SIZE) * SMALL_SIZE
+      const originY = Math.round((clientY + scrollY) / SMALL_SIZE) * SMALL_SIZE
+      const burstCount = w >= 1024 ? 8 : 4
+      const available = Math.max(
+        0,
+        maxStars + burstCount - starsRef.current.length,
+      )
+      if (available === 0) return
+
+      const directions: Array<{
+        dir: 'h' | 'v'
+        moveSignX: number
+        moveSignY: number
+        offsetX: number
+        offsetY: number
+      }> = [
+        { dir: 'h', moveSignX: 1, moveSignY: 1, offsetX: 0, offsetY: 0 },
+        { dir: 'h', moveSignX: -1, moveSignY: 1, offsetX: 0, offsetY: 0 },
+        { dir: 'v', moveSignX: 1, moveSignY: 1, offsetX: 0, offsetY: 0 },
+        { dir: 'v', moveSignX: 1, moveSignY: -1, offsetX: 0, offsetY: 0 },
+        { dir: 'h', moveSignX: 1, moveSignY: 1, offsetX: 0, offsetY: -SMALL_SIZE },
+        { dir: 'h', moveSignX: -1, moveSignY: 1, offsetX: 0, offsetY: SMALL_SIZE },
+        { dir: 'v', moveSignX: 1, moveSignY: 1, offsetX: -SMALL_SIZE, offsetY: 0 },
+        { dir: 'v', moveSignX: 1, moveSignY: -1, offsetX: SMALL_SIZE, offsetY: 0 },
+      ]
+
+      const createBurstTurns = (
+        direction: (typeof directions)[number],
+        index: number,
+      ): BurstTurn[] => {
+        const spreadSign = index % 2 === 0 ? 1 : -1
+        const firstTurn = 44 + Math.random() * 34
+        const secondTurn = firstTurn + 42 + Math.random() * 48
+        const thirdTurn = secondTurn + 54 + Math.random() * 58
+
+        if (direction.dir === 'h') {
+          const ySign = direction.offsetY === 0
+            ? spreadSign
+            : Math.sign(direction.offsetY)
+
+          return [
+            {
+              distance: firstTurn,
+              dir: 'v',
+              moveSignX: direction.moveSignX,
+              moveSignY: ySign,
+            },
+            {
+              distance: secondTurn,
+              dir: 'h',
+              moveSignX: direction.moveSignX,
+              moveSignY: ySign,
+            },
+            {
+              distance: thirdTurn,
+              dir: 'v',
+              moveSignX: direction.moveSignX,
+              moveSignY: -ySign,
+            },
+          ]
+        }
+
+        const xSign = direction.offsetX === 0
+          ? spreadSign
+          : Math.sign(direction.offsetX)
+
+        return [
+          {
+            distance: firstTurn,
+            dir: 'h',
+            moveSignX: xSign,
+            moveSignY: direction.moveSignY,
+          },
+          {
+            distance: secondTurn,
+            dir: 'v',
+            moveSignX: xSign,
+            moveSignY: direction.moveSignY,
+          },
+          {
+            distance: thirdTurn,
+            dir: 'h',
+            moveSignX: -xSign,
+            moveSignY: direction.moveSignY,
+          },
+        ]
+      }
+
+      const now = performance.now()
+      const count = Math.min(available, burstCount, directions.length)
+
+      for (let i = 0; i < count; i++) {
+        const direction = directions[i]
+        const headX = originX + direction.offsetX
+        const headY = originY + direction.offsetY
+
+        starsRef.current.push({
+          headX,
+          headY,
+          dir: direction.dir,
+          moveSignX: direction.moveSignX,
+          moveSignY: direction.moveSignY,
+          speed: 0.5 + Math.random() * 0.16,
+          waypoints: [],
+          startPos: { x: headX, y: headY },
+          totalDist: 0,
+          lastTurnDist: 0,
+          lastGridSize: SMALL_SIZE,
+          currentSize: STAR_THICKNESS + 0.25,
+          guided: false,
+          color: STAR_COLOR,
+          startTime: now,
+          burst: true,
+          lifetime: 1050 + Math.random() * 320,
+          burstTurns: createBurstTurns(direction, i),
+          burstTurnIndex: 0,
+        })
+      }
+    }
+
     const scheduleNext = () => {
       if (!running) return
       const delay =
@@ -622,7 +783,7 @@ export function InteractiveGrid() {
           continue
         }
 
-        if (elapsed > STAR_LIFETIME) {
+        if (elapsed > (star.lifetime ?? STAR_LIFETIME)) {
           if (star.occupancyKey) lineOccupancyRef.current.delete(star.occupancyKey)
           starsRef.current.splice(i, 1)
           continue
@@ -631,13 +792,41 @@ export function InteractiveGrid() {
         const step = star.speed * dt
         star.totalDist += step
 
+        if (star.burst) {
+          if (star.dir === 'h') {
+            star.headX += star.moveSignX * step
+          } else {
+            star.headY += star.moveSignY * step
+          }
+
+          const turnIndex = star.burstTurnIndex ?? 0
+          const nextTurn = star.burstTurns?.[turnIndex]
+          if (nextTurn && star.totalDist >= nextTurn.distance) {
+            star.headX = Math.round(star.headX / SMALL_SIZE) * SMALL_SIZE
+            star.headY = Math.round(star.headY / SMALL_SIZE) * SMALL_SIZE
+            star.waypoints.unshift({ x: star.headX, y: star.headY })
+            star.dir = nextTurn.dir
+            star.moveSignX = nextTurn.moveSignX
+            star.moveSignY = nextTurn.moveSignY
+            star.burstTurnIndex = turnIndex + 1
+          }
+
+          continue
+        }
+
         const vmx = star.headX - scrollX
         const vmy = star.headY - scrollY
         const distToMouse = Math.sqrt((vmx - mx) ** 2 + (vmy - my) ** 2)
 
         // Dynamically upgrade stars to 'guided' if a pointer is now available.
         // This makes existing background stars shift focus to the mouse.
-        if (!star.guided && hasPointer && isMouseInside && !isTouchRef.current) {
+        if (
+          !star.burst &&
+          !star.guided &&
+          hasPointer &&
+          isMouseInside &&
+          !isTouchRef.current
+        ) {
           star.guided = true
         }
 
@@ -821,6 +1010,13 @@ export function InteractiveGrid() {
       }
     }
 
+    const onLogoIgnite = (event: Event) => {
+      const { detail } = event as CustomEvent<LogoIgniteDetail>
+      if (!detail) return
+
+      spawnLogoBurst(detail.x, detail.y)
+    }
+
     updateSize()
 
     const fallback = document.getElementById('grid-fallback')
@@ -838,6 +1034,7 @@ export function InteractiveGrid() {
     document.addEventListener('visibilitychange', onVisibility)
     window.addEventListener('resize', scheduleResize)
     window.addEventListener('pageshow', onPageShow)
+    window.addEventListener(LOGO_IGNITE_EVENT, onLogoIgnite)
 
     animRef.current = requestAnimationFrame(frame)
     scheduleNext()
@@ -851,6 +1048,7 @@ export function InteractiveGrid() {
       document.removeEventListener('visibilitychange', onVisibility)
       window.removeEventListener('resize', scheduleResize)
       window.removeEventListener('pageshow', onPageShow)
+      window.removeEventListener(LOGO_IGNITE_EVENT, onLogoIgnite)
       document.documentElement.removeEventListener('mouseenter', onMouseEnter)
       document.documentElement.removeEventListener('mouseleave', onMouseLeave)
       fallback?.removeAttribute('hidden')
