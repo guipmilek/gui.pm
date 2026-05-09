@@ -52,6 +52,7 @@ export const LogoWrapper = styled('button', {
       transform: 'scale(0.84)',
       transition:
         'opacity 0.45s cubic-bezier(0.16, 1, 0.3, 1), transform 0.55s cubic-bezier(0.16, 1, 0.3, 1)',
+      animation: 'logoEntranceField 1.45s cubic-bezier(0.16, 1, 0.3, 1) 0.08s',
       pointerEvents: 'none',
     },
 
@@ -67,6 +68,8 @@ export const LogoWrapper = styled('button', {
       color: 'inherit',
       filter: 'drop-shadow(0 0 0 rgba(125, 211, 252, 0))',
       transition: 'filter 0.45s cubic-bezier(0.16, 1, 0.3, 1)',
+      transformOrigin: '50% 50%',
+      animation: 'logoEntranceMark 1.08s cubic-bezier(0.16, 1, 0.3, 1) both',
     },
 
     '& .logo-mark, & .logo-helmet-details path': {
@@ -89,6 +92,7 @@ export const LogoWrapper = styled('button', {
       transform: 'scale(0.9)',
       transition:
         'opacity 0.45s cubic-bezier(0.16, 1, 0.3, 1), transform 0.55s cubic-bezier(0.16, 1, 0.3, 1)',
+      animation: 'logoHelmetGlowEntrance 1.16s cubic-bezier(0.16, 1, 0.3, 1) both',
     },
 
     '& .logo-spark-glow': {
@@ -98,6 +102,7 @@ export const LogoWrapper = styled('button', {
       transform: 'scale(0.82)',
       transition:
         'opacity 0.45s cubic-bezier(0.16, 1, 0.3, 1), transform 0.55s cubic-bezier(0.16, 1, 0.3, 1)',
+      animation: 'logoSparkGlowEntrance 1.2s cubic-bezier(0.16, 1, 0.3, 1) both',
     },
 
     '& .logo-helmet-orbit': {
@@ -109,7 +114,8 @@ export const LogoWrapper = styled('button', {
       opacity: 0.18,
       transformBox: 'fill-box',
       transformOrigin: 'center',
-      animation: 'logoHelmetDrift 7s ease-in-out infinite',
+      animation:
+        'logoHelmetBoot 1.28s cubic-bezier(0.16, 1, 0.3, 1) both, logoHelmetDrift 7s ease-in-out 1.28s infinite',
       transition:
         'opacity 0.45s cubic-bezier(0.16, 1, 0.3, 1), stroke 0.45s cubic-bezier(0.16, 1, 0.3, 1)',
     },
@@ -126,6 +132,9 @@ export const LogoWrapper = styled('button', {
       opacity: 0,
       mixBlendMode: 'screen',
       transition: 'opacity 0.45s cubic-bezier(0.16, 1, 0.3, 1)',
+      strokeDasharray: 1080,
+      strokeDashoffset: 1080,
+      animation: 'logoRimTrace 1.16s cubic-bezier(0.16, 1, 0.3, 1) 0.16s',
     },
 
     '@media (hover: hover) and (pointer: fine)': {

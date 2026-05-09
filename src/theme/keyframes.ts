@@ -45,6 +45,48 @@ export const keyframes = defineKeyframes({
     from: { transform: 'rotate(0deg)' },
     to: { transform: 'rotate(360deg)' },
   },
+  logoEntranceField: {
+    '0%': { opacity: '0', transform: 'scale(0.42)' },
+    '34%': { opacity: '0.85', transform: 'scale(1.28)' },
+    '100%': { opacity: '0', transform: 'scale(1.42)' },
+  },
+  logoEntranceMark: {
+    '0%': {
+      opacity: '0',
+      transform: 'rotate(-18deg) scale(0.42)',
+      filter: 'blur(8px) drop-shadow(0 0 18px rgba(125, 211, 252, 0.42))',
+    },
+    '58%': {
+      opacity: '1',
+      transform: 'rotate(5deg) scale(1.08)',
+      filter: 'blur(0) drop-shadow(0 0 18px rgba(236, 253, 255, 0.26))',
+    },
+    '100%': {
+      opacity: '1',
+      transform: 'rotate(0deg) scale(1)',
+      filter: 'blur(0) drop-shadow(0 0 0 rgba(125, 211, 252, 0))',
+    },
+  },
+  logoHelmetGlowEntrance: {
+    '0%': { opacity: '0', transform: 'scale(0.28)' },
+    '42%': { opacity: '0.74', transform: 'scale(1.26)' },
+    '100%': { opacity: '0.16', transform: 'scale(0.9)' },
+  },
+  logoSparkGlowEntrance: {
+    '0%': { opacity: '0', transform: 'scale(0.2)' },
+    '54%': { opacity: '0.9', transform: 'scale(1.34)' },
+    '100%': { opacity: '0.24', transform: 'scale(0.82)' },
+  },
+  logoHelmetBoot: {
+    '0%': { opacity: '0', transform: 'rotate(-110deg) scale(0.64)' },
+    '54%': { opacity: '0.86', transform: 'rotate(250deg) scale(1.16)' },
+    '100%': { opacity: '0.18', transform: 'rotate(-8deg) scale(1)' },
+  },
+  logoRimTrace: {
+    '0%': { opacity: '0', strokeDashoffset: '1080', strokeWidth: '1.2' },
+    '30%': { opacity: '0.56', strokeDashoffset: '640', strokeWidth: '3.4' },
+    '100%': { opacity: '0', strokeDashoffset: '0', strokeWidth: '2.4' },
+  },
   logoHelmetIgnite: {
     '0%': { opacity: '0.35', transform: 'rotate(0deg) scale(0.94)' },
     '62%': { opacity: '0.95', transform: 'rotate(360deg) scale(1.08)' },

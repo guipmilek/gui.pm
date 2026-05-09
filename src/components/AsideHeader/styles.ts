@@ -218,6 +218,10 @@ export const SocialLinks = styled('ul', {
         animationDelay: '600ms',
         lg: { animationDelay: '880ms' },
       },
+      '&:nth-of-type(6)': {
+        animationDelay: '660ms',
+        lg: { animationDelay: '960ms' },
+      },
     },
   },
 })

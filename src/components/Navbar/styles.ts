@@ -11,6 +11,7 @@ export const NavbarContainer = styled('nav', {
 
     '& a': {
       opacity: 0,
+      position: 'relative',
 
       display: 'flex',
       alignItems: 'center',
@@ -23,6 +24,7 @@ export const NavbarContainer = styled('nav', {
 
       textStyle: 'xs',
       fontWeight: 'bold',
+      transform: 'translate3d(0, 0, 0)',
 
       animation: 'fadeSlideRight 0.7s cubic-bezier(0.22, 1, 0.36, 1) both',
 
@@ -35,7 +37,7 @@ export const NavbarContainer = styled('nav', {
 
       '&, & span': {
         transition:
-          'color 0.18s ease-out, width 0.22s cubic-bezier(0.16, 1, 0.3, 1), background-color 0.18s ease-out',
+          'color 0.18s ease-out, transform 0.32s cubic-bezier(0.16, 1, 0.3, 1), width 0.32s cubic-bezier(0.16, 1, 0.3, 1), background-color 0.18s ease-out',
       },
 
       '&:nth-of-type(1)': { animationDelay: '300ms' },
@@ -83,6 +85,7 @@ export const NavbarContainer = styled('nav', {
         outline: '1px solid',
         outlineColor: 'primary',
         outlineOffset: '0.2rem',
+        transform: 'translate3d(0.2rem, 0, 0)',
 
         '& span': {
           backgroundColor: 'primary',
@@ -93,6 +96,7 @@ export const NavbarContainer = styled('nav', {
       '@media (hover: hover) and (pointer: fine)': {
         '&:hover:not(:where(.hover-stale *)), &.scroll-hover': {
           color: 'title',
+          transform: 'translate3d(0.2rem, 0, 0)',
 
           '& span': {
             backgroundColor: 'title',
