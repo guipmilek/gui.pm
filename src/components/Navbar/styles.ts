@@ -14,7 +14,12 @@ export const NavbarContainer = styled('nav', {
 
       display: 'flex',
       alignItems: 'center',
-      gap: '1rem',
+      gap: '0.875rem',
+
+      minHeight: '1.5rem',
+      marginLeft: '-0.25rem',
+      padding: '0.125rem 0.25rem',
+      borderRadius: '0.375rem',
 
       textStyle: 'xs',
       fontWeight: 'bold',
@@ -29,7 +34,8 @@ export const NavbarContainer = styled('nav', {
       },
 
       '&, & span': {
-        transition: 'color 0.2s, width 0.2s, background-color 0.2s',
+        transition:
+          'color 0.18s ease-out, width 0.22s cubic-bezier(0.16, 1, 0.3, 1), background-color 0.18s ease-out',
       },
 
       '&:nth-of-type(1)': { animationDelay: '300ms' },
@@ -40,15 +46,16 @@ export const NavbarContainer = styled('nav', {
       '&:nth-of-type(6)': { animationDelay: '700ms' },
 
       '& + a': {
-        marginTop: '1rem',
+        marginTop: '0.5rem',
       },
 
       '& span': {
         display: 'block',
 
         backgroundColor: 'subtitle',
-        width: '32px',
+        width: '2rem',
         height: '1px',
+        flexShrink: 0,
       },
 
       '&.active': {
@@ -56,7 +63,7 @@ export const NavbarContainer = styled('nav', {
 
         '& span': {
           backgroundColor: 'primary',
-          width: '64px',
+          width: '4rem',
         },
 
         '@media (hover: hover) and (pointer: fine)': {
@@ -65,9 +72,21 @@ export const NavbarContainer = styled('nav', {
 
             '& span': {
               backgroundColor: 'primary',
-              width: '80px',
+              width: '5rem',
             },
           },
+        },
+      },
+
+      '&:focus-visible': {
+        color: 'title',
+        outline: '1px solid',
+        outlineColor: 'primary',
+        outlineOffset: '0.2rem',
+
+        '& span': {
+          backgroundColor: 'primary',
+          width: '4rem',
         },
       },
 
@@ -77,7 +96,7 @@ export const NavbarContainer = styled('nav', {
 
           '& span': {
             backgroundColor: 'title',
-            width: '64px',
+            width: '4rem',
           },
         },
       },

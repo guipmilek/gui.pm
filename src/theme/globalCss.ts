@@ -8,7 +8,7 @@ export const globalCss = defineGlobalStyles({
     lineHeight: '1.5rem',
 
     scrollBehavior: 'smooth',
-    lg: { scrollPaddingTop: '6rem' },
+    lg: { scrollPaddingTop: 'clamp(3rem, 8svh, 6rem)' },
 
     '@media (prefers-reduced-motion: reduce)': {
       scrollBehavior: 'auto',

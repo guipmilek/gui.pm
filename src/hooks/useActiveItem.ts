@@ -6,7 +6,12 @@ export function useActiveItem(
   itemIds: (string | undefined)[],
   defaultActiveItemId?: string,
 ) {
-  const [activeId, setActiveId] = useState<string>(defaultActiveItemId || '')
+  const [activeId, setActiveId] = useState<string>(() => {
+    if (typeof window === 'undefined') return defaultActiveItemId || ''
+
+    const hashId = window.location.hash.substring(1)
+    return itemIds.includes(hashId) ? hashId : defaultActiveItemId || ''
+  })
   const explicitHashTargetRef = useRef<string | null>(null)
   const explicitHashReachedRef = useRef(false)
 
@@ -30,11 +35,13 @@ export function useActiveItem(
       }
     }
 
-    const setExplicitHashTarget = (hashId: string) => {
+    const setExplicitHashTarget = (hashId: string, updateActive = true) => {
       explicitHashTargetRef.current = hashId
       explicitHashReachedRef.current = hashId === topItemId && isAtPageTop()
-      // Do not set activeId here to allow IntersectionObserver to animate
-      // through sections during scroll.
+
+      if (updateActive) {
+        setActiveId(hashId)
+      }
     }
 
     const preserveExplicitTopHash = () => {
@@ -80,8 +87,7 @@ export function useActiveItem(
       }
     }
 
-    const handleDocumentClick = (event: MouseEvent) => {
-      const target = event.target
+    const updateFromAnchorTarget = (target: EventTarget | null) => {
       if (!(target instanceof Element)) return
 
       const anchor = target.closest<HTMLAnchorElement>('a[href^="#"]')
@@ -92,11 +98,26 @@ export function useActiveItem(
       }
     }
 
+    const handleDocumentPointerDown = (event: PointerEvent) => {
+      updateFromAnchorTarget(event.target)
+    }
+
+    const handleDocumentClick = (event: MouseEvent) => {
+      updateFromAnchorTarget(event.target)
+    }
+
+    const handleDocumentKeyDown = (event: KeyboardEvent) => {
+      if (event.key !== 'Enter') return
+
+      const target = event.target
+
+      updateFromAnchorTarget(target)
+    }
+
     if (window.location.hash) {
       const hashId = getCurrentHashId()
       if (itemIds.includes(hashId)) {
-        setExplicitHashTarget(hashId)
-        setActiveId(hashId)
+        setExplicitHashTarget(hashId, false)
       }
     }
 
@@ -110,12 +131,13 @@ export function useActiveItem(
         entries.forEach((entry) => {
           if (entry.isIntersecting) {
             const newId = entry.target.id
+            const explicitHashTarget = explicitHashTargetRef.current
 
-            if (explicitHashTargetRef.current === newId) {
-              explicitHashReachedRef.current = true
-            } else {
-              clearExplicitHashTarget()
+            if (explicitHashTarget && explicitHashTarget !== newId) {
+              return
             }
+
+            clearExplicitHashTarget()
 
             setActiveId(newId)
 
@@ -131,7 +153,11 @@ export function useActiveItem(
 
     window.addEventListener('scroll', handleScroll, { passive: true })
     window.addEventListener('hashchange', handleHashChange)
+    document.addEventListener('pointerdown', handleDocumentPointerDown, {
+      passive: true,
+    })
     document.addEventListener('click', handleDocumentClick)
+    document.addEventListener('keydown', handleDocumentKeyDown)
 
     itemIds.forEach((id) => {
       if (!id) return
@@ -145,7 +171,9 @@ export function useActiveItem(
     return () => {
       window.removeEventListener('scroll', handleScroll)
       window.removeEventListener('hashchange', handleHashChange)
+      document.removeEventListener('pointerdown', handleDocumentPointerDown)
       document.removeEventListener('click', handleDocumentClick)
+      document.removeEventListener('keydown', handleDocumentKeyDown)
       observer.disconnect()
     }
   }, [itemIds])

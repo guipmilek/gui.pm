@@ -1,6 +1,7 @@
 'use client'
 
 import Link from 'next/link'
+import type { MouseEvent } from 'react'
 import { useEffect } from 'react'
 
 import { useActiveItem } from '@/hooks/useActiveItem'
@@ -24,6 +25,26 @@ const sectionsIds = sectionInfos.map((sectionInfo) => sectionInfo.id)
 
 export function Navbar() {
   const activeSection = useActiveItem(sectionsIds)
+
+  function handleNavClick(event: MouseEvent<HTMLAnchorElement>, id: string) {
+    if (event.altKey || event.ctrlKey || event.metaKey || event.shiftKey) return
+    if (event.button !== 0) return
+
+    const element = document.getElementById(id)
+    if (!element) return
+
+    event.preventDefault()
+
+    const prefersReducedMotion = window.matchMedia(
+      '(prefers-reduced-motion: reduce)',
+    ).matches
+
+    window.history.pushState(null, '', `#${id}`)
+    element.scrollIntoView({
+      behavior: prefersReducedMotion ? 'auto' : 'smooth',
+      block: 'start',
+    })
+  }
 
   useEffect(() => {
     if ('scrollRestoration' in history) {
@@ -50,16 +71,19 @@ export function Navbar() {
   }, [])
 
   return (
-    <NavbarContainer>
+    <NavbarContainer aria-label="Navegação principal">
       {sectionInfos.map((sectionInfo) => {
         const { id, text } = sectionInfo
 
         const sectionId = `#${id}`
+        const isActive = activeSection === id
 
         return (
           <Link
             href={sectionId}
-            className={activeSection === id ? 'active' : ''}
+            aria-current={isActive ? 'location' : undefined}
+            className={isActive ? 'active' : ''}
+            onClick={(event) => handleNavClick(event, id)}
             key={id}
           >
             <span></span> {text}

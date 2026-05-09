@@ -11,6 +11,7 @@ export const SectionContainer = styled('section', {
     },
     gap: '1rem',
 
+    scrollMarginTop: { base: '4rem', lg: 'clamp(3rem, 8svh, 6rem)' },
     paddingBottom: { base: 'clamp(4.5rem, 12svh, 6rem)', lg: '0' },
   },
 })
