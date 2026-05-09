@@ -1,10 +1,10 @@
 'use client'
 
-import Link from 'next/link'
-import { useRef } from 'react'
 import { useIntersectionObserver } from 'usehooks-ts'
 
 import { GlassWrapper } from '../../CardItem/GlassWrapper'
+import { InteractiveLogo } from '../../InteractiveLogo'
+import { MobileSectionPicker } from './MobileSectionPicker'
 import { sectionTitleContainerStyles } from './styles'
 
 interface SectionTitleProps {
@@ -13,24 +13,19 @@ interface SectionTitleProps {
 }
 
 export function SectionTitle({ sectionId, sectionTitle }: SectionTitleProps) {
-  const ref = useRef<HTMLAnchorElement | null>(null)
   const { ref: observerRef, entry } = useIntersectionObserver({
     threshold: 1,
     rootMargin: '-1px 0px 0px 0px',
   })
   const isPinned = entry !== undefined && entry.intersectionRatio < 1
 
-  const sectionLink = `#${sectionId}`
-
-  const setRefs = (node: HTMLAnchorElement | null) => {
-    ref.current = node
+  const setRefs = (node: HTMLDivElement | null) => {
     observerRef(node)
   }
 
   return (
-    <Link
+    <div
       ref={setRefs}
-      href={sectionLink}
       className={`${sectionTitleContainerStyles()}${isPinned ? ' pinned' : ''}`}
     >
       <GlassWrapper
@@ -45,8 +40,22 @@ export function SectionTitle({ sectionId, sectionTitle }: SectionTitleProps) {
         enableWebGLEnhancement={false}
         variant="header"
       >
-        <h2>{sectionTitle}</h2>
+        <div className="mobile-section-header-row">
+          <MobileSectionPicker
+            currentSectionId={sectionId}
+            currentSectionTitle={sectionTitle}
+            isPinned={isPinned}
+          />
+
+          <div className="mobile-section-logo" aria-hidden={!isPinned}>
+            <InteractiveLogo
+              variant="compact"
+              className="mobile-section-logo-mark"
+              tabIndex={isPinned ? 0 : -1}
+            />
+          </div>
+        </div>
       </GlassWrapper>
-    </Link>
+    </div>
   )
 }

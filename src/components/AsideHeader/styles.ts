@@ -4,12 +4,12 @@ export const AsideHeaderContainer = styled('header', {
   base: {
     display: 'flex',
     flexDirection: 'column',
-    gap: '2rem',
+    gap: '1.25rem',
     gridArea: 'auto',
 
     width: '100%',
 
-    marginBottom: 'clamp(4rem, 10svh, 6rem)',
+    marginBottom: 'clamp(3.5rem, 9svh, 5rem)',
 
     lg: {
       position: 'sticky',
@@ -33,12 +33,14 @@ export const Bio = styled('div', {
       opacity: 0,
 
       display: 'flex',
+      flexDirection: 'row-reverse',
       alignItems: 'center',
-      gap: '1rem',
+      justifyContent: 'space-between',
+      gap: 'clamp(0.75rem, 4vw, 1rem)',
 
-      width: 'fit-content',
+      width: '100%',
 
-      margin: '0 auto 1rem',
+      margin: '0 0 0.875rem',
 
       color: 'title',
 
@@ -55,27 +57,41 @@ export const Bio = styled('div', {
       },
 
       lg: {
+        flexDirection: 'row',
+        justifyContent: 'flex-start',
+        width: 'fit-content',
         animation: 'fadeSlideRight 0.7s cubic-bezier(0.22, 1, 0.36, 1) both',
       },
 
       sm: {
-        width: '100%',
+        marginBottom: '1rem',
+      },
 
-        margin: '0 0 1rem',
+      '& > div': {
+        minWidth: 0,
+        flex: '1 1 auto',
       },
 
       '& h1': {
-        whiteSpace: 'nowrap',
+        overflowWrap: 'break-word',
+        lineHeight: 1.05,
         textStyle: {
           base: '2xl',
           sm: '4xl',
         },
         fontWeight: 'black',
+
+        sm: {
+          whiteSpace: 'nowrap',
+        },
       },
 
       '& strong': {
         display: 'block',
-        whiteSpace: 'nowrap',
+        maxWidth: 'min(100%, 24rem)',
+        marginTop: '0.125rem',
+
+        whiteSpace: 'normal',
         textStyle: {
           base: 'xs',
           sm: 'sm',
@@ -90,6 +106,8 @@ export const Bio = styled('div', {
 
       animation: 'fadeSlideUp 0.7s cubic-bezier(0.22, 1, 0.36, 1) both',
       animationDelay: '180ms',
+
+      maxWidth: '34rem',
 
       '@media (prefers-reduced-motion: reduce)': {
         opacity: '1 !important',
@@ -164,9 +182,14 @@ export const SocialLinks = styled('ul', {
       base: 'center',
       sm: 'flex-start',
     },
-    gap: '1.5rem',
+    flexWrap: 'wrap',
+    gap: 'clamp(1rem, 5vw, 1.5rem)',
 
-    marginTop: 'auto',
+    marginTop: '0.25rem',
+
+    lg: {
+      marginTop: 'auto',
+    },
 
     '& li a': {
       display: 'flex',

@@ -1,6 +1,6 @@
 'use client'
 
-import { KeyboardEvent, PointerEvent, useRef } from 'react'
+import { KeyboardEvent, PointerEvent, useId, useRef } from 'react'
 
 import { LogoWrapper } from './styles'
 
@@ -19,9 +19,23 @@ function clamp(value: number, min: number, max: number) {
   return Math.min(max, Math.max(min, value))
 }
 
-export function InteractiveLogo() {
+interface InteractiveLogoProps {
+  className?: string
+  tabIndex?: number
+  variant?: 'default' | 'compact'
+}
+
+export function InteractiveLogo({
+  className,
+  tabIndex,
+  variant = 'default',
+}: InteractiveLogoProps) {
   const wrapperRef = useRef<HTMLButtonElement>(null)
   const igniteTimeoutRef = useRef<ReturnType<typeof setTimeout>>(undefined)
+  const uniqueId = useId().replace(/:/g, '')
+
+  const helmetGlowId = `logo-helmet-glow-${uniqueId}`
+  const sparkGlowId = `logo-spark-glow-${uniqueId}`
 
   function setPointerVars(clientX: number, clientY: number) {
     const element = wrapperRef.current
@@ -106,7 +120,9 @@ export function InteractiveLogo() {
     <LogoWrapper
       ref={wrapperRef}
       type="button"
-      className="hoverable"
+      className={['hoverable', className].filter(Boolean).join(' ')}
+      tabIndex={tabIndex}
+      data-variant={variant === 'compact' ? 'compact' : undefined}
       aria-label="Acionar animação do logotipo"
       title="Logotipo por graphitepoint"
       onPointerEnter={handlePointerMove}
@@ -125,14 +141,14 @@ export function InteractiveLogo() {
         focusable="false"
       >
         <defs>
-          <radialGradient id="logo-helmet-glow" cx="50%" cy="45%" r="65%">
+          <radialGradient id={helmetGlowId} cx="50%" cy="45%" r="65%">
             <stop offset="0%" stopColor="rgba(255, 255, 255, 0.98)" />
             <stop offset="38%" stopColor="rgba(186, 230, 253, 0.72)" />
             <stop offset="72%" stopColor="rgba(14, 165, 233, 0.18)" />
             <stop offset="100%" stopColor="rgba(14, 165, 233, 0)" />
           </radialGradient>
 
-          <radialGradient id="logo-spark-glow" cx="50%" cy="50%" r="60%">
+          <radialGradient id={sparkGlowId} cx="50%" cy="50%" r="60%">
             <stop offset="0%" stopColor="rgba(255, 255, 255, 1)" />
             <stop offset="42%" stopColor="rgba(224, 242, 254, 0.86)" />
             <stop offset="100%" stopColor="rgba(14, 165, 233, 0)" />
@@ -140,8 +156,20 @@ export function InteractiveLogo() {
         </defs>
 
         <g className="logo-light-layer">
-          <circle className="logo-helmet-glow" cx="200" cy="200" r="56" />
-          <circle className="logo-spark-glow" cx="295.09" cy="298.75" r="34" />
+          <circle
+            className="logo-helmet-glow"
+            cx="200"
+            cy="200"
+            r="56"
+            fill={`url(#${helmetGlowId})`}
+          />
+          <circle
+            className="logo-spark-glow"
+            cx="295.09"
+            cy="298.75"
+            r="34"
+            fill={`url(#${sparkGlowId})`}
+          />
 
           <g className="logo-helmet-orbit">
             <circle cx="200" cy="200" r="36" />

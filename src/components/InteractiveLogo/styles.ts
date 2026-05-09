@@ -36,6 +36,10 @@ export const LogoWrapper = styled('button', {
       'transform 0.56s cubic-bezier(0.16, 1, 0.3, 1), filter 0.56s cubic-bezier(0.16, 1, 0.3, 1)',
     willChange: 'transform',
 
+    '&[data-variant="compact"]': {
+      width: '2.125rem',
+    },
+
     '& .logo-field': {
       position: 'absolute',
       inset: '-48%',
@@ -86,7 +90,6 @@ export const LogoWrapper = styled('button', {
     },
 
     '& .logo-helmet-glow': {
-      fill: 'url(#logo-helmet-glow)',
       opacity: 0.16,
       transformOrigin: '200px 200px',
       transform: 'scale(0.9)',
@@ -96,7 +99,6 @@ export const LogoWrapper = styled('button', {
     },
 
     '& .logo-spark-glow': {
-      fill: 'url(#logo-spark-glow)',
       opacity: 0.24,
       transformOrigin: '295.09px 298.75px',
       transform: 'scale(0.82)',

@@ -1,30 +1,15 @@
 'use client'
 
 import Link from 'next/link'
-import type { MouseEvent } from 'react'
-import { useEffect } from 'react'
+import { type MouseEvent, useEffect } from 'react'
 
 import { useActiveItem } from '@/hooks/useActiveItem'
 
+import { sectionIds, sectionInfos } from './sections'
 import { NavbarContainer } from './styles'
 
-interface SectionInfo {
-  id: string
-  text: string
-}
-
-const sectionInfos: SectionInfo[] = [
-  { id: 'about', text: 'SOBRE' },
-  { id: 'experience', text: 'EXPERIÊNCIA' },
-  { id: 'education', text: 'FORMAÇÃO' },
-  { id: 'certifications', text: 'CERTIFICAÇÕES' },
-  { id: 'languages', text: 'IDIOMAS' },
-  { id: 'projects', text: 'PROJETOS' },
-]
-const sectionsIds = sectionInfos.map((sectionInfo) => sectionInfo.id)
-
 export function Navbar() {
-  const activeSection = useActiveItem(sectionsIds)
+  const activeSection = useActiveItem(sectionIds)
 
   function handleNavClick(event: MouseEvent<HTMLAnchorElement>, id: string) {
     if (event.altKey || event.ctrlKey || event.metaKey || event.shiftKey) return
@@ -62,6 +47,7 @@ export function Navbar() {
 
           element.scrollIntoView({
             behavior: prefersReducedMotion ? 'auto' : 'smooth',
+            block: 'start',
           })
         }
       }, 100)

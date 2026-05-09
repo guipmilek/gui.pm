@@ -112,6 +112,42 @@ export const keyframes = defineKeyframes({
     '32%': { opacity: '0.46', strokeWidth: '4.4' },
     '100%': { opacity: '0.2', strokeWidth: '2.4' },
   },
+  stickySectionLogoIn: {
+    '0%': {
+      opacity: '0',
+      transform: 'translate3d(0.75rem, -0.125rem, 0) scale(0.76)',
+      filter: 'blur(6px)',
+    },
+    '100%': {
+      opacity: '1',
+      transform: 'translate3d(0, 0, 0) scale(1)',
+      filter: 'blur(0)',
+    },
+  },
+  stickySectionArrowIn: {
+    '0%': {
+      opacity: '0',
+      transform: 'translate3d(-0.25rem, 0, 0) scale(0.7)',
+      filter: 'blur(4px)',
+    },
+    '100%': {
+      opacity: '1',
+      transform: 'translate3d(0, 0, 0) scale(1)',
+      filter: 'blur(0)',
+    },
+  },
+  mobileSectionPickerIn: {
+    '0%': {
+      opacity: '0',
+      transform: 'translate3d(0, -0.375rem, 0) scale(0.98)',
+      filter: 'blur(6px)',
+    },
+    '100%': {
+      opacity: '1',
+      transform: 'translate3d(0, 0, 0) scale(1)',
+      filter: 'blur(0)',
+    },
+  },
   shake: {
     '0%, 100%': { marginLeft: '0' },
     '10%, 30%, 50%, 70%, 90%': { marginLeft: '-4px' },

@@ -6,12 +6,7 @@ export function useActiveItem(
   itemIds: (string | undefined)[],
   defaultActiveItemId?: string,
 ) {
-  const [activeId, setActiveId] = useState<string>(() => {
-    if (typeof window === 'undefined') return defaultActiveItemId || ''
-
-    const hashId = window.location.hash.substring(1)
-    return itemIds.includes(hashId) ? hashId : defaultActiveItemId || ''
-  })
+  const [activeId, setActiveId] = useState<string>(defaultActiveItemId || '')
   const explicitHashTargetRef = useRef<string | null>(null)
   const explicitHashReachedRef = useRef(false)
 
@@ -117,7 +112,7 @@ export function useActiveItem(
     if (window.location.hash) {
       const hashId = getCurrentHashId()
       if (itemIds.includes(hashId)) {
-        setExplicitHashTarget(hashId, false)
+        setExplicitHashTarget(hashId)
       }
     }
 
