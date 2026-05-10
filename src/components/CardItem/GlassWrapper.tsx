@@ -19,6 +19,8 @@ interface GlassWrapperProps {
   padding?: string
   className?: string
   enableWebGLEnhancement?: boolean
+  forceActive?: boolean
+  preserveCoarseMaterial?: boolean
   variant?: 'default' | 'compact' | 'header'
 }
 
@@ -88,6 +90,8 @@ export function GlassWrapper({
   padding = '0',
   className,
   enableWebGLEnhancement = false,
+  forceActive = false,
+  preserveCoarseMaterial = false,
   variant = 'default',
 }: GlassWrapperProps) {
   const wrapperRef = useRef<HTMLDivElement>(null)
@@ -109,10 +113,13 @@ export function GlassWrapper({
   const [isFocusWithin, setIsFocusWithin] = useState(false)
 
   const isFinePointer = !isCoarsePointer
-  const isActive = isHovered || isFocusWithin
-  const effectiveBlur = isCoarsePointer ? Math.min(blur, 5) : blur
+  const isActive = forceActive || isHovered || isFocusWithin
+  const effectiveBlur =
+    isCoarsePointer && !preserveCoarseMaterial ? Math.min(blur, 5) : blur
   const effectiveBackgroundOpacity = isCoarsePointer
-    ? Math.min(backgroundOpacity, 0.1)
+    ? preserveCoarseMaterial
+      ? backgroundOpacity
+      : Math.min(backgroundOpacity, 0.1)
     : backgroundOpacity
   const shouldUseWebGL =
     enableWebGLEnhancement && isFinePointer && !prefersReducedMotion

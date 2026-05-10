@@ -1,5 +1,6 @@
 'use client'
 
+import { useState } from 'react'
 import { useIntersectionObserver } from 'usehooks-ts'
 
 import { GlassWrapper } from '../../CardItem/GlassWrapper'
@@ -13,6 +14,7 @@ interface SectionTitleProps {
 }
 
 export function SectionTitle({ sectionId, sectionTitle }: SectionTitleProps) {
+  const [isMenuOpen, setIsMenuOpen] = useState(false)
   const { ref: observerRef, entry } = useIntersectionObserver({
     threshold: 1,
     rootMargin: '-1px 0px 0px 0px',
@@ -26,7 +28,9 @@ export function SectionTitle({ sectionId, sectionTitle }: SectionTitleProps) {
   return (
     <div
       ref={setRefs}
-      className={`${sectionTitleContainerStyles()}${isPinned ? ' pinned' : ''}`}
+      className={`${sectionTitleContainerStyles()}${
+        isPinned ? ' pinned' : ''
+      }${isMenuOpen ? ' menu-open' : ''}`}
     >
       <GlassWrapper
         distortion={10}
@@ -45,6 +49,7 @@ export function SectionTitle({ sectionId, sectionTitle }: SectionTitleProps) {
             currentSectionId={sectionId}
             currentSectionTitle={sectionTitle}
             isPinned={isPinned}
+            onOpenChange={setIsMenuOpen}
           />
 
           <div className="mobile-section-logo" aria-hidden={!isPinned}>

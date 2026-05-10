@@ -1,7 +1,7 @@
 'use client'
 
 import Link from 'next/link'
-import { type MouseEvent, useEffect, useId, useRef, useState } from 'react'
+import { type MouseEvent, useCallback, useEffect, useId, useRef, useState } from 'react'
 import { RxChevronDown } from 'react-icons/rx'
 
 import { GlassWrapper } from '@/components/CardItem/GlassWrapper'
@@ -11,22 +11,64 @@ interface MobileSectionPickerProps {
   currentSectionId: string
   currentSectionTitle: string
   isPinned: boolean
+  onOpenChange: (isOpen: boolean) => void
 }
+
+const EXIT_TRANSITION_MS = 280
 
 export function MobileSectionPicker({
   currentSectionId,
   currentSectionTitle,
   isPinned,
+  onOpenChange,
 }: MobileSectionPickerProps) {
   const [isOpen, setIsOpen] = useState(false)
+  const [isClosing, setIsClosing] = useState(false)
+  const [mounted, setMounted] = useState(false)
   const pickerRef = useRef<HTMLDivElement>(null)
+  const closeTimerRef = useRef<ReturnType<typeof setTimeout>>(undefined)
   const menuId = useId()
+
+  const closeMenu = useCallback(() => {
+    clearTimeout(closeTimerRef.current)
+    setIsClosing(true)
+    setIsOpen(false)
+
+    const prefersReducedMotion = window.matchMedia(
+      '(prefers-reduced-motion: reduce)',
+    ).matches
+
+    closeTimerRef.current = setTimeout(() => {
+      setMounted(false)
+      setIsClosing(false)
+      onOpenChange(false)
+    }, prefersReducedMotion ? 0 : EXIT_TRANSITION_MS)
+  }, [onOpenChange])
+
+  const openMenu = useCallback(() => {
+    clearTimeout(closeTimerRef.current)
+    setIsClosing(false)
+    onOpenChange(true)
+
+    if (!mounted) {
+      setMounted(true)
+      requestAnimationFrame(() => {
+        setIsOpen(true)
+      })
+    } else {
+      requestAnimationFrame(() => setIsOpen(true))
+    }
+  }, [mounted, onOpenChange])
+
+  useEffect(() => {
+    return () => clearTimeout(closeTimerRef.current)
+  }, [])
 
   useEffect(() => {
     if (!isOpen) return
 
     function handleScroll() {
-      setIsOpen(false)
+      closeMenu()
     }
 
     function handlePointerDown(event: PointerEvent) {
@@ -34,13 +76,13 @@ export function MobileSectionPicker({
 
       if (!picker || !(event.target instanceof Node)) return
       if (!picker.contains(event.target)) {
-        setIsOpen(false)
+        closeMenu()
       }
     }
 
     function handleKeyDown(event: KeyboardEvent) {
       if (event.key === 'Escape') {
-        setIsOpen(false)
+        closeMenu()
       }
     }
 
@@ -53,10 +95,10 @@ export function MobileSectionPicker({
       document.removeEventListener('pointerdown', handlePointerDown)
       document.removeEventListener('keydown', handleKeyDown)
     }
-  }, [isOpen])
+  }, [isOpen, closeMenu])
 
   function handleSectionClick(event: MouseEvent<HTMLAnchorElement>, id: string) {
-    setIsOpen(false)
+    closeMenu()
 
     if (event.altKey || event.ctrlKey || event.metaKey || event.shiftKey) return
     if (event.button !== 0) return
@@ -97,7 +139,7 @@ export function MobileSectionPicker({
       ref={pickerRef}
       className={`mobile-section-picker${isOpen ? ' is-open' : ''}${
         isPinned ? ' is-pinned' : ''
-      }`}
+      }${isClosing ? ' is-closing' : ''}`}
     >
       <h2>
         <button
@@ -112,7 +154,11 @@ export function MobileSectionPicker({
               return
             }
 
-            setIsOpen((current) => !current)
+            if (isOpen) {
+              closeMenu()
+            } else {
+              openMenu()
+            }
           }}
         >
           <span className="mobile-section-picker-title">
@@ -124,18 +170,21 @@ export function MobileSectionPicker({
         </button>
       </h2>
 
-      {isOpen && (
+      {mounted && (
         <div className="mobile-section-picker-menu-shell">
           <GlassWrapper
             distortion={8}
-            blur={8}
-            backgroundOpacity={0.9}
-            backgroundColor="var(--colors-section-title-background)"
+            blur={22}
+            backgroundOpacity={0.72}
+            backgroundColor="var(--colors-background)"
             borderSize={1}
+            borderColor="rgba(226, 232, 240, 0.14)"
             borderRadius={16}
             padding="0"
             className="mobile-section-picker-menu"
             enableWebGLEnhancement={false}
+            forceActive={mounted}
+            preserveCoarseMaterial
             variant="compact"
           >
             <div id={menuId} className="mobile-section-picker-options">
@@ -150,6 +199,7 @@ export function MobileSectionPicker({
                       isCurrent ? ' is-active' : ''
                     }`}
                     aria-current={isCurrent ? 'location' : undefined}
+                    tabIndex={isOpen ? undefined : -1}
                     onClick={(event) => handleSectionClick(event, id)}
                   >
                     <span className="mobile-section-picker-option-line" />
