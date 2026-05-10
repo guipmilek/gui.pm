@@ -254,6 +254,32 @@ export const LogoWrapper = styled('button', {
       },
     },
 
+    '&.is-ignite-settling': {
+      '& .logo-field': {
+        opacity: 1,
+        transform: 'scale(1)',
+      },
+
+      '& .logo-helmet-glow': {
+        opacity: 0.58,
+        transform: 'scale(1.1)',
+      },
+
+      '& .logo-spark-glow': {
+        opacity: 0.9,
+        transform: 'scale(1.18)',
+      },
+
+      '& .logo-helmet-orbit': {
+        opacity: 0.72,
+        stroke: 'rgba(240, 249, 255, 0.88)',
+      },
+
+      '& .logo-rim': {
+        opacity: 0.2,
+      },
+    },
+
     '@media (prefers-reduced-motion: reduce)': {
       transform: 'none !important',
       transition: 'none !important',

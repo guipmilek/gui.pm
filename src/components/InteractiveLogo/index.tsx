@@ -33,7 +33,9 @@ export function InteractiveLogo({
   const wrapperRef = useRef<HTMLButtonElement>(null)
   const entranceTimeoutRef = useRef<ReturnType<typeof setTimeout>>(undefined)
   const igniteTimeoutRef = useRef<ReturnType<typeof setTimeout>>(undefined)
+  const settleFrameRef = useRef<number | null>(null)
   const isIgnitingRef = useRef(false)
+  const isPointerInsideRef = useRef(false)
   const [isEntering, setIsEntering] = useState(true)
   const uniqueId = useId().replace(/:/g, '')
 
@@ -48,8 +50,32 @@ export function InteractiveLogo({
     return () => {
       clearTimeout(entranceTimeoutRef.current)
       clearTimeout(igniteTimeoutRef.current)
+      if (settleFrameRef.current !== null) {
+        cancelAnimationFrame(settleFrameRef.current)
+      }
     }
   }, [])
+
+  function cancelIgniteSettling(element = wrapperRef.current) {
+    if (settleFrameRef.current !== null) {
+      cancelAnimationFrame(settleFrameRef.current)
+      settleFrameRef.current = null
+    }
+
+    element?.classList.remove('is-ignite-settling')
+  }
+
+  function settleIgniteIfPointerLeft(element: HTMLButtonElement) {
+    if (isPointerInsideRef.current) return
+
+    element.classList.add('is-ignite-settling')
+    settleFrameRef.current = requestAnimationFrame(() => {
+      settleFrameRef.current = requestAnimationFrame(() => {
+        settleFrameRef.current = null
+        element.classList.remove('is-ignite-settling')
+      })
+    })
+  }
 
   function setPointerVars(clientX: number, clientY: number) {
     const element = wrapperRef.current
@@ -96,6 +122,7 @@ export function InteractiveLogo({
 
     clearTimeout(igniteTimeoutRef.current)
     clearTimeout(entranceTimeoutRef.current)
+    cancelIgniteSettling(element)
     setIsEntering(false)
     element.classList.remove('is-entering')
     element.classList.add('is-igniting')
@@ -103,16 +130,20 @@ export function InteractiveLogo({
     igniteTimeoutRef.current = setTimeout(() => {
       isIgnitingRef.current = false
       element.classList.remove('is-igniting')
+      settleIgniteIfPointerLeft(element)
     }, 900)
   }
 
   function handlePointerMove(event: PointerEvent<HTMLButtonElement>) {
     if (event.pointerType !== 'mouse' && event.pointerType !== 'pen') return
 
+    isPointerInsideRef.current = true
+    cancelIgniteSettling()
     setPointerVars(event.clientX, event.clientY)
   }
 
   function handlePointerLeave() {
+    isPointerInsideRef.current = false
     resetPointerVars()
   }
 
