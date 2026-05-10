@@ -46,7 +46,9 @@ interface BurstTurn {
 const BIG_SIZE = 80
 const SMALL_SIZE = 20
 const TRAIL_LENGTH = 160
-const MAX_STARS = 20
+const DESKTOP_MIN_WIDTH = 1024
+const DESKTOP_MAX_STARS = 20
+const MOBILE_TABLET_MAX_STARS = DESKTOP_MAX_STARS / 2
 const STAR_THICKNESS = 1.2
 const STAR_HEAD_SIZE = 1.2
 
@@ -215,6 +217,12 @@ function randomGridLine(scroll: number, viewportSize: number) {
   return firstLine + ((Math.random() * lineCount) | 0) * BIG_SIZE
 }
 
+function getMaxStars(viewportWidth: number) {
+  return viewportWidth >= DESKTOP_MIN_WIDTH
+    ? DESKTOP_MAX_STARS
+    : MOBILE_TABLET_MAX_STARS
+}
+
 export function InteractiveGrid() {
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const starsRef = useRef<ShootingStar[]>([])
@@ -275,8 +283,6 @@ export function InteractiveGrid() {
     prefersReducedMotionRef.current = window.matchMedia(
       '(prefers-reduced-motion: reduce)',
     ).matches
-
-    const maxStars = window.innerWidth >= 1024 ? MAX_STARS : 3
 
     let running = true
     let isMouseInside = true
@@ -393,7 +399,7 @@ export function InteractiveGrid() {
       if (prefersReducedMotionRef.current) return
       const { w, h } = sizeRef.current
       if (w === 0 || h === 0) return
-      if (starsRef.current.length >= maxStars) return
+      if (starsRef.current.length >= getMaxStars(w)) return
 
       const scrollX = window.scrollX
       const scrollY = window.scrollY
@@ -529,7 +535,8 @@ export function InteractiveGrid() {
       const scrollY = window.scrollY
       const originX = Math.round((clientX + scrollX) / SMALL_SIZE) * SMALL_SIZE
       const originY = Math.round((clientY + scrollY) / SMALL_SIZE) * SMALL_SIZE
-      const burstCount = w >= 1024 ? 8 : 4
+      const maxStars = getMaxStars(w)
+      const burstCount = w >= DESKTOP_MIN_WIDTH ? 8 : 4
       const available = Math.max(
         0,
         maxStars + burstCount - starsRef.current.length,
