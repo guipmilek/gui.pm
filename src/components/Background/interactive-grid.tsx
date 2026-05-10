@@ -55,6 +55,9 @@ const STAR_HEAD_SIZE = 1.2
 const STAR_SPAWN_MIN = 350
 const STAR_SPAWN_MAX = 800
 const STAR_SPEED = 0.28 // px/ms
+const STAR_HOLD_SPEED_MULTIPLIER = 1.75
+const STAR_HOLD_BRIGHTNESS_MULTIPLIER = 1.25
+const STAR_HOLD_SPAWN_MULTIPLIER = 0.45
 const STAR_LIFETIME = 8000 // ms
 const ABSORB_DIST = 62
 const ABSORB_FADE = 300 // ms
@@ -101,12 +104,16 @@ function drawStars(
   stars: ShootingStar[],
   scrollX: number,
   scrollY: number,
+  isPointerDown: boolean,
 ) {
   for (let i = stars.length - 1; i >= 0; i--) {
     const star = stars[i]
     const elapsed = now - star.startTime
     const lifetime = star.lifetime ?? STAR_LIFETIME
     let alpha = 1 - Math.pow(elapsed / lifetime, star.burst ? 1.35 : 2)
+    const brightnessMultiplier = isPointerDown && star.guided && !star.burst
+      ? STAR_HOLD_BRIGHTNESS_MULTIPLIER
+      : 1
 
     if (star.absorbTime) {
       const absorbElapsed = now - star.absorbTime
@@ -118,10 +125,10 @@ function drawStars(
 
     ctx.globalAlpha = alpha
 
-    // Draw the "Spark" head - brighter only for logo-triggered bursts.
+    // Draw the spark head; held-click guidance gives regular stars a small lift.
     ctx.fillStyle = star.burst
       ? 'rgba(255, 255, 255, 0.78)'
-      : 'rgba(255, 255, 255, 0.4)'
+      : `rgba(255, 255, 255, ${0.4 * brightnessMultiplier})`
     ctx.beginPath()
     ctx.arc(
       star.headX - scrollX,
@@ -180,8 +187,8 @@ function drawStars(
           return 'transparent'
         }
 
-        if (p > 0.8) return `rgba(226, 232, 240, ${p * 0.4})`
-        if (p > 0) return `rgba(148, 163, 184, ${p * 0.2})`
+        if (p > 0.8) return `rgba(226, 232, 240, ${p * 0.4 * brightnessMultiplier})`
+        if (p > 0) return `rgba(148, 163, 184, ${p * 0.2 * brightnessMultiplier})`
         return 'transparent'
       }
 
@@ -232,6 +239,7 @@ export function InteractiveGrid() {
   const spawnIdRef = useRef<ReturnType<typeof setTimeout>>(undefined)
   const smoothRef = useRef({ x: -100, y: -100 })
   const isTouchRef = useRef(true)
+  const isPointerDownRef = useRef(false)
   const prefersReducedMotionRef = useRef(false)
 
   const { positionRef, isHoveringRef } = useMouseContext()
@@ -296,7 +304,22 @@ export function InteractiveGrid() {
     let lastScrollY = Number.NaN
 
     const onMouseEnter = () => { isMouseInside = true }
-    const onMouseLeave = () => { isMouseInside = false }
+    const onMouseLeave = () => {
+      isMouseInside = false
+      isPointerDownRef.current = false
+    }
+    const onPointerDown = (event: PointerEvent) => {
+      if (event.pointerType !== 'mouse' && event.pointerType !== 'pen') return
+      if (event.button !== 0) return
+
+      if (isPointerDownRef.current) return
+      isPointerDownRef.current = true
+      clearTimeout(spawnIdRef.current)
+      scheduleNext()
+    }
+    const stopPointerHold = () => {
+      isPointerDownRef.current = false
+    }
     document.documentElement.addEventListener('mouseenter', onMouseEnter)
     document.documentElement.addEventListener('mouseleave', onMouseLeave)
 
@@ -654,10 +677,13 @@ export function InteractiveGrid() {
       }
     }
 
-    const scheduleNext = () => {
+    function scheduleNext() {
       if (!running) return
-      const delay =
+      const delayBase =
         STAR_SPAWN_MIN + Math.random() * (STAR_SPAWN_MAX - STAR_SPAWN_MIN)
+      const delay = delayBase * (isPointerDownRef.current
+        ? STAR_HOLD_SPAWN_MULTIPLIER
+        : 1)
 
       doSpawn()
       spawnIdRef.current = setTimeout(scheduleNext, delay)
@@ -796,10 +822,11 @@ export function InteractiveGrid() {
           continue
         }
 
-        const step = star.speed * dt
-        star.totalDist += step
+        let step = star.speed * dt
 
         if (star.burst) {
+          star.totalDist += step
+
           if (star.dir === 'h') {
             star.headX += star.moveSignX * step
           } else {
@@ -839,6 +866,10 @@ export function InteractiveGrid() {
 
         // B2: Stars always seek the cursor if they are guided, ensuring they stay on path.
         const isActivelyGuided = star.guided && hasPointer && isMouseInside
+        if (isActivelyGuided && isPointerDownRef.current) {
+          step *= STAR_HOLD_SPEED_MULTIPLIER
+        }
+        star.totalDist += step
 
         // Update dynamic size: match small grid (1.0) only when guided and on small grid,
         // otherwise revert to original STAR_THICKNESS (1.2).
@@ -990,6 +1021,7 @@ export function InteractiveGrid() {
         starsRef.current,
         scrollX,
         scrollY,
+        isPointerDownRef.current,
       )
 
       animRef.current = requestAnimationFrame(frame)
@@ -1041,6 +1073,11 @@ export function InteractiveGrid() {
     document.addEventListener('visibilitychange', onVisibility)
     window.addEventListener('resize', scheduleResize)
     window.addEventListener('pageshow', onPageShow)
+    window.addEventListener('pointerdown', onPointerDown, { passive: true })
+    window.addEventListener('pointerup', stopPointerHold, { passive: true })
+    window.addEventListener('pointercancel', stopPointerHold, { passive: true })
+    window.addEventListener('blur', stopPointerHold)
+    window.addEventListener('contextmenu', stopPointerHold)
     window.addEventListener(LOGO_IGNITE_EVENT, onLogoIgnite)
 
     animRef.current = requestAnimationFrame(frame)
@@ -1055,6 +1092,11 @@ export function InteractiveGrid() {
       document.removeEventListener('visibilitychange', onVisibility)
       window.removeEventListener('resize', scheduleResize)
       window.removeEventListener('pageshow', onPageShow)
+      window.removeEventListener('pointerdown', onPointerDown)
+      window.removeEventListener('pointerup', stopPointerHold)
+      window.removeEventListener('pointercancel', stopPointerHold)
+      window.removeEventListener('blur', stopPointerHold)
+      window.removeEventListener('contextmenu', stopPointerHold)
       window.removeEventListener(LOGO_IGNITE_EVENT, onLogoIgnite)
       document.documentElement.removeEventListener('mouseenter', onMouseEnter)
       document.documentElement.removeEventListener('mouseleave', onMouseLeave)
