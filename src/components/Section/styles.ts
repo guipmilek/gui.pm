@@ -32,7 +32,34 @@ export const customLinkStyles = cva({
 
     transform: 'translate3d(0, 0, 0)',
     transition:
-      'color 0.2s ease-out, transform 0.34s cubic-bezier(0.16, 1, 0.3, 1)',
+      'color 0.2s ease-out, transform 0.34s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.9s cubic-bezier(0.16, 1, 0.3, 1), filter 0.9s cubic-bezier(0.16, 1, 0.3, 1)',
+
+    '&:where(.reveal-pending)': {
+      opacity: 0,
+      transform: 'translate3d(0, 1.125rem, 0) scale(0.985)',
+      filter: 'blur(8px)',
+      transitionDelay: 'var(--reveal-delay, 0ms)',
+      willChange: 'opacity, transform, filter',
+
+      lg: {
+        transform: 'translate3d(1.25rem, 0, 0) scale(0.985)',
+      },
+
+      '@media (prefers-reduced-motion: reduce)': {
+        opacity: '1 !important',
+        transform: 'none !important',
+        filter: 'none !important',
+        transition: 'none !important',
+        willChange: 'auto',
+      },
+    },
+
+    '&:where(.reveal-pending.is-revealed)': {
+      opacity: 1,
+      transform: 'translate3d(0, 0, 0)',
+      filter: 'none',
+      willChange: 'auto',
+    },
 
     '& span': {
       position: 'relative',

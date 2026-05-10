@@ -86,6 +86,7 @@ export function DescriptionCardItem({ description }: DescriptionCardItemProps) {
         <Button
           onClick={toggleDescription}
           rotateIcon={isDescriptionExpanded}
+          data-appear="true"
           style={{
             marginTop: isDescriptionExpanded ? '0' : DEFAULT_BUTTON_MARGIN_TOP,
           }}

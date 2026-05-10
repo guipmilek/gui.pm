@@ -3,6 +3,7 @@
 import { useEffect } from 'react'
 
 const REVEAL_SELECTOR = '[data-reveal]'
+const REVEAL_END_SELECTOR = '[data-reveal-end]'
 const REVEAL_PRELOAD_CLASS = 'reveal-preload'
 const REVEAL_PENDING_CLASS = 'reveal-pending'
 const REVEALED_CLASS = 'is-revealed'
@@ -49,17 +50,34 @@ export function ScrollReveal() {
 
     const initiallyVisibleElements: HTMLElement[] = []
 
+    const handleIntersectingEntries = (
+      entries: IntersectionObserverEntry[],
+      activeObserver: IntersectionObserver,
+    ) => {
+      entries.forEach((entry) => {
+        if (!entry.isIntersecting) return
+
+        entry.target.classList.add(REVEALED_CLASS)
+        activeObserver.unobserve(entry.target)
+      })
+    }
+
     const observer = new IntersectionObserver(
       (entries) => {
-        entries.forEach((entry) => {
-          if (!entry.isIntersecting) return
-
-          entry.target.classList.add(REVEALED_CLASS)
-          observer.unobserve(entry.target)
-        })
+        handleIntersectingEntries(entries, observer)
       },
       {
         rootMargin: '0px 0px -12% 0px',
+        threshold: 0.1,
+      },
+    )
+
+    const endObserver = new IntersectionObserver(
+      (entries) => {
+        handleIntersectingEntries(entries, endObserver)
+      },
+      {
+        rootMargin: '0px',
         threshold: 0.1,
       },
     )
@@ -72,7 +90,11 @@ export function ScrollReveal() {
         return
       }
 
-      observer.observe(element)
+      if (element.matches(REVEAL_END_SELECTOR)) {
+        endObserver.observe(element)
+      } else {
+        observer.observe(element)
+      }
     })
 
     root.classList.remove(REVEAL_PRELOAD_CLASS)
@@ -98,6 +120,7 @@ export function ScrollReveal() {
       cancelAnimationFrame(revealFrame)
       revealTimeouts.forEach(clearTimeout)
       observer.disconnect()
+      endObserver.disconnect()
     }
   }, [])
 

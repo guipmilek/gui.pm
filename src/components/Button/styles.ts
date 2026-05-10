@@ -24,6 +24,10 @@ export const ButtonContainer = styled('button', {
 
     transition: 'color 0.2s, background-color 0.2s, margin 0.5s',
 
+    '&[data-appear="true"]': {
+      animation: 'fadeSlideUp 0.52s cubic-bezier(0.22, 1, 0.36, 1) both',
+    },
+
     '@media (hover: hover) and (pointer: fine)': {
       '&:hover:not(:where(.hover-stale *)), &.scroll-hover': {
         backgroundColor: 'title',
@@ -40,6 +44,10 @@ export const ButtonContainer = styled('button', {
 
     '@media (prefers-reduced-motion: reduce)': {
       transition: 'none',
+
+      '&[data-appear="true"]': {
+        animation: 'none',
+      },
 
       '& svg': {
         transition: 'none',
