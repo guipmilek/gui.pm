@@ -1,6 +1,6 @@
 'use client'
 
-import { KeyboardEvent, PointerEvent, useId, useRef } from 'react'
+import { MouseEvent, PointerEvent, useEffect, useId, useRef } from 'react'
 
 import { LogoWrapper } from './styles'
 
@@ -31,11 +31,28 @@ export function InteractiveLogo({
   variant = 'default',
 }: InteractiveLogoProps) {
   const wrapperRef = useRef<HTMLButtonElement>(null)
+  const entranceTimeoutRef = useRef<ReturnType<typeof setTimeout>>(undefined)
   const igniteTimeoutRef = useRef<ReturnType<typeof setTimeout>>(undefined)
+  const isIgnitingRef = useRef(false)
   const uniqueId = useId().replace(/:/g, '')
 
   const helmetGlowId = `logo-helmet-glow-${uniqueId}`
   const sparkGlowId = `logo-spark-glow-${uniqueId}`
+
+  useEffect(() => {
+    const element = wrapperRef.current
+    if (!element) return
+
+    element.classList.add('is-entering')
+    entranceTimeoutRef.current = setTimeout(() => {
+      element.classList.remove('is-entering')
+    }, 1600)
+
+    return () => {
+      clearTimeout(entranceTimeoutRef.current)
+      clearTimeout(igniteTimeoutRef.current)
+    }
+  }, [])
 
   function setPointerVars(clientX: number, clientY: number) {
     const element = wrapperRef.current
@@ -66,6 +83,9 @@ export function InteractiveLogo({
   function ignite() {
     const element = wrapperRef.current
     if (!element) return
+    if (isIgnitingRef.current) return
+
+    isIgnitingRef.current = true
 
     const rect = element.getBoundingClientRect()
     const x = rect.left + rect.width / 2
@@ -78,11 +98,12 @@ export function InteractiveLogo({
     )
 
     clearTimeout(igniteTimeoutRef.current)
-    element.classList.remove('is-igniting')
-    void element.offsetWidth
+    clearTimeout(entranceTimeoutRef.current)
+    element.classList.remove('is-entering')
     element.classList.add('is-igniting')
 
     igniteTimeoutRef.current = setTimeout(() => {
+      isIgnitingRef.current = false
       element.classList.remove('is-igniting')
     }, 900)
   }
@@ -105,14 +126,15 @@ export function InteractiveLogo({
     } else {
       resetPointerVars()
     }
-
-    ignite()
   }
 
-  function handleKeyDown(event: KeyboardEvent<HTMLButtonElement>) {
-    if (event.key !== 'Enter' && event.key !== ' ') return
+  function handleClick(event: MouseEvent<HTMLButtonElement>) {
+    if (event.detail > 0) {
+      setPointerVars(event.clientX, event.clientY)
+    } else {
+      resetPointerVars()
+    }
 
-    event.preventDefault()
     ignite()
   }
 
@@ -130,7 +152,7 @@ export function InteractiveLogo({
       onPointerLeave={handlePointerLeave}
       onPointerCancel={handlePointerLeave}
       onPointerDown={handlePointerDown}
-      onKeyDown={handleKeyDown}
+      onClick={handleClick}
     >
       <span className="logo-field" aria-hidden="true" />
 
