@@ -1,6 +1,6 @@
 'use client'
 
-import { MouseEvent, PointerEvent, useEffect, useId, useRef } from 'react'
+import { MouseEvent, PointerEvent, useEffect, useId, useRef, useState } from 'react'
 
 import { LogoWrapper } from './styles'
 
@@ -34,18 +34,15 @@ export function InteractiveLogo({
   const entranceTimeoutRef = useRef<ReturnType<typeof setTimeout>>(undefined)
   const igniteTimeoutRef = useRef<ReturnType<typeof setTimeout>>(undefined)
   const isIgnitingRef = useRef(false)
+  const [isEntering, setIsEntering] = useState(true)
   const uniqueId = useId().replace(/:/g, '')
 
   const helmetGlowId = `logo-helmet-glow-${uniqueId}`
   const sparkGlowId = `logo-spark-glow-${uniqueId}`
 
   useEffect(() => {
-    const element = wrapperRef.current
-    if (!element) return
-
-    element.classList.add('is-entering')
     entranceTimeoutRef.current = setTimeout(() => {
-      element.classList.remove('is-entering')
+      setIsEntering(false)
     }, 1600)
 
     return () => {
@@ -99,6 +96,7 @@ export function InteractiveLogo({
 
     clearTimeout(igniteTimeoutRef.current)
     clearTimeout(entranceTimeoutRef.current)
+    setIsEntering(false)
     element.classList.remove('is-entering')
     element.classList.add('is-igniting')
 
@@ -142,7 +140,9 @@ export function InteractiveLogo({
     <LogoWrapper
       ref={wrapperRef}
       type="button"
-      className={['hoverable', className].filter(Boolean).join(' ')}
+      className={['hoverable', isEntering && 'is-entering', className]
+        .filter(Boolean)
+        .join(' ')}
       tabIndex={tabIndex}
       data-variant={variant === 'compact' ? 'compact' : undefined}
       aria-label="Acionar animação do logotipo"
