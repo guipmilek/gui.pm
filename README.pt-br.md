@@ -336,25 +336,19 @@ npm run dev
 cd ../guipm-dev
 ```
 
-4. Renomeie o arquivo `.env.local.example` para `.env.local` e insira as informações necessárias:
-
-```sh
-mv .env.local.example .env.local
-```
-
-1. Execute o script de codegen do Panda:
+4. Execute o script de codegen do Panda:
 
 ```sh
 npm run prepare
 ```
 
-6. Inicie a aplicação web:
+5. Inicie a aplicação web:
 
 ```sh
 npm run dev
 ```
 
-7. Acesse http://localhost:3000/ para visualizar a aplicação
+6. Acesse http://localhost:3000/ para visualizar a aplicação
 
 ## 📄 Licença
 

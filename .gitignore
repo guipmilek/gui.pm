@@ -25,7 +25,8 @@ yarn-debug.log*
 yarn-error.log*
 
 # local env files
-.env*.local
+.env
+.env.*
 
 # vercel
 .vercel
@@ -37,3 +38,6 @@ next-env.d.ts
 ## Panda
 styled-system
 styled-system-static
+
+# local reference dumps
+refs
