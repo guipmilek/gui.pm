@@ -1,11 +1,11 @@
 {
-  "name": "guipm-dev",
-  "description": "Interactive personal portfolio site with custom cursor and focus on user experience",
+  "name": "gui-pm",
+  "description": "Digital resume website for gui.pm with custom interactions and accessibility-focused UX",
   "private": true,
   "scripts": {
     "prepare": "panda codegen",
     "dev": "next dev -p 3000 -H 0.0.0.0",
-    "build": "next build",
+    "build": "panda codegen && next build",
     "start": "next start",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix"
@@ -47,16 +47,16 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/guipmdev/guipm-dev.git"
+    "url": "git+https://github.com/guipmilek/gui.pm.git"
   },
   "bugs": {
-    "url": "https://github.com/guipmdev/guipm-dev/issues"
+    "url": "https://github.com/guipmilek/gui.pm/issues"
   },
   "author": {
     "name": "Guilherme Preveda Milék",
     "email": "guipmdev@gmail.com",
-    "url": "https://guipm.dev/"
+    "url": "https://gui.pm/"
   },
   "license": "MIT",
-  "homepage": "https://guipmdev-guipm-dev.vercel.app/"
+  "homepage": "https://gui.pm/"
 }

@@ -62,12 +62,12 @@ export default function Home() {
           Design e desenvolvimento feito com{' '}
           <SafeFluentEmoji emoji="💙" type="anim" size={16} /> por{' '}
           <Link
-            href="https://guipm.dev"
+            href="https://gui.pm"
             className="footer-link"
             target="_blank"
             rel="noopener noreferrer"
           >
-            <strong>guipm.dev</strong>
+            <strong>gui.pm</strong>
           </Link>.
         </div>
 
